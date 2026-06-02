@@ -8,6 +8,16 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function home()
+    {
+        $categories = Category::where('status', true)->limit(6)->get();
+        $products = Product::with(['category', 'primaryImage'])
+            ->where('status', true)
+            ->limit(3)
+            ->get();
+        return view('landing', compact('categories', 'products'));
+    }
+
     public function index(Request $request)
     {
         $query = Product::with(['category', 'primaryImage'])->where('status', true);

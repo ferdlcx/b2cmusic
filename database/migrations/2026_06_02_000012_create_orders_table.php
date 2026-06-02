@@ -17,7 +17,7 @@ return new class extends Migration
             $table->decimal('shipping_cost', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('total', 15, 2);
-            $table->enum('status', ['pending', 'paid', 'shipped', 'completed', 'canceled'])->default('pending');
+            $table->enum('status', ['pending', 'paid', 'processing', 'shipped', 'completed', 'canceled'])->default('pending');
             $table->timestamps();
         });
     }

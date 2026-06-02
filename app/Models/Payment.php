@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['order_id', 'payment_method', 'transaction_id', 'payment_gateway', 'amount', 'status', 'paid_at'])]
+#[Fillable(['order_id', 'payment_method', 'transaction_id', 'payment_gateway', 'snap_token', 'amount', 'status', 'paid_at'])]
 class Payment extends Model
 {
     protected $casts = [

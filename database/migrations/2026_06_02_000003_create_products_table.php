@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('short_description')->nullable();
             $table->text('description')->nullable();
             $table->decimal('price', 15, 2);
+            $table->decimal('discount_price', 15, 2)->nullable();
+            $table->timestamp('discount_start')->nullable();
+            $table->timestamp('discount_end')->nullable();
+            $table->integer('weight')->default(1000); // weight in grams
             $table->integer('stock')->default(0);
             $table->string('sku')->unique();
             $table->boolean('status')->default(true);

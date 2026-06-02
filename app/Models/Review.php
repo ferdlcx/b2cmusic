@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['product_id', 'user_id', 'rating', 'comment'])]
+#[Fillable(['product_id', 'user_id', 'order_id', 'title', 'rating', 'comment', 'status'])]
 class Review extends Model
 {
     protected $casts = [
@@ -20,5 +20,10 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

@@ -12,8 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('order_id')->nullable()->constrained('orders')->onDelete('set null');
+            $table->string('title', 100)->nullable();
             $table->tinyInteger('rating'); // e.g. 1 to 5
             $table->text('comment')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

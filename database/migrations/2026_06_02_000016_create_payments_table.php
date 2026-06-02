@@ -14,6 +14,7 @@ return new class extends Migration
             $table->enum('payment_method', ['va', 'ewallet', 'credit_card', 'qris']);
             $table->string('transaction_id')->nullable();
             $table->string('payment_gateway')->nullable();
+            $table->string('snap_token')->nullable();
             $table->decimal('amount', 15, 2);
             $table->enum('status', ['pending', 'paid', 'failed', 'expired'])->default('pending');
             $table->timestamp('paid_at')->nullable();

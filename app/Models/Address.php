@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['user_id', 'label', 'name', 'phone', 'address', 'city', 'province', 'postal_code', 'is_default'])]
+#[Fillable(['user_id', 'label', 'name', 'phone', 'address', 'city', 'city_id', 'province', 'province_id', 'postal_code', 'is_default'])]
 class Address extends Model
 {
     protected $casts = [

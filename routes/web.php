@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'home'])->name('home');
 Route::get('/shop', [ProductController::class, 'index'])->name('catalog');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::post('/midtrans/webhook', [OrderController::class, 'handleWebhook'])->name('midtrans.webhook');
 
 // Auth Routes
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class CheckoutController extends Controller
 {
@@ -39,8 +40,47 @@ class CheckoutController extends Controller
             return $item->price * $item->quantity;
         });
 
-        // Simple shipping calculation simulation (e.g. flat rate or based on city)
-        $shippingCost = 25000; // Flat Rp 25.000 for standard shipping
+        // Calculate shipping cost using RajaOngkir cost API if key is set
+        $shippingCost = 25000; // default flat rate
+        $apiKey = config('services.rajaongkir.api_key');
+        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
+        
+        if ($apiKey && $defaultAddress && $defaultAddress->city_id) {
+            try {
+                // Calculate total weight of cart
+                $totalWeight = $cartItems->sum(function($item) {
+                    return ($item->product->weight ?: 1000) * $item->quantity;
+                });
+                
+                $response = Http::withHeaders([
+                    'key' => $apiKey
+                ])->post('https://api.rajaongkir.com/starter/cost', [
+                    'origin' => (int) $originCity,
+                    'destination' => (int) $defaultAddress->city_id,
+                    'weight' => (int) $totalWeight,
+                    'courier' => 'jne' // default courier for estimation
+                ]);
+                
+                if ($response->successful()) {
+                    $results = $response->json('rajaongkir.results.0.costs');
+                    if ($results && count($results) > 0) {
+                        $costVal = null;
+                        foreach ($results as $c) {
+                            if (str_contains(strtoupper($c['service']), 'REG')) {
+                                $costVal = $c['cost'][0]['value'];
+                                break;
+                            }
+                        }
+                        if (is_null($costVal)) {
+                            $costVal = $results[0]['cost'][0]['value'];
+                        }
+                        $shippingCost = $costVal;
+                    }
+                }
+            } catch (\Exception $e) {
+                logger()->error('RajaOngkir Cost API failed in index: ' . $e->getMessage());
+            }
+        }
 
         return view('cart.checkout', compact('cartItems', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost'));
     }
@@ -77,7 +117,57 @@ class CheckoutController extends Controller
             return $item->price * $item->quantity;
         });
 
-        $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000;
+        // Calculate shipping cost using RajaOngkir cost API if key is set
+        $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default flat rate
+        $apiKey = config('services.rajaongkir.api_key');
+        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
+        
+        // Calculate total weight of cart
+        $totalWeight = $cartItems->sum(function($item) {
+            return ($item->product->weight ?: 1000) * $item->quantity;
+        });
+
+        $selectedCourier = 'jne';
+        if (str_contains(strtolower($request->courier), 'pos')) {
+            $selectedCourier = 'pos';
+        }
+
+        if ($apiKey && $address->city_id) {
+            try {
+                $response = Http::withHeaders([
+                    'key' => $apiKey
+                ])->post('https://api.rajaongkir.com/starter/cost', [
+                    'origin' => (int) $originCity,
+                    'destination' => (int) $address->city_id,
+                    'weight' => (int) $totalWeight,
+                    'courier' => $selectedCourier
+                ]);
+                
+                if ($response->successful()) {
+                    $results = $response->json('rajaongkir.results.0.costs');
+                    if ($results && count($results) > 0) {
+                        $costVal = null;
+                        $isYes = str_contains(strtoupper($request->courier), 'YES');
+                        foreach ($results as $c) {
+                            if ($isYes && str_contains(strtoupper($c['service']), 'YES')) {
+                                $costVal = $c['cost'][0]['value'];
+                                break;
+                            } elseif (!$isYes && str_contains(strtoupper($c['service']), 'REG')) {
+                                $costVal = $c['cost'][0]['value'];
+                                break;
+                            }
+                        }
+                        if (is_null($costVal)) {
+                            $costVal = $results[0]['cost'][0]['value'];
+                        }
+                        $shippingCost = $costVal;
+                    }
+                }
+            } catch (\Exception $e) {
+                logger()->error('RajaOngkir cost calculation failed on process: ' . $e->getMessage());
+            }
+        }
+
         $discount = 0;
         $coupon = null;
 
@@ -155,18 +245,96 @@ class CheckoutController extends Controller
                 'delivered_at' => null,
             ]);
 
-            // 4. Create Payment
+            // 4. Request Midtrans Snap Token
+            $snapToken = null;
+            $midtransServerKey = config('services.midtrans.server_key');
+            
+            if ($midtransServerKey) {
+                try {
+                    $itemDetails = [];
+                    foreach ($cartItems as $item) {
+                        $itemDetails[] = [
+                            'id' => (string) $item->product_id,
+                            'price' => (int) $item->price,
+                            'quantity' => (int) $item->quantity,
+                            'name' => substr($item->product->name, 0, 50),
+                        ];
+                    }
+                    
+                    if ($shippingCost > 0) {
+                        $itemDetails[] = [
+                            'id' => 'SHIPPING',
+                            'price' => (int) $shippingCost,
+                            'quantity' => 1,
+                            'name' => 'Shipping Cost (' . $request->courier . ')',
+                        ];
+                    }
+                    
+                    if ($discount > 0) {
+                        $itemDetails[] = [
+                            'id' => 'DISCOUNT',
+                            'price' => -((int) $discount),
+                            'quantity' => 1,
+                            'name' => 'Coupon Discount',
+                        ];
+                    }
+                    
+                    $payload = [
+                        'transaction_details' => [
+                            'order_id' => $orderCode,
+                            'gross_amount' => (int) $total,
+                        ],
+                        'item_details' => $itemDetails,
+                        'customer_details' => [
+                            'first_name' => $user->name,
+                            'email' => $user->email,
+                            'phone' => $user->phone ?: '081234567890',
+                            'billing_address' => [
+                                'first_name' => $user->name,
+                                'phone' => $user->phone ?: '081234567890',
+                                'address' => $address->address,
+                                'city' => $address->city,
+                                'postal_code' => $address->postal_code,
+                            ],
+                            'shipping_address' => [
+                                'first_name' => $address->name,
+                                'phone' => $address->phone,
+                                'address' => $address->address,
+                                'city' => $address->city,
+                                'postal_code' => $address->postal_code,
+                            ],
+                        ],
+                    ];
+                    
+                    $response = Http::withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                    ])->withBasicAuth($midtransServerKey, '')
+                      ->post('https://app.sandbox.midtrans.com/snap/v1/transactions', $payload);
+                      
+                    if ($response->successful()) {
+                        $snapToken = $response->json('token');
+                    } else {
+                        logger()->error('Midtrans Snap error: ' . $response->body());
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('Midtrans API exception: ' . $e->getMessage());
+                }
+            }
+
+            // 5. Create Payment
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $request->payment_method,
                 'transaction_id' => 'TX-' . strtoupper(Str::random(10)),
-                'payment_gateway' => 'Internal Simulation',
+                'payment_gateway' => $midtransServerKey ? 'Midtrans' : 'Internal Simulation',
+                'snap_token' => $snapToken,
                 'amount' => $total,
                 'status' => 'pending',
                 'paid_at' => null,
             ]);
 
-            // 5. Save Order Coupon if applied
+            // 6. Save Order Coupon if applied
             if ($coupon) {
                 OrderCoupon::create([
                     'order_id' => $order->id,
@@ -175,7 +343,7 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // 6. Clear user cart
+            // 7. Clear user cart
             CartItem::where('cart_id', $cart->id)->delete();
 
             DB::commit();

@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('phone');
             $table->text('address');
             $table->string('city');
+            $table->integer('city_id')->nullable();
             $table->string('province');
+            $table->integer('province_id')->nullable();
             $table->string('postal_code');
             $table->boolean('is_default')->default(false);
             $table->timestamps();

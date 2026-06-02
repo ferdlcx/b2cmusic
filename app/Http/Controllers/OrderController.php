@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -54,5 +57,104 @@ class OrderController extends Controller
         ]);
 
         return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan Anda kini sedang diproses.');
+    }
+
+    public function handleWebhook(Request $request)
+    {
+        Log::info('Midtrans Webhook Received:', $request->all());
+
+        $serverKey = config('services.midtrans.server_key');
+        $orderId = $request->input('order_id');
+        $statusCode = $request->input('status_code');
+        $grossAmount = $request->input('gross_amount');
+        $signatureKey = $request->input('signature_key');
+
+        // Validate Signature
+        $computedSignature = hash("sha512", $orderId . $statusCode . $grossAmount . $serverKey);
+
+        if ($computedSignature !== $signatureKey) {
+            Log::warning('Midtrans Webhook Invalid Signature:', [
+                'received' => $signatureKey,
+                'computed' => $computedSignature
+            ]);
+            return response()->json(['message' => 'Invalid signature'], 400);
+        }
+
+        // Find Order
+        $order = Order::with(['payment', 'items'])->where('order_code', $orderId)->first();
+
+        if (!$order) {
+            Log::warning('Midtrans Webhook: Order not found: ' . $orderId);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Map Midtrans Status
+        $transactionStatus = $request->input('transaction_status');
+        $paymentType = $request->input('payment_type');
+        $fraudStatus = $request->input('fraud_status');
+        $transactionId = $request->input('transaction_id');
+
+        $orderStatus = 'pending';
+        $paymentStatus = 'pending';
+        $paidAt = null;
+
+        if ($transactionStatus == 'capture') {
+            if ($paymentType == 'credit_card') {
+                if ($fraudStatus == 'challenge') {
+                    $orderStatus = 'pending';
+                    $paymentStatus = 'pending';
+                } else {
+                    $orderStatus = 'paid';
+                    $paymentStatus = 'paid';
+                    $paidAt = now();
+                }
+            }
+        } elseif ($transactionStatus == 'settlement') {
+            $orderStatus = 'paid';
+            $paymentStatus = 'paid';
+            $paidAt = now();
+        } elseif ($transactionStatus == 'pending') {
+            $orderStatus = 'pending';
+            $paymentStatus = 'pending';
+        } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+            $orderStatus = 'canceled';
+            $paymentStatus = 'failed';
+        }
+
+        // Update Status in Database Transaction (with stock restoration)
+        DB::beginTransaction();
+        try {
+            // Restore stock if transitioning to canceled/failed from pending
+            if ($orderStatus === 'canceled' && $order->status === 'pending') {
+                Log::info("Restoring stock for order {$order->order_code} due to cancellation/expiration.");
+                foreach ($order->items as $item) {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
+                }
+            }
+
+            // Update Order
+            $order->update(['status' => $orderStatus]);
+
+            // Update Payment
+            if ($order->payment) {
+                $order->payment->update([
+                    'status' => $paymentStatus,
+                    'transaction_id' => $transactionId ?: $order->payment->transaction_id,
+                    'paid_at' => $paidAt ?: $order->payment->paid_at,
+                ]);
+            }
+
+            DB::commit();
+            Log::info("Order {$order->order_code} updated successfully via Webhook to: {$orderStatus}");
+            
+            return response()->json(['message' => 'Success'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error processing webhook transaction: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal server error'], 500);
+        }
     }
 }

@@ -40,8 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/order/{id}/pay', [OrderController::class, 'pay'])->name('orders.pay');
 });
 
-// Admin Routes (Protected by auth & admin role)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)
+$adminRoutes = function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
     // Products Management
@@ -56,4 +56,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
-});
+};
+
+// 1. Subdomain routing (admin.domain.com)
+$appHost = parse_url(config('app.url'), PHP_URL_HOST);
+if ($appHost && !app()->runningInConsole()) {
+    Route::domain('admin.' . $appHost)->middleware(['auth', 'admin'])->name('admin.')->group($adminRoutes);
+}
+
+// 2. Path prefix routing (domain.com/admin)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group($adminRoutes);

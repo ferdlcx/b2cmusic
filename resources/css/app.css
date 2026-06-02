@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+        --bg: #f8f8f8;
+        --surface: #ffffff;
+        --surface-strong: #111111;
+        --text: #111111;
+        --muted: #6f6f6f;
+        --border: rgba(17, 17, 17, 0.08);
+    }
+
+    html {
+        background: var(--bg);
+        min-height: 100%;
+    }
+
+    body {
+        min-height: 100vh;
+        color: var(--text);
+        font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        background: none;
+    }
+
+    .surface-panel {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid var(--border);
+        box-shadow: 0 24px 70px rgba(17, 17, 17, 0.08);
+    }
+
+    .image-panel {
+        background-size: cover;
+        background-position: center;
+    }
+
+    .text-display {
+        letter-spacing: -0.05em;
+    }
+
+    .text-muted {
+        color: var(--muted);
+    }
+
+    .subtle-grid {
+        background-image: linear-gradient(180deg, rgba(17, 17, 17, 0.02) 1px, transparent 1px);
+        background-size: 100% 72px;
+    }
+}

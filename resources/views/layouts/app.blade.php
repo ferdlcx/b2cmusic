@@ -119,6 +119,9 @@
                                         <i data-lucide="shield-check" class="w-4 h-4"></i> Panel Admin
                                     </a>
                                 @endif
+                                <a href="{{ route('profile.show') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
+                                </a>
                                 <a href="{{ route('orders.history') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
                                     <i data-lucide="package" class="w-4 h-4"></i> Pesanan Saya
                                 </a>

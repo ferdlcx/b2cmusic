@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -38,6 +39,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'history'])->name('orders.history');
     Route::get('/order/{order_code}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/order/{id}/pay', [OrderController::class, 'pay'])->name('orders.pay');
+
+    // Profile & Address Routes
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/address', [ProfileController::class, 'storeAddress'])->name('profile.address.store');
+    Route::put('/profile/address/{address}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
+    Route::delete('/profile/address/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
+    Route::post('/profile/address/{address}/default', [ProfileController::class, 'setDefaultAddress'])->name('profile.address.default');
+    Route::get('/api/provinces', [ProfileController::class, 'getProvinces'])->name('api.provinces');
+    Route::get('/api/cities', [ProfileController::class, 'getCities'])->name('api.cities');
 });
 
 // Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)

@@ -63,7 +63,7 @@ class AuthController extends Controller
             ]);
         } catch (\Exception $e) {}
 
-        return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di DjudasMS.');
+        return redirect()->route('customer.dashboard')->with('success', 'Registrasi berhasil! Silakan verifikasi email Anda.');
     }
 
     public function showLogin()

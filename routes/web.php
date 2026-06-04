@@ -59,8 +59,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/email/verification-notification', [AuthController::class, 'resendVerification'])->middleware('throttle:6,1')->name('verification.send');
 });
 
-// Customer Routes (Protected by auth)
-Route::middleware('auth')->group(function () {
+// Customer Routes (Protected by auth and email verification)
+Route::middleware(['auth', 'verified'])->group(function () {
     // Customer Dashboard
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('customer.dashboard');
 

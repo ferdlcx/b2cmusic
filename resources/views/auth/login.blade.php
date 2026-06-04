@@ -20,11 +20,11 @@
             <div class="space-y-1.5">
                 <label for="email" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email</label>
                 <div class="relative">
-                    <span class="absolute left-4 top-4.5 text-slate-400">
+                    <span class="absolute left-4 top-4 text-slate-400">
                         <i data-lucide="mail" class="w-4 h-4"></i>
                     </span>
                     <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus
-                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold @error('email') border-rose-500 @enderror" 
+                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-sm font-medium @error('email') border-rose-500 @enderror" 
                         placeholder="nama@email.com" />
                 </div>
                 @error('email')
@@ -38,11 +38,11 @@
                     <label for="password" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password</label>
                 </div>
                 <div class="relative">
-                    <span class="absolute left-4 top-4.5 text-slate-400">
+                    <span class="absolute left-4 top-4 text-slate-400">
                         <i data-lucide="lock" class="w-4 h-4"></i>
                     </span>
                     <input type="password" name="password" id="password" required
-                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold" 
+                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-sm font-medium" 
                         placeholder="••••••••" />
                 </div>
             </div>
@@ -50,20 +50,20 @@
             <!-- Remember Me -->
             <div class="flex items-center">
                 <input type="checkbox" name="remember" id="remember" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer" />
-                <label for="remember" class="ml-2.5 text-xs text-slate-500 font-semibold select-none cursor-pointer">Ingat saya di perangkat ini</label>
+                <label for="remember" class="ml-2.5 text-sm text-slate-500 font-medium select-none cursor-pointer">Ingat saya di perangkat ini</label>
             </div>
 
             <!-- Submit -->
             <button type="submit" 
-                class="w-full py-4.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
+                class="w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-sm tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
                 <i data-lucide="log-in" class="w-4 h-4"></i> Masuk
             </button>
         </form>
 
         <!-- Seeder info helper for easy student demonstration -->
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-xs space-y-2 text-slate-500">
-            <span class="font-bold text-slate-700 block uppercase tracking-wider text-[0.6rem]">Akun Demo Pengujian:</span>
-            <div class="space-y-1 text-[0.7rem] font-semibold text-slate-600">
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm space-y-2 text-slate-500">
+            <span class="font-bold text-slate-700 block uppercase tracking-wider text-[0.65rem]">Akun Demo Pengujian:</span>
+            <div class="space-y-1 text-sm font-medium text-slate-600">
                 <div class="flex justify-between">
                     <span>Pelanggan: <strong class="text-indigo-600">user@musicstore.com</strong></span>
                     <span>Pass: <strong class="text-slate-800">password</strong></span>

@@ -113,6 +113,135 @@
             opacity: 1;
             transform: rotate(30deg) translateY(-30%);
         }
+
+        /* ===== GLOBAL DYNAMIC ENHANCEMENTS ===== */
+
+        /* Premium Button Hover Effects */
+        a[class*='bg-indigo-600']:hover,
+        button[class*='bg-indigo-600']:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -8px rgba(79, 70, 229, 0.4);
+        }
+        a[class*='bg-indigo-600'],
+        button[class*='bg-indigo-600'] {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* Cards - Global glass/lift effect */
+        [class*='rounded-3xl'][class*='border'][class*='bg-white'],
+        [class*='rounded-[32px]'][class*='border'][class*='bg-white'],
+        [class*='rounded-[36px]'][class*='border'][class*='bg-white'],
+        [class*='rounded-2xl'][class*='border'][class*='bg-white'] {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            background: rgba(255,255,255,0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+        [class*='rounded-3xl'][class*='border'][class*='bg-white']:hover,
+        [class*='rounded-[32px]'][class*='border'][class*='bg-white']:hover,
+        [class*='rounded-[36px]'][class*='border'][class*='bg-white']:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1), 0 0 0 1px rgba(99, 102, 241, 0.08);
+        }
+
+        /* Image zoom on hover inside cards */
+        [class*='overflow-hidden'] img {
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        [class*='overflow-hidden']:hover img {
+            transform: scale(1.06);
+        }
+
+        /* Badge/Tag pulse glow */
+        [class*='bg-indigo-50'][class*='text-indigo-600'] {
+            transition: all 0.3s ease;
+        }
+        [class*='bg-indigo-50'][class*='text-indigo-600']:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+
+        /* Status badge micro-animation */
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Input focus glow */
+        input:focus, select:focus, textarea:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
+        }
+
+        /* Smooth section dividers */
+        section + section {
+            position: relative;
+        }
+
+        /* Typography - subtle text gradient on headings */
+        .font-display {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Staggered animation for grid children */
+        @keyframes stagger-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .grid > * {
+            animation: stagger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        .grid > *:nth-child(1) { animation-delay: 0.05s; }
+        .grid > *:nth-child(2) { animation-delay: 0.1s; }
+        .grid > *:nth-child(3) { animation-delay: 0.15s; }
+        .grid > *:nth-child(4) { animation-delay: 0.2s; }
+        .grid > *:nth-child(5) { animation-delay: 0.25s; }
+        .grid > *:nth-child(6) { animation-delay: 0.3s; }
+        .grid > *:nth-child(7) { animation-delay: 0.35s; }
+        .grid > *:nth-child(8) { animation-delay: 0.4s; }
+        .grid > *:nth-child(9) { animation-delay: 0.45s; }
+        .grid > *:nth-child(10) { animation-delay: 0.5s; }
+        .grid > *:nth-child(11) { animation-delay: 0.55s; }
+        .grid > *:nth-child(12) { animation-delay: 0.6s; }
+
+        /* Page container subtle entrance */
+        .max-w-\[1440px\] > main,
+        .max-w-\[1440px\] > .space-y-10 {
+            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Footer lift on scroll */
+        footer {
+            transition: transform 0.5s ease;
+        }
+
+        /* Toast/Alert notification animation */
+        [class*='bg-emerald-50'][class*='border-emerald'],
+        [class*='bg-rose-50'][class*='border-rose'],
+        [class*='bg-amber-50'][class*='border-amber'] {
+            animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Smooth scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #a5b4fc, #6366f1);
+            border-radius: 100px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #818cf8, #4f46e5);
+        }
+
+        /* Selection color */
+        ::selection {
+            background: rgba(99, 102, 241, 0.2);
+            color: #312e81;
+        }
     </style>
 </head>
 <body class="font-sans text-slate-900 bg-[#f8f8f8] min-h-screen flex flex-col justify-between overflow-x-hidden">

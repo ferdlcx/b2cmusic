@@ -25,7 +25,7 @@
         </div>
 
         <!-- Sidebar Filters -->
-        <aside class="space-y-8 lg:block" :class="showFilters ? 'block' : 'hidden'">
+        <aside class="space-y-8 lg:block transition-all duration-500 ease-in-out" :class="showFilters ? 'block' : 'hidden'">
             <!-- Search -->
             <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
                 <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Pencarian</span>
@@ -165,7 +165,7 @@
             @else
                 <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     @foreach($products as $product)
-                        <article class="group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
+                        <article class="card-shine group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
                             <a href="{{ route('products.show', $product->slug) }}" class="block">
                                 <div class="h-60 overflow-hidden bg-slate-50 flex items-center justify-center relative">
                                     <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-103" />

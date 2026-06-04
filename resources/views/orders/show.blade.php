@@ -205,6 +205,14 @@
                                         }
                                     });
                                 };
+                                // Auto-open payment popup for QRIS/eWallet
+                                @if(in_array($order->payment->payment_method, ['qris', 'ewallet']))
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        setTimeout(function() {
+                                            document.getElementById('pay-button').click();
+                                        }, 800);
+                                    });
+                                @endif
                             </script>
 
                             <form action="{{ route('orders.checkStatus', $order->id) }}" method="POST" class="mt-3">

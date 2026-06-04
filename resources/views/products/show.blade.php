@@ -76,7 +76,7 @@
             </div>
 
             <!-- Price & Stock Card -->
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-6">
+            <div class="card-shine bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-6">
                 <div class="space-y-1">
                     <span class="text-xs uppercase tracking-widest text-slate-400 font-semibold block">Harga</span>
                     <span class="text-3xl font-black text-indigo-600">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
@@ -143,7 +143,7 @@
             @if($product->specifications->isEmpty())
                 <p class="text-sm text-slate-400">Tidak ada spesifikasi khusus untuk produk ini.</p>
             @else
-                <div class="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
+                <div class="card-shine overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm">
                     <table class="w-full text-xs text-left">
                         <tbody>
                             @foreach($product->specifications as $spec)
@@ -193,7 +193,7 @@
             @else
                 <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                     @foreach($product->reviews as $review)
-                        <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-3">
+                        <div class="card-shine bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-3">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="w-9 h-9 bg-indigo-50 text-indigo-700 flex items-center justify-center rounded-full text-xs font-bold uppercase">
@@ -227,7 +227,7 @@
             </div>
             <div class="grid gap-6 md:grid-cols-3">
                 @foreach($relatedProducts as $rel)
-                    <article class="group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
+                    <article class="card-shine group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
                         <a href="{{ route('products.show', $rel->slug) }}" class="block">
                             <div class="h-52 overflow-hidden bg-slate-50 flex items-center justify-center">
                                 <img src="{{ $rel->primaryImage ? $rel->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $rel->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-103" />

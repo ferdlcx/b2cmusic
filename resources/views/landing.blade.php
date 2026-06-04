@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Parallax Hero Section -->
-<section class="relative -mx-6 lg:-mx-10 -mt-4 overflow-hidden" x-data="{ 
+<section class="relative -mx-6 lg:-mx-10 -mt-[5.5rem] pt-0 overflow-hidden" x-data="{ 
     mouseX: 0, mouseY: 0,
     handleMouse(e) {
         this.mouseX = (e.clientX / window.innerWidth - 0.5) * 30;

@@ -3,99 +3,83 @@
 @section('title', 'DjudasMS - Premium Instruments & Records')
 
 @section('content')
-<!-- Hero Section -->
-<section class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center py-8">
-    <div class="space-y-8">
-        <div class="inline-flex items-center gap-3 text-[0.65rem] font-bold uppercase tracking-[0.45em] text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full">
-            <span>ARTISAN TOKO MUSIK B2C</span>
-        </div>
-        <div class="max-w-3xl">
-            <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-tight font-black uppercase tracking-tight text-slate-950">
-                Suara Murni.<br />Craftsmanship<br />
-                <span class="text-indigo-600">Ikonik.</span>
-            </h1>
-        </div>
-        <p class="max-w-2xl text-md md:text-lg text-slate-600 leading-relaxed font-normal">
-            Selamat datang di DjudasMS. Kami menyediakan instrumen musik kelas dunia, piringan hitam legendaris, dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 pt-2">
-            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/25 transition duration-300">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i> Jelajahi Toko
-            </a>
-            <a href="#collections" class="inline-flex items-center justify-center px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-semibold tracking-wider hover:border-indigo-600 hover:text-indigo-600 transition duration-300">
-                Lihat Kategori
-            </a>
-        </div>
+<!-- Parallax Hero Section -->
+<section class="relative -mx-6 lg:-mx-10 -mt-4 overflow-hidden" x-data="{ 
+    mouseX: 0, mouseY: 0,
+    handleMouse(e) {
+        this.mouseX = (e.clientX / window.innerWidth - 0.5) * 30;
+        this.mouseY = (e.clientY / window.innerHeight - 0.5) * 30;
+    }
+}" @mousemove.window="handleMouse($event)">
+    <!-- Parallax Background -->
+    <div class="absolute inset-0 w-full h-full" 
+         :style="'transform: translate(' + mouseX + 'px, ' + mouseY + 'px) scale(1.1)'">
+        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=2000&q=80" 
+             alt="Music Studio" class="w-full h-full object-cover" />
     </div>
+    
+    <!-- Dark Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/60 to-[#f8f8f8]"></div>
+    
+    <!-- Animated Grid Pattern -->
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 40px 40px;"></div>
 
-    <!-- Right Graphic: Interactive Slider -->
-    <div x-data="{ 
-        activeSlide: 0, 
-        slides: [
-            {
-                image: 'https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?auto=format&fit=crop&w=1200&q=80',
-                title: 'Fender Electric Player Stratocaster',
-                tagline: 'FENDER SIGNATURE SERIES',
-                link: '{{ route('catalog', ['category' => 'gitar-elektrik']) }}'
-            },
-            {
-                image: 'https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&w=1200&q=80',
-                title: 'Yamaha PSR Series Keyboards',
-                tagline: 'YAMAHA DIGITAL INSTRUMENTS',
-                link: '{{ route('catalog', ['category' => 'keyboard-piano']) }}'
-            },
-            {
-                image: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1200&q=80',
-                title: 'Professional Studio Recording Gear',
-                tagline: 'FOCUSRITE & SHURE AUDIO GEAR',
-                link: '{{ route('catalog', ['category' => 'audio-recording']) }}'
-            }
-        ],
-        next() { this.activeSlide = (this.activeSlide + 1) % this.slides.length },
-        prev() { this.activeSlide = (this.activeSlide - 1 + this.slides.length) % this.slides.length }
-    }" x-init="setInterval(() => next(), 5000)" class="relative overflow-hidden rounded-[36px] bg-slate-950 shadow-2xl h-[320px] sm:h-[400px] lg:h-[480px] group border border-slate-900">
-        <!-- Slides -->
-        <template x-for="(slide, index) in slides" :key="index">
-            <div x-show="activeSlide === index" 
-                 x-transition:enter="transition ease-out duration-700"
-                 x-transition:enter-start="opacity-0 scale-[1.02] translate-x-4"
-                 x-transition:enter-end="opacity-100 scale-100 translate-x-0"
-                 x-transition:leave="transition ease-in duration-500"
-                 x-transition:leave-start="opacity-100 scale-100 translate-x-0"
-                 x-transition:leave-end="opacity-0 scale-98 -translate-x-4"
-                 class="absolute inset-0 w-full h-full">
-                <!-- Background Image -->
-                <img :src="slide.image" alt="" class="h-full w-full object-cover opacity-60 transform group-hover:scale-[1.02] transition duration-700" />
-                <!-- Overlay Gradient -->
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-                <!-- Slide Content -->
-                <div class="absolute bottom-0 left-0 right-0 p-8 md:p-10 space-y-3 max-w-2xl text-left">
-                    <span class="text-[0.65rem] uppercase tracking-[0.35em] font-black text-indigo-400" x-text="slide.tagline"></span>
-                    <h2 class="text-2xl md:text-3xl font-display font-black text-white leading-tight uppercase tracking-tight" x-text="slide.title"></h2>
-                    <div class="pt-2">
-                        <a :href="slide.link" class="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-white font-bold hover:text-indigo-400 transition duration-300">
-                            Jelajahi Koleksi <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </a>
-                    </div>
-                </div>
+    <!-- Hero Content -->
+    <div class="relative min-h-[92vh] flex flex-col justify-center px-6 lg:px-10 max-w-[1440px] mx-auto">
+        <div class="space-y-8 max-w-3xl">
+            <!-- Animated Badge -->
+            <div class="inline-flex items-center gap-3 text-[0.65rem] font-bold uppercase tracking-[0.45em] text-indigo-300 bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2.5 rounded-full animate-fade-in-up" style="animation-delay: 0.2s">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                ARTISAN TOKO MUSIK B2C
             </div>
-        </template>
-
-        <!-- Navigation Arrows -->
-        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/10 opacity-0 group-hover:opacity-100 transition duration-300">
-            <i data-lucide="chevron-left" class="w-5 h-5"></i>
-        </button>
-        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/10 opacity-0 group-hover:opacity-100 transition duration-300">
-            <i data-lucide="chevron-right" class="w-5 h-5"></i>
-        </button>
-
-        <!-- Indicators -->
-        <div class="absolute bottom-8 right-8 flex gap-2">
-            <template x-for="(slide, index) in slides" :key="index">
-                <button @click="activeSlide = index" 
-                        :class="activeSlide === index ? 'bg-indigo-600 w-8' : 'bg-white/30 w-2'" 
-                        class="h-2 rounded-full transition-all duration-300"></button>
-            </template>
+            
+            <!-- Main Heading with Staggered Animation -->
+            <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.9] font-black uppercase tracking-tight text-white">
+                <span class="block animate-fade-in-up" style="animation-delay: 0.4s">Suara Murni.</span>
+                <span class="block animate-fade-in-up" style="animation-delay: 0.6s">Craftsmanship</span>
+                <span class="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-fade-in-up" style="animation-delay: 0.8s">Ikonik.</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="max-w-xl text-lg text-slate-300 leading-relaxed font-light animate-fade-in-up" style="animation-delay: 1s">
+                Instrumen musik kelas dunia dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda.
+            </p>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4 animate-fade-in-up" style="animation-delay: 1.2s">
+                <a href="{{ route('catalog') }}" class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-slate-950 rounded-2xl text-sm font-bold tracking-wider hover:bg-indigo-600 hover:text-white hover:shadow-2xl hover:shadow-indigo-600/30 transition-all duration-500">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
+                    Jelajahi Toko
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+                <a href="#collections" class="inline-flex items-center justify-center px-8 py-4 bg-white/5 backdrop-blur-md border border-white/15 text-white rounded-2xl text-sm font-semibold tracking-wider hover:bg-white/10 hover:border-white/30 transition-all duration-500">
+                    Lihat Kategori
+                </a>
+            </div>
+        </div>
+        
+        <!-- Glassmorphism Stats Cards -->
+        <div class="absolute bottom-12 right-6 lg:right-10 hidden lg:flex gap-4 animate-fade-in-up" style="animation-delay: 1.6s">
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center min-w-[120px]">
+                <div class="text-2xl font-black text-white">500+</div>
+                <div class="text-[0.6rem] uppercase tracking-widest text-slate-400 font-semibold mt-1">Produk</div>
+            </div>
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center min-w-[120px]">
+                <div class="text-2xl font-black text-white">50+</div>
+                <div class="text-[0.6rem] uppercase tracking-widest text-slate-400 font-semibold mt-1">Brand</div>
+            </div>
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center min-w-[120px]">
+                <div class="text-2xl font-black text-white">4.9</div>
+                <div class="text-[0.6rem] uppercase tracking-widest text-slate-400 font-semibold mt-1">Rating</div>
+            </div>
+        </div>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce-slow">
+            <span class="text-[0.55rem] uppercase tracking-[0.3em] text-white/50 font-semibold">Scroll</span>
+            <div class="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1.5">
+                <div class="w-1.5 h-3 bg-white/40 rounded-full animate-scroll-dot"></div>
+            </div>
         </div>
     </div>
 </section>

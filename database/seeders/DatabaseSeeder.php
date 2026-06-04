@@ -61,6 +61,10 @@ class DatabaseSeeder extends Seeder
             'city_id' => 153,
             'province' => 'DKI Jakarta',
             'province_id' => 6,
+            'district' => 'Kebayoran Baru',
+            'village' => 'Melawai',
+            'latitude' => -6.244589,
+            'longitude' => 106.800534,
             'postal_code' => '12110',
             'is_default' => true,
         ]);
@@ -75,6 +79,10 @@ class DatabaseSeeder extends Seeder
             'city_id' => 152,
             'province' => 'DKI Jakarta',
             'province_id' => 6,
+            'district' => 'Tanah Abang',
+            'village' => 'Karet Tengsin',
+            'latitude' => -6.213589,
+            'longitude' => 106.818534,
             'postal_code' => '10220',
             'is_default' => false,
         ]);

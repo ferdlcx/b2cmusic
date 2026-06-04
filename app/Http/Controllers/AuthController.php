@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\Wishlist;
+use App\Models\ActivityLog;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,6 +51,18 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        try {
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'register',
+                'model_type' => User::class,
+                'model_id' => $user->id,
+                'description' => "Registrasi akun baru: {$user->name} ({$user->email})",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
+
         return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di MusicStore.');
     }
 
@@ -73,6 +86,18 @@ class AuthController extends Controller
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
 
+            try {
+                ActivityLog::create([
+                    'user_id' => null,
+                    'action' => 'login_locked_out',
+                    'model_type' => User::class,
+                    'model_id' => null,
+                    'description' => "Lockout login karena terlalu banyak percobaan: {$request->email}",
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+
             return back()->withErrors([
                 'email' => str_replace(':seconds', $seconds, 'Terlalu banyak percobaan login. Silakan coba lagi dalam :seconds detik.'),
             ])->onlyInput('email');
@@ -90,6 +115,18 @@ class AuthController extends Controller
                 ]);
             }
 
+            try {
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'login',
+                    'model_type' => User::class,
+                    'model_id' => $user->id,
+                    'description' => "Berhasil login ke sistem",
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+
             if ($user->role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
             }
@@ -99,6 +136,18 @@ class AuthController extends Controller
 
         RateLimiter::hit($throttleKey, 1800);
 
+        try {
+            ActivityLog::create([
+                'user_id' => null,
+                'action' => 'login_failed',
+                'model_type' => User::class,
+                'model_id' => null,
+                'description' => "Gagal login dengan email: {$request->email}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
+
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
         ])->onlyInput('email');
@@ -106,6 +155,21 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        if ($user) {
+            try {
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'logout',
+                    'model_type' => User::class,
+                    'model_id' => $user->id,
+                    'description' => "Keluar dari sistem",
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

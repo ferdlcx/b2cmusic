@@ -3,6 +3,10 @@
 @section('title', 'Profil Saya - MusicStore Luxe')
 
 @section('content')
+<!-- Leaflet Map CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <div class="max-w-[1200px] mx-auto px-4 md:px-8 py-8" 
      x-data="{ 
         activeTab: 'profile',
@@ -10,6 +14,10 @@
         showEditAddressModal: false,
         provinces: [],
         cities: [],
+        addMap: null,
+        addMarker: null,
+        editMap: null,
+        editMarker: null,
         editAddressData: {
             id: '',
             label: '',
@@ -20,7 +28,11 @@
             province: '',
             city_id: '',
             city: '',
+            district: '',
+            village: '',
             postal_code: '',
+            latitude: '',
+            longitude: '',
             is_default: false
         },
         async init() {
@@ -68,6 +80,72 @@
                 this.editAddressData.city = cityName;
             }
         },
+        initMap(type) {
+            this.$nextTick(() => {
+                const defaultLat = -6.200000;
+                const defaultLng = 106.816666;
+                if (type === 'add') {
+                    let lat = defaultLat;
+                    let lng = defaultLng;
+                    
+                    if (this.addMap) {
+                        this.addMap.invalidateSize();
+                        return;
+                    }
+                    
+                    this.addMap = L.map('map-add').setView([lat, lng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(this.addMap);
+                    
+                    this.addMarker = L.marker([lat, lng], { draggable: true }).addTo(this.addMap);
+                    
+                    this.addMarker.on('dragend', (e) => {
+                        let position = this.addMarker.getLatLng();
+                        document.getElementById('add-latitude').value = position.lat.toFixed(6);
+                        document.getElementById('add-longitude').value = position.lng.toFixed(6);
+                    });
+                    
+                    this.addMap.on('click', (e) => {
+                        this.addMarker.setLatLng(e.latlng);
+                        document.getElementById('add-latitude').value = e.latlng.lat.toFixed(6);
+                        document.getElementById('add-longitude').value = e.latlng.lng.toFixed(6);
+                    });
+                    
+                    document.getElementById('add-latitude').value = lat.toFixed(6);
+                    document.getElementById('add-longitude').value = lng.toFixed(6);
+                } else if (type === 'edit') {
+                    let lat = parseFloat(this.editAddressData.latitude) || defaultLat;
+                    let lng = parseFloat(this.editAddressData.longitude) || defaultLng;
+                    
+                    if (this.editMap) {
+                        this.editMap.setView([lat, lng], 13);
+                        this.editMarker.setLatLng([lat, lng]);
+                        this.editMap.invalidateSize();
+                        return;
+                    }
+                    
+                    this.editMap = L.map('map-edit').setView([lat, lng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(this.editMap);
+                    
+                    this.editMarker = L.marker([lat, lng], { draggable: true }).addTo(this.editMap);
+                    
+                    this.editMarker.on('dragend', (e) => {
+                        let position = this.editMarker.getLatLng();
+                        this.editAddressData.latitude = position.lat.toFixed(6);
+                        this.editAddressData.longitude = position.lng.toFixed(6);
+                    });
+                    
+                    this.editMap.on('click', (e) => {
+                        this.editMarker.setLatLng(e.latlng);
+                        this.editAddressData.latitude = e.latlng.lat.toFixed(6);
+                        this.editAddressData.longitude = e.latlng.lng.toFixed(6);
+                    });
+                }
+            });
+        },
         async openEditAddress(addr) {
             this.editAddressData = {
                 id: addr.id,
@@ -79,7 +157,11 @@
                 province: addr.province || '',
                 city_id: addr.city_id || '',
                 city: addr.city || '',
+                district: addr.district || '',
+                village: addr.village || '',
                 postal_code: addr.postal_code || '',
+                latitude: addr.latitude || '',
+                longitude: addr.longitude || '',
                 is_default: addr.is_default
             };
             
@@ -95,6 +177,7 @@
                 }
             }
             this.showEditAddressModal = true;
+            this.initMap('edit');
         }
      }">
      
@@ -228,7 +311,7 @@
                         <h3 class="font-display text-xl font-bold text-slate-950 uppercase tracking-tight">Daftar Alamat Pengiriman</h3>
                         <p class="text-xs text-slate-500">Kelola beberapa alamat tujuan pengiriman barang Anda.</p>
                     </div>
-                    <button @click="showAddAddressModal = true" 
+                    <button @click="showAddAddressModal = true; initMap('add')" 
                             class="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition duration-300">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                         Tambah
@@ -255,8 +338,19 @@
                                         <span class="text-xs font-bold text-slate-900">{{ $addr->label }}</span>
                                     </div>
                                     <p class="text-xs font-bold text-slate-700">{{ $addr->name }}</p>
-                                    <p class="text-xs text-slate-500 leading-relaxed">{{ $addr->address }}, {{ $addr->city }}, {{ $addr->province }}, {{ $addr->postal_code }}</p>
+                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                        {{ $addr->address }}, 
+                                        @if($addr->village) Kel. {{ $addr->village }}, @endif
+                                        @if($addr->district) Kec. {{ $addr->district }}, @endif
+                                        {{ $addr->city }}, {{ $addr->province }}, {{ $addr->postal_code }}
+                                    </p>
                                     <p class="text-xs text-slate-600 font-medium">Telp: {{ $addr->phone }}</p>
+                                    @if($addr->latitude && $addr->longitude)
+                                        <div class="flex items-center gap-1 text-[0.65rem] text-slate-400 pt-1">
+                                            <i data-lucide="map" class="w-3 h-3 text-indigo-500"></i>
+                                            <span>{{ $addr->latitude }}, {{ $addr->longitude }}</span>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <div class="flex items-center gap-3 pt-5 border-t border-slate-100/80 mt-4">
@@ -367,9 +461,37 @@
                     </div>
                 </div>
 
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
+                        <input type="text" name="district" required placeholder="Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
+                        <input type="text" name="village" required placeholder="Kelurahan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    </div>
+                </div>
+
                 <div class="space-y-1">
                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                    <textarea name="address" required rows="3" placeholder="Nama Jalan, Blok, No. Rumah, RT/RW, Kelurahan, Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
+                    <textarea name="address" required rows="3" placeholder="Nama Jalan, Blok, No. Rumah, RT/RW" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Pinpoint Lokasi (Peta)</label>
+                    <p class="text-[0.65rem] text-slate-400 pb-1">Geser pin atau klik pada peta untuk menentukan koordinat.</p>
+                    <div id="map-add" class="h-48 rounded-xl border border-slate-200" style="position: relative; outline: none; z-index: 10;"></div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
+                        <input type="text" name="latitude" id="add-latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
+                        <input type="text" name="longitude" id="add-longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-2 pt-2">
@@ -457,9 +579,37 @@
                     </div>
                 </div>
 
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
+                        <input type="text" name="district" required x-model="editAddressData.district" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
+                        <input type="text" name="village" required x-model="editAddressData.village" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    </div>
+                </div>
+
                 <div class="space-y-1">
                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
                     <textarea name="address" required rows="3" x-model="editAddressData.address" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Pinpoint Lokasi (Peta)</label>
+                    <p class="text-[0.65rem] text-slate-400 pb-1">Geser pin atau klik pada peta untuk menentukan koordinat.</p>
+                    <div id="map-edit" class="h-48 rounded-xl border border-slate-200" style="position: relative; outline: none; z-index: 10;"></div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
+                        <input type="text" name="latitude" id="edit-latitude" x-model="editAddressData.latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
+                        <input type="text" name="longitude" id="edit-longitude" x-model="editAddressData.longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-2 pt-2">

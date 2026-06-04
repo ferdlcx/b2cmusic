@@ -38,7 +38,7 @@ class ReviewController extends Controller
             $photoPath = $request->file('photo')->store('reviews', 'public');
         }
 
-        Review::create([
+        $review = Review::create([
             'product_id' => $request->product_id,
             'user_id'    => $user->id,
             'order_id'   => $request->order_id,
@@ -47,6 +47,18 @@ class ReviewController extends Controller
             'photo'      => $photoPath,
             'status'     => 'pending', // Pending moderation by default
         ]);
+
+        try {
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'submit_review',
+                'model_type' => Review::class,
+                'model_id' => $review->id,
+                'description' => "Mengirim ulasan untuk produk ID {$request->product_id} dengan rating {$request->rating}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
 
         return back()->with('success', 'Ulasan Anda berhasil dikirim dan sedang menunggu moderasi admin.');
     }

@@ -63,13 +63,25 @@ class ReturnController extends Controller
             $photoPath = $request->file('photo')->store('returns', 'public');
         }
 
-        ReturnRequest::create([
+        $returnReq = ReturnRequest::create([
             'order_id' => $order->id,
             'user_id'  => $user->id,
             'reason'   => $request->reason,
             'photo'    => $photoPath,
             'status'   => 'pending',
         ]);
+
+        try {
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'submit_return',
+                'model_type' => ReturnRequest::class,
+                'model_id' => $returnReq->id,
+                'description' => "Mengajukan pengembalian barang untuk pesanan {$order->order_code}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
 
         return redirect()->route('returns.index')->with('success', 'Pengajuan pengembalian barang Anda berhasil dikirim dan akan segera diproses oleh admin.');
     }

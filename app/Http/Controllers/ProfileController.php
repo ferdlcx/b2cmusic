@@ -117,7 +117,11 @@ class ProfileController extends Controller
             'city_id'     => ['nullable', 'integer'],
             'province'    => ['required', 'string', 'max:100'],
             'province_id' => ['nullable', 'integer'],
+            'district'    => ['required', 'string', 'max:100'],
+            'village'     => ['required', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:10'],
+            'latitude'    => ['nullable', 'numeric'],
+            'longitude'   => ['nullable', 'numeric'],
             'is_default'  => ['nullable', 'boolean'],
         ]);
 
@@ -157,7 +161,11 @@ class ProfileController extends Controller
             'city_id'     => ['nullable', 'integer'],
             'province'    => ['required', 'string', 'max:100'],
             'province_id' => ['nullable', 'integer'],
+            'district'    => ['required', 'string', 'max:100'],
+            'village'     => ['required', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:10'],
+            'latitude'    => ['nullable', 'numeric'],
+            'longitude'   => ['nullable', 'numeric'],
             'is_default'  => ['nullable', 'boolean'],
         ]);
 

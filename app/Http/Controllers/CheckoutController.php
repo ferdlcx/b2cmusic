@@ -347,6 +347,19 @@ class CheckoutController extends Controller
             // 7. Clear user cart
             CartItem::where('cart_id', $cart->id)->delete();
 
+            // Log activity
+            try {
+                \App\Models\ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'checkout',
+                    'model_type' => Order::class,
+                    'model_id' => $order->id,
+                    'description' => "Membuat pesanan baru: {$order->order_code} dengan total Rp " . number_format($order->total, 0, ',', '.'),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+
             // 8. Notify user
             $user->notify(new OrderCreated($order));
 

@@ -57,6 +57,18 @@ class OrderController extends Controller
             'paid_at' => now(),
         ]);
 
+        try {
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'payment_simulated',
+                'model_type' => Order::class,
+                'model_id' => $order->id,
+                'description' => "Simulasi pembayaran lunas untuk pesanan {$order->order_code}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
+
         $user->notify(new PaymentSuccess($order));
 
         return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan Anda kini sedang diproses.');
@@ -157,6 +169,18 @@ class OrderController extends Controller
             DB::commit();
             Log::info("Order {$order->order_code} updated successfully via Webhook to: {$orderStatus}");
             
+            try {
+                \App\Models\ActivityLog::create([
+                    'user_id' => $order->user_id,
+                    'action' => 'payment_webhook_' . $orderStatus,
+                    'model_type' => Order::class,
+                    'model_id' => $order->id,
+                    'description' => "Status pembayaran pesanan {$order->order_code} diperbarui via Midtrans Webhook menjadi: {$orderStatus}",
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+
             return response()->json(['message' => 'Success'], 200);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -89,6 +89,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/order/{order_code}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
     Route::get('/order/{id}/track', [TrackingController::class, 'track'])->name('orders.track');
     Route::post('/order/{id}/delivered', [TrackingController::class, 'simulateDelivery'])->name('orders.delivered');
+    Route::post('/order/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Review Routes
     Route::post('/review', [ReviewController::class, 'store'])->name('reviews.store');

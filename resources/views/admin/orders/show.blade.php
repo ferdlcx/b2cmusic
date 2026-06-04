@@ -106,7 +106,6 @@
                             <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending (Belum Bayar)</option>
                             <option value="paid" {{ $order->status === 'paid' ? 'selected' : '' }}>Paid (Diproses)</option>
                             <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped (Dikirim)</option>
-                            <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
                             <option value="canceled" {{ $order->status === 'canceled' ? 'selected' : '' }}>Canceled (Batal)</option>
                         </select>
                     </div>
@@ -125,6 +124,21 @@
                         Perbarui Status
                     </button>
                 </form>
+
+                <!-- Testing Only: Simulate Completed -->
+                @if($order->status === 'shipped')
+                    <div class="mt-4 pt-4 border-t border-dashed border-amber-200">
+                        <p class="text-[0.6rem] uppercase tracking-widest text-amber-600 font-bold mb-3">⚠️ Testing Mode Only</p>
+                        <form action="{{ route('admin.orders.status', $order->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" 
+                                class="w-full py-3 bg-amber-50 border-2 border-amber-300 text-amber-700 rounded-xl font-bold uppercase text-[0.65rem] tracking-widest hover:bg-amber-100 transition flex items-center justify-center gap-2">
+                                <i data-lucide="flask-conical" class="w-4 h-4"></i> [SIMULASI] Tandai Selesai (Testing)
+                            </button>
+                        </form>
+                    </div>
+                @endif
             </div>
 
             <!-- Totals Card -->

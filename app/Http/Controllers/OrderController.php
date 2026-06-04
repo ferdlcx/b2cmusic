@@ -214,4 +214,54 @@ class OrderController extends Controller
             return response()->json(['message' => 'Internal server error'], 500);
         }
     }
+
+    public function cancel($id)
+    {
+        $user = Auth::user();
+        $order = Order::where('user_id', $user->id)->where('id', $id)->firstOrFail();
+
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Hanya pesanan dengan status Pending yang bisa dibatalkan.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Restore stock
+            foreach ($order->items as $item) {
+                Product::where('id', $item->product_id)->increment('stock', $item->quantity);
+            }
+
+            // Cancel order
+            $order->update(['status' => 'canceled']);
+
+            // Cancel payment
+            if ($order->payment) {
+                $order->payment->update(['status' => 'canceled']);
+            }
+
+            // Cancel shipment
+            if ($order->shipment) {
+                $order->shipment->update(['status' => 'canceled']);
+            }
+
+            // Log activity
+            try {
+                \App\Models\ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'cancel_order',
+                    'model_type' => Order::class,
+                    'model_id' => $order->id,
+                    'description' => "Membatalkan pesanan: {$order->order_code}",
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            } catch (\Exception $e) {}
+
+            DB::commit();
+            return redirect()->route('orders.history')->with('success', "Pesanan #{$order->order_code} berhasil dibatalkan. Stok produk telah dikembalikan.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }

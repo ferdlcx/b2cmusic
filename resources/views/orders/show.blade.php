@@ -237,6 +237,55 @@
                 @endif
             </div>
 
+            @if($order->status === 'pending')
+                <div class="pt-4 border-t border-slate-100" x-data="{ showCancelModal: false }">
+                    <button @click="showCancelModal = true" 
+                        class="w-full py-3.5 bg-white border-2 border-rose-500 text-rose-600 rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-rose-50 transition duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i> Batalkan Pesanan
+                    </button>
+                    
+                    <!-- Cancel Confirmation Modal -->
+                    <div x-show="showCancelModal" x-cloak
+                        class="fixed inset-0 z-[999] flex items-center justify-center p-4"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0">
+                        <div class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm" @click="showCancelModal = false"></div>
+                        <div class="relative bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6 z-10"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                            x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+                            <div class="text-center space-y-3">
+                                <div class="inline-flex items-center justify-center w-14 h-14 bg-rose-50 rounded-full">
+                                    <i data-lucide="alert-triangle" class="w-7 h-7 text-rose-600"></i>
+                                </div>
+                                <h3 class="font-display text-xl font-black uppercase tracking-tight text-slate-950">Batalkan Pesanan?</h3>
+                                <p class="text-sm text-slate-500">Apakah Anda yakin ingin membatalkan pesanan <strong>#{{ $order->order_code }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+                            </div>
+                            <div class="flex gap-3">
+                                <button @click="showCancelModal = false" class="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-slate-200 transition">Tidak Jadi</button>
+                                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" class="flex-1">
+                                    @csrf
+                                    <button type="submit" class="w-full py-3 bg-rose-600 text-white rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-rose-700 transition">Ya, Batalkan</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if($order->status === 'completed')
+                <div class="pt-4 border-t border-slate-100">
+                    <a href="{{ route('returns.create', $order->id) }}" 
+                        class="w-full py-3.5 bg-white border-2 border-amber-500 text-amber-700 rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-amber-50 transition duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="package-x" class="w-4 h-4"></i> Ajukan Pengembalian Barang
+                    </a>
+                </div>
+            @endif
+
             <!-- Invoice Totals Card -->
             <div class="bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-4">
                 <h3 class="font-display text-base font-bold uppercase tracking-tight text-slate-950 pb-2 border-b border-slate-100">Total Invoice</h3>

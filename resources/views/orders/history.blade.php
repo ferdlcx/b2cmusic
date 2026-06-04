@@ -111,6 +111,9 @@
                                             <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Bayar
                                         </a>
                                     @endif
+                                    @if($order->status === 'completed')
+                                        <a href="{{ route('returns.create', $order->id) }}" class="text-[0.7rem] text-amber-600 font-bold hover:underline">Retur</a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

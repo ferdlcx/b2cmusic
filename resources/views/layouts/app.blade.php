@@ -496,5 +496,155 @@
             sections.forEach(el => observer.observe(el));
         });
     </script>
+
+<!-- Floating Chat CS Widget -->
+<div x-data="chatWidget()" class="fixed bottom-6 right-6 z-[100]" x-cloak>
+    <!-- Chat Window -->
+    <div x-show="isOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90 translate-y-4"
+        class="absolute bottom-20 right-0 w-[360px] max-h-[520px] bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                        <i data-lucide="headphones" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">DjudasMS Support</h4>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                            <span class="text-[0.65rem] text-white/80 font-medium">Online sekarang</span>
+                        </div>
+                    </div>
+                </div>
+                <button @click="isOpen = false" class="w-8 h-8 hover:bg-white/10 rounded-lg flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[300px]" x-ref="chatMessages">
+            <template x-for="(msg, idx) in messages" :key="idx">
+                <div :class="msg.from === 'bot' ? 'flex justify-start' : 'flex justify-end'">
+                    <div :class="msg.from === 'bot' ? 'bg-slate-100 text-slate-800 rounded-2xl rounded-tl-md' : 'bg-indigo-600 text-white rounded-2xl rounded-tr-md'" class="px-4 py-2.5 max-w-[85%] text-[0.8rem] leading-relaxed font-medium shadow-sm">
+                        <span x-html="msg.text"></span>
+                    </div>
+                </div>
+            </template>
+            <div x-show="isTyping" class="flex justify-start">
+                <div class="bg-slate-100 text-slate-500 rounded-2xl rounded-tl-md px-4 py-3 text-xs font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
+                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-4 pb-2" x-show="messages.length <= 1">
+            <div class="flex flex-wrap gap-1.5">
+                <button @click="sendQuickQuestion('Cara bayar?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Cara bayar?</button>
+                <button @click="sendQuickQuestion('Cara retur?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Cara retur?</button>
+                <button @click="sendQuickQuestion('Jam operasional?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Jam operasional?</button>
+                <button @click="sendQuickQuestion('Ongkir berapa?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Ongkir?</button>
+                <button @click="sendQuickQuestion('Hubungi CS')" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold hover:bg-emerald-100 transition">💬 Hubungi CS</button>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="p-3 border-t border-slate-100">
+            <form @submit.prevent="sendMessage()" class="flex gap-2">
+                <input x-model="userInput" type="text" placeholder="Ketik pertanyaan Anda..." class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
+                <button type="submit" class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center hover:bg-indigo-700 transition shrink-0">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Button -->
+    <button @click="toggleChat()" 
+        class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl hover:shadow-indigo-600/30 hover:scale-110 transition-all duration-300 flex items-center justify-center relative">
+        <i data-lucide="message-circle" class="w-6 h-6" x-show="!isOpen"></i>
+        <i data-lucide="x" class="w-6 h-6" x-show="isOpen"></i>
+        <span x-show="!isOpen && unread > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[0.6rem] font-bold rounded-full flex items-center justify-center animate-bounce" x-text="unread"></span>
+    </button>
+</div>
+
+<script>
+function chatWidget() {
+    return {
+        isOpen: false,
+        isTyping: false,
+        unread: 1,
+        userInput: '',
+        messages: [
+            { from: 'bot', text: 'Halo! 👋 Selamat datang di <strong>DjudasMS Support</strong>. Ada yang bisa saya bantu hari ini?' }
+        ],
+        faq: [
+            { keywords: ['bayar', 'pembayaran', 'payment', 'transfer', 'qris'], answer: '💳 <strong>Cara Pembayaran:</strong><br>1. Pilih produk & checkout<br>2. Pilih metode: QRIS, VA, E-Wallet, atau Kartu Kredit<br>3. Selesaikan pembayaran via Midtrans<br>4. Status otomatis ter-update!' },
+            { keywords: ['retur', 'kembalikan', 'refund', 'pengembalian', 'return'], answer: '📦 <strong>Cara Retur Barang:</strong><br>1. Buka halaman Detail Pesanan (status: Selesai)<br>2. Klik tombol "Ajukan Pengembalian"<br>3. Isi alasan & upload foto bukti<br>4. Tunggu persetujuan Admin (1-3 hari kerja)' },
+            { keywords: ['jam', 'operasional', 'buka', 'tutup', 'waktu'], answer: '🕐 <strong>Jam Operasional:</strong><br>Senin - Jumat: 09.00 - 21.00 WIB<br>Sabtu - Minggu: 10.00 - 18.00 WIB<br>Chat bot ini tersedia 24/7!' },
+            { keywords: ['ongkir', 'kirim', 'pengiriman', 'shipping', 'kurir', 'jne', 'jnt'], answer: '🚚 <strong>Info Pengiriman:</strong><br>Kami menggunakan JNE, J&T, dan POS Indonesia. Ongkir dihitung otomatis berdasarkan berat & lokasi Anda saat checkout.' },
+            { keywords: ['batalkan', 'batal', 'cancel', 'hapus'], answer: '❌ <strong>Batalkan Pesanan:</strong><br>Anda bisa membatalkan pesanan yang masih berstatus "Pending". Buka halaman Detail Pesanan → klik tombol merah "Batalkan Pesanan".' },
+            { keywords: ['garansi', 'warranty', 'rusak'], answer: '🛡️ <strong>Garansi:</strong><br>Semua produk DjudasMS dilindungi garansi resmi 1 tahun. Jika ada kerusakan, ajukan retur melalui halaman pesanan Anda.' },
+            { keywords: ['hubungi', 'cs', 'customer service', 'whatsapp', 'wa', 'telepon', 'kontak'], answer: '📞 <strong>Hubungi CS Kami:</strong><br>Untuk pertanyaan lebih lanjut, silakan hubungi CS kami via WhatsApp:<br><a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-1 mt-2 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 transition">💬 Chat WhatsApp</a>' },
+            { keywords: ['halo', 'hai', 'hi', 'hey', 'hello'], answer: 'Halo juga! 😊 Silakan tanyakan apa saja seputar DjudasMS. Saya siap membantu!' },
+            { keywords: ['terima kasih', 'thanks', 'makasih', 'thx'], answer: 'Sama-sama! 🙏 Jika ada pertanyaan lain, jangan ragu untuk bertanya ya!' }
+        ],
+        toggleChat() {
+            this.isOpen = !this.isOpen;
+            if (this.isOpen) {
+                this.unread = 0;
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+            }
+        },
+        sendQuickQuestion(q) {
+            this.userInput = q;
+            this.sendMessage();
+        },
+        sendMessage() {
+            const input = this.userInput.trim();
+            if (!input) return;
+            this.messages.push({ from: 'user', text: input });
+            this.userInput = '';
+            this.isTyping = true;
+            this.scrollToBottom();
+
+            setTimeout(() => {
+                const lowerInput = input.toLowerCase();
+                let reply = null;
+                for (const faqItem of this.faq) {
+                    if (faqItem.keywords.some(k => lowerInput.includes(k))) {
+                        reply = faqItem.answer;
+                        break;
+                    }
+                }
+                if (!reply) {
+                    reply = 'Maaf, saya belum bisa menjawab pertanyaan tersebut. 🤔<br>Silakan hubungi CS kami via <a href="https://wa.me/6281234567890" target="_blank" class="text-indigo-600 font-bold underline">WhatsApp</a> untuk bantuan lebih lanjut.';
+                }
+                this.isTyping = false;
+                this.messages.push({ from: 'bot', text: reply });
+                this.$nextTick(() => {
+                    this.scrollToBottom();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                });
+            }, 800 + Math.random() * 600);
+        },
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const container = this.$refs.chatMessages;
+                if (container) container.scrollTop = container.scrollHeight;
+            });
+        }
+    }
+}
+</script>
+
 </body>
 </html>

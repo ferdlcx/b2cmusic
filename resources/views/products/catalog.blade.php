@@ -48,7 +48,7 @@
             <!-- Categories -->
             <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
                 <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Kategori</span>
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2">
                     <a href="{{ route('catalog', array_merge(request()->except('category', 'page'))) }}" 
                         class="text-xs py-2.5 px-3.5 rounded-xl transition font-semibold flex items-center justify-between {{ !request('category') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'text-slate-600 hover:bg-slate-50' }}">
                         <span>Semua Kategori</span>
@@ -63,6 +63,68 @@
                     @endforeach
                 </div>
             </div>
+
+            <!-- Advanced Filters -->
+            <form action="{{ route('catalog') }}" method="GET" class="space-y-6">
+                @if(request('category'))
+                    <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+                @if(request('sort'))
+                    <input type="hidden" name="sort" value="{{ request('sort') }}">
+                @endif
+
+                <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Filter</span>
+                        <a href="{{ route('catalog') }}" class="text-[0.65rem] text-indigo-600 font-bold hover:underline">Reset</a>
+                    </div>
+                    
+                    <!-- Harga -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-slate-700">Rentang Harga (Rp)</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                            <span class="text-slate-400">-</span>
+                            <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Max" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Merek -->
+                    @if(isset($brands) && $brands->count() > 0)
+                    <div class="space-y-3 border-t border-slate-100 pt-4">
+                        <span class="text-xs font-bold text-slate-700">Merek</span>
+                        <div class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-2">
+                            @foreach($brands as $brand)
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" name="brand[]" value="{{ $brand->id }}" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500" {{ in_array($brand->id, (array)request('brand', [])) ? 'checked' : '' }}>
+                                <span class="text-xs text-slate-600 group-hover:text-indigo-600 font-medium">{{ $brand->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Rating -->
+                    <div class="space-y-3 border-t border-slate-100 pt-4">
+                        <span class="text-xs font-bold text-slate-700">Rating Minimum</span>
+                        <div class="flex flex-col gap-2">
+                            @foreach([4 => '4 Bintang & Ke atas', 3 => '3 Bintang & Ke atas'] as $val => $label)
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input type="radio" name="rating" value="{{ $val }}" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" {{ request('rating') == $val ? 'checked' : '' }}>
+                                <span class="text-xs text-slate-600 group-hover:text-indigo-600 font-medium">{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full py-2.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl hover:bg-indigo-100 transition">Terapkan Filter</button>
+                    </div>
+                </div>
+            </form>
 
             <!-- Sorting -->
             <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">

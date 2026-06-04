@@ -3,81 +3,90 @@
 @section('title', 'Reset Password - MusicStore Luxe')
 
 @section('content')
-<div class="min-h-[75vh] flex items-center justify-center py-12 px-4">
-    <div class="w-full max-w-md bg-white border border-slate-200/80 rounded-[36px] p-8 md:p-10 shadow-sm space-y-8">
-        <!-- Header -->
-        <div class="text-center space-y-2">
-            <span class="text-[0.65rem] uppercase tracking-[0.4em] text-indigo-600 font-bold bg-indigo-50 px-3.5 py-1.5 rounded-full inline-block">Atur Ulang</span>
-            <h2 class="font-display text-3xl font-black uppercase tracking-tight text-slate-950">Reset Password</h2>
-            <p class="text-xs text-slate-500 font-normal">Buat password baru untuk akun Anda. Pastikan menggunakan kombinasi yang kuat dan mudah diingat.</p>
-        </div>
+<div class="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-[32px] border border-slate-200/80 shadow-xl shadow-slate-200/40 relative overflow-hidden">
+        
+        <!-- Decorative blobs -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl"></div>
 
-        <!-- Form -->
-        <form action="{{ route('password.update') }}" method="POST" class="space-y-4.5">
-            @csrf
-
-            <!-- Token -->
-            <input type="hidden" name="token" value="{{ $token ?? request()->route('token') }}" />
-
-            <!-- Email -->
-            <div class="space-y-1.5">
-                <label for="email" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email</label>
-                <div class="relative">
-                    <span class="absolute left-4 top-4.5 text-slate-400">
-                        <i data-lucide="mail" class="w-4 h-4"></i>
-                    </span>
-                    <input type="email" name="email" id="email" value="{{ old('email', $email ?? request()->email) }}" required autofocus
-                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold @error('email') border-rose-500 @enderror" 
-                        placeholder="nama@email.com" />
-                </div>
-                @error('email')
-                    <span class="text-[0.65rem] text-rose-600 font-semibold block mt-1">{{ $message }}</span>
-                @enderror
+        <div class="relative z-10 text-center space-y-2">
+            <div class="mx-auto w-14 h-14 bg-indigo-600 text-white flex items-center justify-center rounded-2xl shadow-lg shadow-indigo-600/30 mb-6">
+                <i data-lucide="shield-check" class="w-7 h-7"></i>
             </div>
-
-            <!-- New Password -->
-            <div class="space-y-1.5">
-                <label for="password" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password Baru</label>
-                <div class="relative">
-                    <span class="absolute left-4 top-4.5 text-slate-400">
-                        <i data-lucide="lock" class="w-4 h-4"></i>
-                    </span>
-                    <input type="password" name="password" id="password" required
-                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold @error('password') border-rose-500 @enderror" 
-                        placeholder="••••••••" />
-                </div>
-                @error('password')
-                    <span class="text-[0.65rem] text-rose-600 font-semibold block mt-1">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="space-y-1.5">
-                <label for="password_confirmation" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Konfirmasi Password Baru</label>
-                <div class="relative">
-                    <span class="absolute left-4 top-4.5 text-slate-400">
-                        <i data-lucide="lock-keyhole" class="w-4 h-4"></i>
-                    </span>
-                    <input type="password" name="password_confirmation" id="password_confirmation" required
-                        class="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold" 
-                        placeholder="••••••••" />
-                </div>
-            </div>
-
-            <!-- Submit -->
-            <button type="submit" 
-                class="w-full py-4.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2 mt-2">
-                <i data-lucide="shield-check" class="w-4 h-4"></i> Reset Password
-            </button>
-        </form>
-
-        <!-- Footer -->
-        <div class="text-center pt-2">
-            <p class="text-xs text-slate-500 font-semibold">
-                Kembali ke halaman 
-                <a href="{{ route('login') }}" class="font-bold text-indigo-600 hover:text-indigo-700 transition">Masuk</a>
+            <h2 class="font-display text-3xl font-black uppercase tracking-tight text-slate-900">
+                Reset Password
+            </h2>
+            <p class="text-sm text-slate-500 font-medium">
+                Buat kata sandi baru untuk akun Anda.
             </p>
         </div>
+
+        <form class="relative z-10 mt-8 space-y-6" action="{{ route('password.update') }}" method="POST">
+            @csrf
+            
+            <!-- Password Reset Token -->
+            <input type="hidden" name="token" value="{{ $token }}">
+
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label for="email" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </div>
+                        <input id="email" name="email" type="email" autocomplete="email" required 
+                            class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
+                            value="{{ old('email', request()->email) }}" readonly>
+                    </div>
+                    @error('email')
+                        <p class="text-rose-500 text-xs font-bold mt-1.5">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="space-y-2">
+                    <label for="password" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password Baru</label>
+                    <div class="relative" x-data="{ show: false }">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="lock" class="w-4 h-4"></i>
+                        </div>
+                        <input id="password" name="password" :type="show ? 'text' : 'password'" required 
+                            class="block w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
+                            placeholder="••••••••">
+                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 focus:outline-none transition">
+                            <i x-show="!show" data-lucide="eye" class="w-4 h-4"></i>
+                            <i x-show="show" data-lucide="eye-off" class="w-4 h-4" style="display: none;"></i>
+                        </button>
+                    </div>
+                    @error('password')
+                        <p class="text-rose-500 text-xs font-bold mt-1.5">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="space-y-2">
+                    <label for="password_confirmation" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Konfirmasi Password Baru</label>
+                    <div class="relative" x-data="{ show: false }">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        </div>
+                        <input id="password_confirmation" name="password_confirmation" :type="show ? 'text' : 'password'" required 
+                            class="block w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
+                            placeholder="••••••••">
+                        <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 focus:outline-none transition">
+                            <i x-show="!show" data-lucide="eye" class="w-4 h-4"></i>
+                            <i x-show="show" data-lucide="eye-off" class="w-4 h-4" style="display: none;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 px-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 transition-all duration-300 uppercase tracking-wider">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    Simpan Password Baru
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

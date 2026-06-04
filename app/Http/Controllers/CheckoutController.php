@@ -58,14 +58,35 @@ class CheckoutController extends Controller
         }
 
         $request->validate([
-            'address_id' => ['required', 'exists:addresses,id'],
+            'address_id' => ['nullable', 'exists:addresses,id'],
+            'new_address_label' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_name' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_phone' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_address' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_city' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_province' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_postal_code' => ['required_without:address_id', 'nullable', 'string'],
             'courier' => ['required', 'string'],
             'payment_method' => ['required', 'in:va,ewallet,credit_card,qris'],
             'coupon_code' => ['nullable', 'string', 'exists:coupons,code'],
         ]);
 
         // Verify Address
-        $address = Address::where('user_id', $user->id)->findOrFail($request->address_id);
+        if ($request->address_id) {
+            $address = Address::where('user_id', $user->id)->findOrFail($request->address_id);
+        } else {
+            $address = Address::create([
+                'user_id' => $user->id,
+                'label' => $request->new_address_label ?? 'Rumah',
+                'name' => $request->new_address_name,
+                'phone' => $request->new_address_phone,
+                'address' => $request->new_address_address,
+                'city' => $request->new_address_city,
+                'province' => $request->new_address_province,
+                'postal_code' => $request->new_address_postal_code,
+                'is_default' => Address::where('user_id', $user->id)->count() === 0,
+            ]);
+        }
 
         // Verify Stock again
         foreach ($cartItems as $item) {

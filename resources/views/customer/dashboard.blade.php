@@ -10,12 +10,15 @@
             <h1 class="font-display text-4xl font-black uppercase tracking-tight text-slate-950">Dashboard Saya</h1>
             <p class="text-sm text-slate-500 font-normal">Halo, <span class="font-bold text-slate-800">{{ auth()->user()->name }}</span>! Kelola pesanan, alamat, dan wishlist Anda di sini.</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+            <a href="{{ route('returns.index') }}" class="inline-flex items-center justify-center px-5 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
+                <i data-lucide="refresh-cw" class="w-4 h-4 mr-2 text-rose-400"></i> Riwayat Retur
+            </a>
             <a href="{{ route('profile.show') }}" class="inline-flex items-center justify-center px-5 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
                 <i data-lucide="user" class="w-4 h-4 mr-2 text-slate-400"></i> Edit Profil
             </a>
             <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center px-5 py-3 bg-indigo-600 rounded-2xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">
-                <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i> Belanja Sekarang
+                <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i> Belanja
             </a>
         </div>
     </div>

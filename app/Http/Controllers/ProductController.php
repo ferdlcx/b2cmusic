@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -34,9 +35,32 @@ class ProductController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('brand', 'like', "%{$search}%")
+                  ->orWhereHas('brand', function($b) use ($search) {
+                      $b->where('name', 'like', "%{$search}%");
+                  })
                   ->orWhere('short_description', 'like', "%{$search}%");
             });
+        }
+
+        // Filter by Brand
+        if ($request->has('brand') && is_array($request->brand)) {
+            $query->whereIn('brand_id', $request->brand);
+        }
+
+        // Filter by Price Range
+        if ($request->has('min_price') && $request->min_price != '') {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->has('max_price') && $request->max_price != '') {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Filter by Rating (requires joining reviews or using withAvg)
+        if ($request->has('rating') && $request->rating != '') {
+            $minRating = $request->rating;
+            // Since we need to filter by average rating, we can use withAvg
+            $query->withAvg('reviews', 'rating')
+                  ->having('reviews_avg_rating', '>=', $minRating);
         }
 
         // Sort
@@ -54,8 +78,9 @@ class ProductController extends Controller
 
         $products = $query->paginate(9)->withQueryString();
         $categories = Category::where('status', true)->get();
+        $brands = Brand::where('status', true)->get();
 
-        return view('products.catalog', compact('products', 'categories'));
+        return view('products.catalog', compact('products', 'categories', 'brands'));
     }
 
     public function show($slug)

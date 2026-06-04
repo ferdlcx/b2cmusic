@@ -128,7 +128,7 @@
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                                <textarea name="new_address_detail" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
+                                <textarea name="new_address_address" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-1.5">
@@ -165,6 +165,56 @@
                                     </div>
                                 </div>
                             @endforeach
+
+                            <!-- Option for New Address -->
+                            <div @click="addressId = ''; selectedCityId = null; shippingCost = 0" 
+                                 :class="addressId === '' ? 'border-indigo-600 bg-indigo-50/20' : 'border-slate-200/80'"
+                                 class="flex gap-4 p-5 border-2 rounded-2xl cursor-pointer hover:bg-slate-50/50 transition duration-300">
+                                <div class="pt-0.5">
+                                    <div :class="addressId === '' ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'" 
+                                         class="w-4 h-4 rounded-full border flex items-center justify-center transition">
+                                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 w-full">
+                                    <span class="text-xs font-bold text-slate-900 block mb-3">+ Tambah Alamat Baru</span>
+                                    
+                                    <div x-show="addressId === ''" class="border border-slate-200 bg-white rounded-2xl p-4 space-y-4">
+                                        <div class="grid gap-4 sm:grid-cols-2">
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label</label>
+                                                <input type="text" name="new_address_label" placeholder="Rumah/Kantor" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Penerima</label>
+                                                <input type="text" name="new_address_name" placeholder="Nama" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon</label>
+                                                <input type="text" name="new_address_phone" placeholder="No. Telp" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
+                                                <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                        </div>
+                                        <div class="space-y-1.5">
+                                            <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
+                                            <textarea name="new_address_address" rows="2" placeholder="Detail jalan" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"></textarea>
+                                        </div>
+                                        <div class="grid gap-4 sm:grid-cols-2">
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota</label>
+                                                <input type="text" name="new_address_city" placeholder="Kota" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                            <div class="space-y-1.5">
+                                                <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
+                                                <input type="text" name="new_address_province" placeholder="Provinsi" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>

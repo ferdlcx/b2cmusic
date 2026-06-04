@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Produk: ' . $product->name . ' - Admin MusicStore')
+@section('title', 'Edit Produk: ' . $product->name . ' - Admin DjudasMS')
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-10 py-4">

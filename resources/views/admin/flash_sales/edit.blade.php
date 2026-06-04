@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Edit Flash Sale - Admin MusicStore Luxe')
+@section('title', 'Edit Flash Sale - Admin DjudasMS')
 
 @section('admin_content')
 <div class="space-y-6" x-data="flashSaleForm()">

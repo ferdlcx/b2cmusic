@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Kelola Kupon - Admin MusicStore Luxe')
+@section('title', 'Kelola Kupon - Admin DjudasMS')
 
 @section('admin_content')
 <div class="space-y-6">

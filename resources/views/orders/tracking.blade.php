@@ -145,7 +145,7 @@
 
         // Add markers
         var originMarker = L.marker([originLat, originLng], {icon: storeIcon}).addTo(map)
-            .bindPopup('<b>Toko MusicStore</b><br>Jakarta Barat');
+            .bindPopup('<b>Toko DjudasMS</b><br>Jakarta Barat');
 
         var destMarker = L.marker([destLat, destLng], {icon: customerIcon}).addTo(map)
             .bindPopup('<b>Alamat Pengiriman</b><br>{{ $order->address->city ?? "Tujuan" }}');

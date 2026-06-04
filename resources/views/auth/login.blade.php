@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Masuk - MusicStore Luxe')
+@section('title', 'Masuk - DjudasMS')
 
 @section('content')
 <div class="min-h-[75vh] flex items-center justify-center py-12 px-4">

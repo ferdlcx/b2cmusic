@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Laporan Pelanggan - Admin MusicStore Luxe')
+@section('title', 'Laporan Pelanggan - Admin DjudasMS')
 
 @section('admin_content')
 <div class="space-y-6">

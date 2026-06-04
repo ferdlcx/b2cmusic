@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Riwayat Pesanan - MusicStore Luxe')
+@section('title', 'Riwayat Pesanan - DjudasMS')
 
 @section('content')
 <div class="space-y-10 py-4">

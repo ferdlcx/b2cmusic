@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@yield('title', 'MusicStore Luxe')</title>
+    <title>@yield('title', 'DjudasMS')</title>
     <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-slate-900 hover:opacity-90 transition">
                     <span class="font-display font-black text-xl tracking-tight uppercase flex items-center gap-1.5">
                         <i data-lucide="music-4" class="w-6 h-6 text-indigo-600"></i>
-                        MusicStore <span class="text-indigo-600 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5 hidden sm:inline-block">LUXE</span>
+                        DjudasMS <span class="text-indigo-600 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5 hidden sm:inline-block">LUXE</span>
                     </span>
                 </a>
 
@@ -247,7 +247,7 @@
                 </div>
             </div>
             <div class="pt-8 text-center text-xs text-slate-400 tracking-wider">
-                &copy; {{ date('Y') }} MusicStore Luxe. Dibuat untuk Tugas Kuliah. model B2C E-commerce.
+                &copy; {{ date('Y') }} DjudasMS. Dibuat untuk Tugas Kuliah. model B2C E-commerce.
             </div>
         </div>
     </footer>

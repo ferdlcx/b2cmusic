@@ -32,7 +32,7 @@ class PaymentSuccess extends Notification implements ShouldQueue
                     ->line('Kami telah menerima pembayaran untuk pesanan Anda sebesar Rp ' . number_format($this->order->total, 0, ',', '.'))
                     ->line('Pesanan Anda saat ini sedang diproses oleh tim kami.')
                     ->action('Lihat Detail Pesanan', route('orders.show', $this->order->order_code))
-                    ->line('Terima kasih telah berbelanja di MusicStore!');
+                    ->line('Terima kasih telah berbelanja di DjudasMS!');
     }
 
     public function toArray($notifiable): array

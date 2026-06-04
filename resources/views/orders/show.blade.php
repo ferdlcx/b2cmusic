@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Pesanan #' . $order->order_code . ' - MusicStore Luxe')
+@section('title', 'Detail Pesanan #' . $order->order_code . ' - DjudasMS')
 
 @section('content')
 <div class="space-y-10 py-4">

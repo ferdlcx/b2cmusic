@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Saya - MusicStore Luxe')
+@section('title', 'Profil Saya - DjudasMS')
 
 @section('content')
 <!-- Leaflet Map CSS & JS -->

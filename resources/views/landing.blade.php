@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'MusicStore Luxe - Premium Instruments & Records')
+@section('title', 'DjudasMS - Premium Instruments & Records')
 
 @section('content')
 <!-- Hero Section -->
@@ -16,7 +16,7 @@
             </h1>
         </div>
         <p class="max-w-2xl text-md md:text-lg text-slate-600 leading-relaxed font-normal">
-            Selamat datang di MusicStore Luxe. Kami menyediakan instrumen musik kelas dunia, piringan hitam legendaris, dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda.
+            Selamat datang di DjudasMS. Kami menyediakan instrumen musik kelas dunia, piringan hitam legendaris, dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-2">
             <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/25 transition duration-300">
@@ -213,7 +213,7 @@
         <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Kualitas Suara Maksimal</span>
         <h2 class="font-display text-4xl font-black uppercase tracking-tight text-slate-950">Desain Suara & Estetika Tanpa Kompromi.</h2>
         <p class="text-slate-600 leading-relaxed text-sm">
-            MusicStore Luxe bukan sekadar toko retail alat musik biasa. Kami adalah kurator seni musik. Kami percaya bahwa instrumen yang indah secara visual akan melahirkan melodi yang indah secara emosional.
+            DjudasMS bukan sekadar toko retail alat musik biasa. Kami adalah kurator seni musik. Kami percaya bahwa instrumen yang indah secara visual akan melahirkan melodi yang indah secara emosional.
         </p>
     </div>
     <div class="grid gap-6 sm:grid-cols-2">

@@ -80,7 +80,7 @@
         <h2>Laporan Penjualan</h2>
         <p>
             Periode: <strong>{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }}</strong> s/d <strong>{{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</strong><br>
-            MusicStore Luxe
+            DjudasMS
         </p>
     </div>
 
@@ -131,7 +131,7 @@
     </table>
 
     <div class="footer">
-        Laporan ini dihasilkan secara otomatis oleh sistem MusicStore Luxe pada {{ now()->format('d M Y H:i:s') }} WIB.
+        Laporan ini dihasilkan secara otomatis oleh sistem DjudasMS pada {{ now()->format('d M Y H:i:s') }} WIB.
     </div>
 </body>
 </html>

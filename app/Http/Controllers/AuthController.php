@@ -63,7 +63,7 @@ class AuthController extends Controller
             ]);
         } catch (\Exception $e) {}
 
-        return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di MusicStore.');
+        return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di DjudasMS.');
     }
 
     public function showLogin()

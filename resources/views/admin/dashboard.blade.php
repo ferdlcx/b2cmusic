@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Admin Dashboard - MusicStore Luxe')
+@section('title', 'Admin Dashboard - DjudasMS')
 
 @section('admin_content')
 <div class="space-y-10 py-4">

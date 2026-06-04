@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Seed Users (Super Admin, Admin & Customer)
         $superAdmin = User::create([
-            'name' => 'Super Admin MusicStore',
+            'name' => 'Super Admin DjudasMS',
             'email' => 'superadmin@musicstore.com',
             'password' => Hash::make('password'),
             'phone' => '081122334455',
@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $admin = User::create([
-            'name' => 'Admin MusicStore',
+            'name' => 'Admin DjudasMS',
             'email' => 'admin@musicstore.com',
             'password' => Hash::make('password'),
             'phone' => '081234567890',

@@ -114,7 +114,7 @@
         <table class="header-table">
             <tr>
                 <td>
-                    <div class="logo">MusicStore <span>Luxe</span></div>
+                    <div class="logo">DjudasMS <span>Luxe</span></div>
                     <p style="margin: 5px 0 0 0; color: #64748b; font-size: 10px;">
                         Model B2C E-commerce instrumen musik premium<br>
                         Jakarta, Indonesia
@@ -210,7 +210,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            Terima kasih telah berbelanja di MusicStore Luxe.<br>
+            Terima kasih telah berbelanja di DjudasMS.<br>
             Jika Anda memiliki pertanyaan mengenai invoice ini, silakan hubungi Customer Support kami.
         </div>
     </div>

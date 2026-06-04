@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Notifikasi Saya - MusicStore Luxe')
+@section('title', 'Notifikasi Saya - DjudasMS')
 
 @section('content')
 <div class="max-w-3xl mx-auto space-y-8">

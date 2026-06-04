@@ -46,7 +46,8 @@ class ReturnController extends Controller
         $request->validate([
             'order_id' => ['required', 'exists:orders,id'],
             'reason'   => ['required', 'string', 'max:1000'],
-            'photo'    => ['nullable', 'image', 'max:2048'],
+            'photo'    => ['required', 'image', 'max:2048'],
+            'video'    => ['required', 'mimes:mp4,mov,avi,webm', 'max:51200'],
         ]);
 
         $user = Auth::user();
@@ -63,11 +64,17 @@ class ReturnController extends Controller
             $photoPath = $request->file('photo')->store('returns', 'public');
         }
 
+        $videoPath = null;
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('returns/videos', 'public');
+        }
+
         $returnReq = ReturnRequest::create([
             'order_id' => $order->id,
             'user_id'  => $user->id,
             'reason'   => $request->reason,
             'photo'    => $photoPath,
+            'video'    => $videoPath,
             'status'   => 'pending',
         ]);
 

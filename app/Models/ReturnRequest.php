@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['order_id', 'user_id', 'reason', 'photo', 'status', 'admin_notes'])]
+#[Fillable(['order_id', 'user_id', 'reason', 'photo', 'video', 'status', 'admin_notes'])]
 class ReturnRequest extends Model
 {
     public function order()

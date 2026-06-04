@@ -15,6 +15,8 @@
               addressId: '{{ $defaultAddress ? $defaultAddress->id : '' }}',
               courier: 'JNE_REG',
               paymentMethod: 'va',
+              packingOption: 'standard',
+              packingCost: 0,
               shippingCost: {{ $shippingCost }},
               shippingLoading: false,
               totalWeight: {{ $cartItems->sum(function($item) { return ($item->product->weight ?: 1000) * $item->quantity; }) }},
@@ -86,6 +88,7 @@
         <input type="hidden" name="courier" :value="courier" />
         <input type="hidden" name="payment_method" :value="paymentMethod" />
         <input type="hidden" name="coupon_code" :value="couponCode" />
+        <input type="hidden" name="packing" :value="packingOption" />
 
         <div class="grid gap-10 lg:grid-cols-[1fr_400px]">
             <!-- Left Side: Shipping Address, Courier, Payment Method -->
@@ -264,6 +267,58 @@
                     </div>
                 </div>
 
+                <!-- Packing Protection Section -->
+                <div class="bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-6">
+                    <div class="flex items-center gap-2 pb-4 border-b border-slate-100">
+                        <i data-lucide="shield" class="w-5 h-5 text-indigo-600"></i>
+                        <h3 class="font-display text-lg font-bold uppercase tracking-tight text-slate-950">Perlindungan Paket</h3>
+                    </div>
+                    <div class="grid gap-4 sm:grid-cols-3">
+                        <!-- Standard -->
+                        <label class="block p-4 border rounded-xl cursor-pointer hover:border-indigo-600 transition"
+                                :class="packingOption === 'standard' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : 'border-slate-200'">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="packing" value="standard" x-model="packingOption" @change="packingCost = 0" class="text-indigo-600 focus:ring-indigo-600">
+                                <div>
+                                    <span class="block text-sm font-bold">Standar</span>
+                                    <span class="block text-xs text-slate-500">Kardus biasa</span>
+                                    <span class="block text-[0.65rem] text-emerald-600 font-bold mt-1">Gratis</span>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Bubble Wrap -->
+                        <label class="block p-4 border rounded-xl cursor-pointer hover:border-indigo-600 transition"
+                                :class="packingOption === 'bubble_wrap' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : 'border-slate-200'">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="packing" value="bubble_wrap" x-model="packingOption" @change="packingCost = 15000" class="text-indigo-600 focus:ring-indigo-600">
+                                <div>
+                                    <span class="block text-sm font-bold">Bubble Wrap</span>
+                                    <span class="block text-xs text-slate-500">Perlindungan goncangan</span>
+                                    <span class="block text-[0.65rem] text-indigo-600 font-bold mt-1">+ Rp 15.000</span>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Packing Kayu -->
+                        <label class="block p-4 border rounded-xl cursor-pointer hover:border-indigo-600 transition"
+                                :class="packingOption === 'wooden_crate' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : 'border-slate-200'">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="packing" value="wooden_crate" x-model="packingOption" @change="packingCost = 50000" class="text-indigo-600 focus:ring-indigo-600">
+                                <div>
+                                    <span class="block text-sm font-bold">Packing Kayu</span>
+                                    <span class="block text-xs text-slate-500">Max protection (Rekomendasi)</span>
+                                    <span class="block text-[0.65rem] text-indigo-600 font-bold mt-1">+ Rp 50.000</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 text-xs text-slate-600 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i>
+                        <p><strong>Packing Kayu</strong> sangat direkomendasikan untuk instrumen musik berharga tinggi seperti gitar, keyboard, dan drum. Melindungi dari benturan keras selama pengiriman.</p>
+                    </div>
+                </div>
+
                 <!-- Payment Method Section -->
                 <div class="bg-white border border-slate-200/80 rounded-[32px] p-8 shadow-sm space-y-6">
                     <div class="flex items-center gap-2 pb-4 border-b border-slate-100">
@@ -372,6 +427,10 @@
                                 <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Menghitung...
                             </span>
                         </div>
+                        <div class="flex justify-between" x-show="packingCost > 0" style="display: none;">
+                            <span>Biaya Packing</span>
+                            <span class="font-bold text-slate-800" x-text="'Rp ' + packingCost.toLocaleString('id-ID')"></span>
+                        </div>
                         <div class="flex justify-between text-emerald-600" x-show="discount > 0" style="display: none;">
                             <span>Diskon Kupon</span>
                             <span class="font-bold" x-text="'-Rp ' + discount.toLocaleString('id-ID')">-Rp 0</span>
@@ -379,7 +438,7 @@
                         
                         <div class="pt-4 border-t border-slate-100 flex justify-between items-end">
                             <span class="text-slate-950 font-bold">Total Pembayaran</span>
-                            <span class="text-2xl font-black text-indigo-600" x-text="'Rp ' + (subtotal + shippingCost - discount).toLocaleString('id-ID')">
+                            <span class="text-2xl font-black text-indigo-600" x-text="'Rp ' + (subtotal + shippingCost + packingCost - discount).toLocaleString('id-ID')">
                                 Rp {{ number_format($subtotal + 25000, 0, ',', '.') }}
                             </span>
                         </div>

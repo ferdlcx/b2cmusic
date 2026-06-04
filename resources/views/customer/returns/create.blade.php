@@ -64,15 +64,42 @@
 
             <!-- Photo Upload -->
             <div class="space-y-1.5">
-                <label for="photo" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Foto Bukti (Wajib)</label>
+                <label for="photo" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Foto Bukti Kondisi Barang (Wajib)</label>
                 <div class="relative">
                     <input type="file" name="photo" id="photo" required accept="image/*"
                         class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold @error('photo') border-rose-500 @enderror" />
                 </div>
-                <p class="text-[0.65rem] text-slate-400 font-medium">Unggah foto produk yang menunjukkan kerusakan atau ketidaksesuaian (Max. 2MB, format JPEG/PNG).</p>
+                <p class="text-[0.65rem] text-slate-400 font-medium">Unggah foto produk yang menunjukkan kerusakan/ketidaksesuaian (Max. 2MB, format JPEG/PNG).</p>
                 @error('photo')
                     <span class="text-[0.65rem] text-rose-600 font-semibold block mt-1">{{ $message }}</span>
                 @enderror
+            </div>
+
+            <!-- Video Unboxing Upload -->
+            <div class="space-y-1.5">
+                <label for="video" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Video Unboxing (Wajib)</label>
+                <div class="relative">
+                    <input type="file" name="video" id="video" required accept="video/*"
+                        class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition text-xs font-semibold @error('video') border-rose-500 @enderror" />
+                </div>
+                <p class="text-[0.65rem] text-slate-400 font-medium">Unggah video saat unboxing paket Anda (Max. 50MB, format MP4/MOV/AVI).</p>
+                @error('video')
+                    <span class="text-[0.65rem] text-rose-600 font-semibold block mt-1">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <!-- Warning Box -->
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                <div class="text-xs text-amber-800 space-y-1.5">
+                    <p class="font-bold uppercase tracking-wider text-[0.65rem]">⚠️ Syarat Wajib Pengembalian / Garansi</p>
+                    <ul class="list-disc pl-4 space-y-1 text-amber-700 font-medium">
+                        <li><strong>Video unboxing</strong> adalah syarat utama yang WAJIB dilampirkan.</li>
+                        <li>Pengajuan <strong>tanpa video unboxing akan otomatis DITOLAK</strong>.</li>
+                        <li>Video harus menampilkan proses membuka paket dari awal hingga terlihat kondisi barang.</li>
+                        <li>Foto tambahan wajib menunjukkan kerusakan/ketidaksesuaian barang secara jelas.</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Submit -->

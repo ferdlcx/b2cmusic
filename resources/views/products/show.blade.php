@@ -159,7 +159,9 @@
 
             <div class="space-y-4 pt-4">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Keterangan Lengkap</h3>
-                <p class="text-slate-600 text-sm leading-relaxed whitespace-pre-line font-normal">{{ $product->description }}</p>
+                <div class="prose prose-sm prose-slate max-w-none text-slate-600 font-normal">
+                    {!! $product->description !!}
+                </div>
             </div>
         </div>
 

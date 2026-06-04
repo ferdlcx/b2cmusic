@@ -200,16 +200,27 @@
                             <div class="px-6 pb-6">
                                 <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
                                     <a href="{{ route('products.show', $product->slug) }}" class="text-xs uppercase tracking-widest text-slate-900 font-bold hover:text-indigo-600 transition">Detail</a>
-                                    @if($product->stock > 0)
-                                        <form action="{{ route('cart.add') }}" method="POST">
+                                    <div class="flex items-center gap-2">
+                                        <!-- Wishlist Button -->
+                                        <form action="{{ route('wishlist.add') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider bg-indigo-600 text-white px-3.5 py-2 rounded-xl hover:bg-indigo-700 transition duration-300 font-semibold shadow-sm hover:shadow-indigo-600/10">
-                                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Beli
+                                            <button type="submit" class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-slate-350 hover:bg-slate-100 transition" title="Tambah ke Wishlist">
+                                                <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i>
                                             </button>
                                         </form>
-                                    @endif
+
+                                        @if($product->stock > 0)
+                                            <form action="{{ route('cart.add') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button type="submit" class="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider bg-indigo-600 text-white px-3.5 py-2 rounded-xl hover:bg-indigo-700 transition duration-300 font-semibold shadow-sm hover:shadow-indigo-600/10">
+                                                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Beli
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </article>

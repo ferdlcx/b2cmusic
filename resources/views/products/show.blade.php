@@ -125,6 +125,16 @@
                         Stok Habis Terjual
                     </button>
                 @endif
+
+                <!-- Add to Wishlist Form -->
+                <form action="{{ route('wishlist.add') }}" method="POST" class="pt-2">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <button type="submit" 
+                        class="w-full py-3.5 bg-white border border-slate-200 hover:border-slate-350 text-slate-700 rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-slate-50 transition duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="heart" class="w-4 h-4 text-rose-500 fill-rose-500"></i> Tambah ke Wishlist
+                    </button>
+                </form>
             </div>
 
             <!-- Short Description -->

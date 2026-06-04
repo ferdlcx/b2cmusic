@@ -10,6 +10,13 @@
             <span class="text-[0.65rem] uppercase tracking-[0.4em] text-rose-600 font-bold bg-rose-50 px-3.5 py-1.5 rounded-full inline-block">Formulir Retur</span>
             <h1 class="font-display text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Ajukan Pengembalian</h1>
             <p class="text-sm text-slate-500 font-normal">Pengajuan pengembalian barang untuk Pesanan <span class="font-bold text-slate-800">#{{ $order->order_code }}</span></p>
+            @php
+                $daysRemaining = max(0, 30 - $order->updated_at->diffInDays(now()));
+            @endphp
+            <div class="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-50 border border-amber-200/60 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                <span class="text-[0.65rem] text-amber-800 font-bold uppercase tracking-wider">Sisa Garansi: {{ $daysRemaining }} Hari lagi</span>
+            </div>
         </div>
         <a href="{{ route('orders.history') }}" class="inline-flex items-center justify-center p-2.5 border border-slate-200 bg-white rounded-2xl text-slate-500 hover:text-slate-850 hover:bg-slate-50 transition" title="Kembali ke Riwayat Pesanan">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
@@ -94,6 +101,7 @@
                 <div class="text-xs text-amber-800 space-y-1.5">
                     <p class="font-bold uppercase tracking-wider text-[0.65rem]">⚠️ Syarat Wajib Pengembalian / Garansi</p>
                     <ul class="list-disc pl-4 space-y-1 text-amber-700 font-medium">
+                        <li><strong>Garansi Pengembalian</strong> hanya berlaku selama <strong>30 hari</strong> sejak pesanan selesai/diterima.</li>
                         <li><strong>Video unboxing</strong> adalah syarat utama yang WAJIB dilampirkan.</li>
                         <li>Pengajuan <strong>tanpa video unboxing akan otomatis DITOLAK</strong>.</li>
                         <li>Video harus menampilkan proses membuka paket dari awal hingga terlihat kondisi barang.</li>

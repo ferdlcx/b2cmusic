@@ -277,12 +277,18 @@
                 </div>
             @endif
 
-            @if($order->status === 'completed')
-                <div class="pt-4 border-t border-slate-100">
+            @if($order->status === 'completed' && $order->updated_at->addDays(30)->isFuture())
+                <div class="pt-4 border-t border-slate-100 space-y-2">
                     <a href="{{ route('returns.create', $order->id) }}" 
                         class="w-full py-3.5 bg-white border-2 border-amber-500 text-amber-700 rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-amber-50 transition duration-300 flex items-center justify-center gap-2">
                         <i data-lucide="package-x" class="w-4 h-4"></i> Ajukan Pengembalian Barang
                     </a>
+                    @php
+                        $daysRemaining = max(0, 30 - $order->updated_at->diffInDays(now()));
+                    @endphp
+                    <p class="text-[0.65rem] text-amber-600 font-bold text-center uppercase tracking-wider">
+                        Sisa Masa Garansi Retur: {{ $daysRemaining }} Hari (Garansi 30 Hari)
+                    </p>
                 </div>
             @endif
 

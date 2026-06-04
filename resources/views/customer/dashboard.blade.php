@@ -213,12 +213,12 @@
                         <div class="border-t border-slate-200 pt-3 flex items-center justify-between">
                             <a href="{{ route('orders.show', $lastOrder->order_code) }}" class="text-[0.7rem] text-indigo-600 font-bold hover:underline">Detail Pesanan &rarr;</a>
                             
-                            @if($lastOrder->status === 'completed')
+                            @if($lastOrder->status === 'completed' && $lastOrder->updated_at->addDays(30)->isFuture())
                                 @php
                                     $hasReturn = \App\Models\ReturnRequest::where('order_id', $lastOrder->id)->exists();
                                 @endphp
                                 @if(!$hasReturn)
-                                    <a href="{{ route('returns.create', $lastOrder->id) }}" class="text-[0.7rem] text-rose-600 font-bold hover:underline">Ajukan Retur</a>
+                                    <a href="{{ route('returns.create', $lastOrder->id) }}" class="text-[0.7rem] text-rose-600 font-bold hover:underline" title="Garansi Sisa {{ max(0, 30 - $lastOrder->updated_at->diffInDays(now())) }} Hari">Ajukan Retur</a>
                                 @else
                                     <span class="text-[0.6rem] text-slate-400 font-semibold">Retur Diajukan</span>
                                 @endif

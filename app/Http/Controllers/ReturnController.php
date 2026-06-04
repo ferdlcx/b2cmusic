@@ -32,10 +32,13 @@ class ReturnController extends Controller
             return redirect()->route('orders.history')->with('error', 'Pengajuan pengembalian barang untuk pesanan ini sudah ada.');
         }
 
-        // Only allow returns if the order is completed (or paid/shipped)
-        // Adjust status check based on business flow, e.g., 'completed' or 'paid'
-        if ($order->status === 'canceled' || $order->status === 'pending') {
-            return redirect()->route('orders.history')->with('error', 'Pesanan yang belum selesai atau dibatalkan tidak dapat dikembalikan.');
+        // Only allow returns if the order is completed and within the 30-day warranty period
+        if ($order->status !== 'completed') {
+            return redirect()->route('orders.history')->with('error', 'Hanya pesanan dengan status Selesai yang dapat diajukan pengembalian.');
+        }
+
+        if ($order->updated_at->addDays(30)->isPast()) {
+            return redirect()->route('orders.history')->with('error', 'Masa garansi 30 hari telah berakhir. Anda tidak dapat mengajukan pengembalian barang.');
         }
 
         return view('customer.returns.create', compact('order'));
@@ -52,6 +55,15 @@ class ReturnController extends Controller
 
         $user = Auth::user();
         $order = Order::where('user_id', $user->id)->findOrFail($request->order_id);
+
+        // Only allow returns if the order is completed and within the 30-day warranty period
+        if ($order->status !== 'completed') {
+            return redirect()->route('returns.index')->with('error', 'Hanya pesanan dengan status Selesai yang dapat diajukan pengembalian.');
+        }
+
+        if ($order->updated_at->addDays(30)->isPast()) {
+            return redirect()->route('returns.index')->with('error', 'Masa garansi 30 hari telah berakhir. Anda tidak dapat mengajukan pengembalian barang.');
+        }
 
         // Check if return request already exists
         $exists = ReturnRequest::where('order_id', $order->id)->exists();

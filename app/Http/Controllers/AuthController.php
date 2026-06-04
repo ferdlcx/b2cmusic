@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
@@ -47,7 +49,14 @@ class AuthController extends Controller
         Cart::create(['user_id' => $user->id]);
         Wishlist::create(['user_id' => $user->id]);
 
-        event(new Registered($user));
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $user->otp_code = $otpCode;
+        $user->otp_expires_at = now()->addMinutes(15);
+        $user->save();
+
+        try {
+            Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
+        } catch (\Exception $e) {}
 
         Auth::login($user);
 
@@ -233,21 +242,47 @@ class AuthController extends Controller
         return view('auth.verify-email');
     }
 
-    public function verifyEmail(\Illuminate\Foundation\Auth\EmailVerificationRequest $request)
+    public function verifyOtp(Request $request)
     {
-        $request->fulfill();
+        $request->validate([
+            'otp_code' => ['required', 'string', 'size:6'],
+        ]);
 
-        return redirect('/')->with('success', 'Email berhasil diverifikasi!');
+        $user = Auth::user();
+
+        if ($user->otp_code !== $request->otp_code) {
+            return back()->withErrors(['otp_code' => 'Kode OTP tidak valid.']);
+        }
+
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return back()->withErrors(['otp_code' => 'Kode OTP sudah kedaluwarsa. Silakan minta kode baru.']);
+        }
+
+        $user->email_verified_at = now();
+        $user->otp_code = null;
+        $user->otp_expires_at = null;
+        $user->save();
+
+        return redirect('/')->with('success', 'Email berhasil diverifikasi! Selamat datang di DjudasMS.');
     }
 
     public function resendVerification(Request $request)
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
             return redirect('/');
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        $user->otp_code = $otpCode;
+        $user->otp_expires_at = now()->addMinutes(15);
+        $user->save();
 
-        return back()->with('success', 'Link verifikasi baru telah dikirim ke alamat email Anda.');
+        try {
+            Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
+        } catch (\Exception $e) {}
+
+        return back()->with('success', 'Kode OTP baru telah dikirim ke alamat email Anda.');
     }
 }

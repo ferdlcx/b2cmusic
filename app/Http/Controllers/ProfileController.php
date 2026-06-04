@@ -17,19 +17,26 @@ class ProfileController extends Controller
     public function getProvinces()
     {
         $apiKey = config('services.rajaongkir.api_key');
-        if (!$apiKey) {
-            return response()->json(['error' => 'API Key RajaOngkir belum dikonfigurasi.'], 500);
+        
+        if ($apiKey) {
+            try {
+                $response = Http::timeout(4)->withHeaders(['key' => $apiKey])->get('https://api.rajaongkir.com/starter/province');
+                if ($response->successful() && $response->json('rajaongkir.results')) {
+                    return response()->json($response->json('rajaongkir.results'));
+                }
+            } catch (\Exception $e) {
+                // Fail silently to fall back
+            }
         }
 
-        try {
-            $response = Http::withHeaders(['key' => $apiKey])->get('https://api.rajaongkir.com/starter/province');
-            if ($response->successful()) {
-                return response()->json($response->json('rajaongkir.results'));
-            }
-            return response()->json(['error' => 'Gagal mengambil data provinsi.'], 500);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        // Fallback to local JSON file
+        $path = resource_path('data/provinces.json');
+        if (file_exists($path)) {
+            $data = json_decode(file_get_contents($path), true);
+            return response()->json($data);
         }
+
+        return response()->json(['error' => 'Gagal mengambil data provinsi.'], 500);
     }
 
     /**
@@ -38,23 +45,35 @@ class ProfileController extends Controller
     public function getCities(Request $request)
     {
         $apiKey = config('services.rajaongkir.api_key');
-        if (!$apiKey) {
-            return response()->json(['error' => 'API Key RajaOngkir belum dikonfigurasi.'], 500);
-        }
-
         $provinceId = $request->query('province_id');
 
-        try {
-            $response = Http::withHeaders(['key' => $apiKey])->get('https://api.rajaongkir.com/starter/city', [
-                'province' => $provinceId
-            ]);
-            if ($response->successful()) {
-                return response()->json($response->json('rajaongkir.results'));
+        if ($apiKey) {
+            try {
+                $response = Http::timeout(4)->withHeaders(['key' => $apiKey])->get('https://api.rajaongkir.com/starter/city', [
+                    'province' => $provinceId
+                ]);
+                if ($response->successful() && $response->json('rajaongkir.results')) {
+                    return response()->json($response->json('rajaongkir.results'));
+                }
+            } catch (\Exception $e) {
+                // Fail silently to fall back
             }
-            return response()->json(['error' => 'Gagal mengambil data kota.'], 500);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        // Fallback to local JSON file
+        $path = resource_path('data/cities.json');
+        if (file_exists($path)) {
+            $allCities = json_decode(file_get_contents($path), true);
+            if ($provinceId) {
+                $filteredCities = array_filter($allCities, function ($city) use ($provinceId) {
+                    return $city['province_id'] == $provinceId;
+                });
+                return response()->json(array_values($filteredCities));
+            }
+            return response()->json($allCities);
+        }
+
+        return response()->json(['error' => 'Gagal mengambil data kota.'], 500);
     }
     /**
      * Show the user profile page with addresses.

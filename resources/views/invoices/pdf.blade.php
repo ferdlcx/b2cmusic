@@ -139,7 +139,8 @@
                     <div class="details-heading">Detail Invoice</div>
                     No. Invoice: <strong>#{{ $order->order_code }}</strong><br>
                     Tanggal: {{ $order->created_at->format('d F Y, H:i') }} WIB<br>
-                    Metode Pembayaran: {{ $order->payment ? strtoupper(str_replace('_', ' ', $order->payment->payment_type)) : '-' }}<br>
+                    Metode Pembayaran: {{ $order->payment ? strtoupper(str_replace('_', ' ', $order->payment->payment_method)) : '-' }}<br>
+                    Transaction ID: {{ $order->payment ? $order->payment->transaction_id : '-' }}<br>
                     Status: <strong>{{ strtoupper($order->status) }}</strong>
                 </td>
             </tr>
@@ -150,6 +151,22 @@
                         <strong>{{ $order->address->name }}</strong> ({{ $order->address->label }})<br>
                         {{ $order->address->address }}, {{ $order->address->village }}, {{ $order->address->district }}<br>
                         {{ $order->address->city }}, {{ $order->address->province }}, {{ $order->address->postal_code }}
+                    </td>
+                </tr>
+            @endif
+            @if($order->shipment)
+                <tr>
+                    <td colspan="2" style="padding-top: 15px;">
+                        <div class="details-heading">Informasi Pengiriman</div>
+                        <strong>{{ $order->shipment->courier }}</strong> - {{ $order->shipment->service }}<br>
+                        No. Resi: {{ $order->shipment->tracking_number ?: 'Belum tersedia' }}<br>
+                        Status Pengiriman: {{ ucfirst($order->shipment->status) }}
+                        @if($order->shipment->shipped_at)
+                            <br>Tanggal Kirim: {{ \Carbon\Carbon::parse($order->shipment->shipped_at)->format('d F Y, H:i') }} WIB
+                        @endif
+                        @if($order->shipment->delivered_at)
+                            <br>Tanggal Diterima: {{ \Carbon\Carbon::parse($order->shipment->delivered_at)->format('d F Y, H:i') }} WIB
+                        @endif
                     </td>
                 </tr>
             @endif

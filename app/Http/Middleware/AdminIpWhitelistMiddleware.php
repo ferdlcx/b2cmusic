@@ -15,7 +15,7 @@ class AdminIpWhitelistMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $allowedIps = explode(',', env('ADMIN_ALLOWED_IPS', '127.0.0.1,::1'));
+        $allowedIps = explode(',', env('ADMIN_ALLOWED_IPS', '*'));
         
         // If * is provided, allow all IPs
         if (in_array('*', $allowedIps)) {

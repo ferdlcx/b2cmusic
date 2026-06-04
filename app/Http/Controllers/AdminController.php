@@ -35,7 +35,7 @@ class AdminController extends Controller
                 'action' => $action,
                 'model_type' => $modelType,
                 'model_id' => $modelId,
-                'description' => $description,
+                'description' => '[' . strtoupper(Auth::user()->role) . '] ' . $description,
                 'ip_address' => request()->ip(),
                 'user_agent' => request()->userAgent(),
             ]);

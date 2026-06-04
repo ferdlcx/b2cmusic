@@ -30,8 +30,99 @@
             }
         </script>
     @endif
+
+    <style>
+        /* Floating Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float-orb 20s ease-in-out infinite;
+        }
+        .orb-1 {
+            width: 600px; height: 600px;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            top: -10%; left: -5%;
+            animation-delay: 0s;
+            animation-duration: 25s;
+        }
+        .orb-2 {
+            width: 500px; height: 500px;
+            background: linear-gradient(135deg, #ec4899, #f97316);
+            top: 50%; right: -10%;
+            animation-delay: -8s;
+            animation-duration: 30s;
+        }
+        .orb-3 {
+            width: 400px; height: 400px;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            bottom: -10%; left: 30%;
+            animation-delay: -15s;
+            animation-duration: 22s;
+        }
+        @keyframes float-orb {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(80px, -60px) scale(1.1); }
+            50% { transform: translate(-40px, 80px) scale(0.95); }
+            75% { transform: translate(60px, 40px) scale(1.05); }
+        }
+
+        /* Fade-in-up animation */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        /* Scroll indicator bounce */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0) translateX(-50%); }
+            50% { transform: translateY(8px) translateX(-50%); }
+        }
+        .animate-bounce-slow { animation: bounce-slow 2.5s ease-in-out infinite; }
+
+        /* Scroll dot inside indicator */
+        @keyframes scroll-dot {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(12px); }
+        }
+        .animate-scroll-dot { animation: scroll-dot 1.8s ease-in-out infinite; }
+
+        /* Card shine hover effect */
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(30deg);
+            transition: 0.6s;
+            opacity: 0;
+        }
+        .card-shine:hover::after {
+            opacity: 1;
+            transform: rotate(30deg) translateY(-30%);
+        }
+    </style>
 </head>
 <body class="font-sans text-slate-900 bg-[#f8f8f8] min-h-screen flex flex-col justify-between overflow-x-hidden">
+    <!-- Floating Orbs Background -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
     <div>
         <!-- Navbar -->
         <header x-data="{ mobileMenuOpen: false }" class="bg-white/80 backdrop-blur-xl border-b border-slate-100/85 sticky top-0 z-50 transition duration-300">
@@ -254,6 +345,26 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+
+            // Scroll Animation Observer
+            const sections = document.querySelectorAll('section, .scroll-reveal');
+            sections.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(40px)';
+                el.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            sections.forEach(el => observer.observe(el));
         });
     </script>
 </body>

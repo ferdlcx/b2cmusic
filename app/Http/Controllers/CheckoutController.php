@@ -88,12 +88,7 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // Verify Stock again
-        foreach ($cartItems as $item) {
-            if ($item->product->stock < $item->quantity) {
-                return back()->with('error', "Stok produk {$item->product->name} tidak mencukupi.");
-            }
-        }
+
 
         // Calculate Totals
         $subtotal = $cartItems->sum(function($item) {
@@ -186,6 +181,15 @@ class CheckoutController extends Controller
         // Start Database Transaction based on ERD structure
         DB::beginTransaction();
         try {
+            // Verify & Lock Stock (NFR-10: Atomic stock management)
+            foreach ($cartItems as $item) {
+                $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
+                if (!$product || $product->stock < $item->quantity) {
+                    DB::rollBack();
+                    return back()->with('error', "Stok produk {$item->product->name} tidak mencukupi.");
+                }
+            }
+
             // 1. Create Order
             $orderCode = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
             $order = Order::create([
@@ -211,9 +215,8 @@ class CheckoutController extends Controller
                     'subtotal' => $item->price * $item->quantity,
                 ]);
 
-                // Update product stock
-                $product = Product::findOrFail($item->product_id);
-                $product->decrement('stock', $item->quantity);
+                // Update product stock (already locked above)
+                Product::where('id', $item->product_id)->decrement('stock', $item->quantity);
             }
 
             // 3. Create Shipment

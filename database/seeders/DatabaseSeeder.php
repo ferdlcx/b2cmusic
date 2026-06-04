@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '081122334455',
             'role' => 'super_admin',
             'status' => 'active',
+            'email_verified_at' => now(),
         ]);
 
         $admin = User::create([
@@ -36,6 +37,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '081234567890',
             'role' => 'admin',
             'status' => 'active',
+            'email_verified_at' => now(),
         ]);
 
         $customer = User::create([
@@ -45,6 +47,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '089876543210',
             'role' => 'customer',
             'status' => 'active',
+            'email_verified_at' => now(),
         ]);
 
         // 2. Seed Customer Addresses
@@ -75,6 +78,25 @@ class DatabaseSeeder extends Seeder
             'postal_code' => '10220',
             'is_default' => false,
         ]);
+
+        // 2.5 Seed Brands (25 Brands for B2C Requirement)
+        $brandsList = [
+            'Yamaha', 'Fender', 'Gibson', 'Ibanez', 'Cort', 
+            'Roland', 'Korg', 'Boss', 'Marshall', 'Shure', 
+            'Audio-Technica', 'Sennheiser', 'Focusrite', 'Pioneer', 'Kala', 
+            'Hohner', 'D\'Addario', 'Elixir', 'Hercules', 'Pearl', 
+            'Genta', 'Taylor', 'Martin', 'Epiphone', 'Lokal'
+        ];
+        
+        $brands = [];
+        foreach ($brandsList as $bName) {
+            $brands[$bName] = \App\Models\Brand::create([
+                'name' => $bName,
+                'slug' => Str::slug($bName),
+                'description' => "Produsen instrumen musik dan aksesoris audio premium merek {$bName}.",
+                'status' => true,
+            ]);
+        }
 
         // 3. Seed Categories (13 Categories from User Request)
         $categoriesData = [
@@ -663,12 +685,21 @@ class DatabaseSeeder extends Seeder
                     $discountEnd = now()->addDays(30);
                 }
 
+                $brandModel = $brands[$pData['brand']] ?? \App\Models\Brand::firstOrCreate([
+                    'name' => $pData['brand'],
+                    'slug' => Str::slug($pData['brand']),
+                    'description' => "Produsen instrumen musik dan aksesoris audio premium merek {$pData['brand']}.",
+                    'status' => true,
+                ]);
+
                 // Create Product
                 $product = Product::create([
                     'category_id' => $cat->id,
+                    'brand_id' => $brandModel->id,
+                    'condition' => 'new',
+                    'sold_count' => rand(5, 45),
                     'name' => $pData['name'],
                     'slug' => Str::slug($pData['name']),
-                    'brand' => $pData['brand'],
                     'short_description' => $pData['short_description'],
                     'description' => $pData['description'],
                     'price' => $pData['price'],
@@ -717,6 +748,56 @@ class DatabaseSeeder extends Seeder
                     'user_id' => $customer->id,
                     'rating' => rand(4, 5),
                     'comment' => 'Produk sangat memuaskan, kualitas bahan premium dan suara sangat mantap! Pengiriman cepat.',
+                ]);
+            }
+        }
+
+        // 4.5 Programmatically expand to 100+ products (total ~117 products)
+        $extraBrands = ['Yamaha', 'Fender', 'Gibson', 'Ibanez', 'Cort', 'Roland', 'Korg', 'Boss'];
+        foreach ($categories as $catName => $cat) {
+            $existingCount = Product::where('category_id', $cat->id)->count();
+            $needed = 9 - $existingCount;
+            for ($i = 1; $i <= $needed; $i++) {
+                $brandName = $extraBrands[array_rand($extraBrands)];
+                $brandModel = $brands[$brandName];
+                $name = $catName . ' ' . $brandName . ' Premium Edition ' . $i;
+                $price = rand(15, 120) * 100000;
+                
+                $product = Product::create([
+                    'category_id' => $cat->id,
+                    'brand_id' => $brandModel->id,
+                    'condition' => array_rand(['new' => 0, 'used' => 1, 'refurbished' => 2]),
+                    'sold_count' => rand(0, 30),
+                    'name' => $name,
+                    'slug' => Str::slug($name) . '-' . Str::random(3),
+                    'short_description' => "Instrumen {$catName} edisi khusus dengan kualitas akustik profesional.",
+                    'description' => "Edisi khusus {$name} menawarkan nilai performa luar biasa bagi musisi profesional maupun pemula. Dibuat dengan presisi tinggi menggunakan material terpilih.",
+                    'price' => $price,
+                    'discount_price' => rand(1, 10) > 7 ? $price * 0.9 : null,
+                    'weight' => rand(1000, 15000),
+                    'stock' => rand(2, 20),
+                    'sku' => strtoupper(substr($catName, 0, 3)) . '-' . strtoupper(substr($brandName, 0, 3)) . '-' . rand(100, 999) . $i,
+                    'status' => true,
+                ]);
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image' => 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
+                    'is_primary' => true,
+                ]);
+
+                ProductSpecification::create([
+                    'product_id' => $product->id,
+                    'spec_name' => 'Edisi',
+                    'spec_value' => 'Premium Studio Edition',
+                ]);
+
+                Review::create([
+                    'product_id' => $product->id,
+                    'user_id' => $customer->id,
+                    'rating' => rand(4, 5),
+                    'comment' => 'Kualitas instrumen sangat bagus untuk harganya. Sangat direkomendasikan!',
+                    'status' => 'approved',
                 ]);
             }
         }

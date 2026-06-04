@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use App\Notifications\OrderCreated;
 
 class CheckoutController extends Controller
 {
@@ -345,6 +346,9 @@ class CheckoutController extends Controller
 
             // 7. Clear user cart
             CartItem::where('cart_id', $cart->id)->delete();
+
+            // 8. Notify user
+            $user->notify(new OrderCreated($order));
 
             DB::commit();
 

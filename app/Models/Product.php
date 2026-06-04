@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['category_id', 'name', 'slug', 'brand', 'short_description', 'description', 'price', 'discount_price', 'discount_start', 'discount_end', 'weight', 'stock', 'sku', 'status'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'brand', 'short_description', 'description', 'price', 'discount_price', 'discount_start', 'discount_end', 'weight', 'stock', 'sku', 'condition', 'sold_count', 'status'])]
 class Product extends Model
 {
+    use SoftDeletes;
     protected $casts = [
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
@@ -16,6 +18,7 @@ class Product extends Model
         'weight' => 'integer',
         'stock' => 'integer',
         'status' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     public function isDiscountActive(): bool
@@ -65,5 +68,10 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

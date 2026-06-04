@@ -12,9 +12,20 @@
     </div>
 
     <!-- Layout Grid -->
-    <div class="grid gap-10 lg:grid-cols-[260px_1fr]">
+    <div class="grid gap-10 lg:grid-cols-[260px_1fr]" x-data="{ showFilters: false }">
+        <!-- Toggle Button for Filters on Mobile -->
+        <div class="lg:hidden flex items-center justify-between bg-white border border-slate-200/80 rounded-[20px] p-4 shadow-sm col-span-1">
+            <span class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-indigo-600"></i>
+                Filter & Urutkan
+            </span>
+            <button type="button" @click="showFilters = !showFilters" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition">
+                <span x-text="showFilters ? 'Sembunyikan' : 'Tampilkan'"></span>
+            </button>
+        </div>
+
         <!-- Sidebar Filters -->
-        <aside class="space-y-8">
+        <aside class="space-y-8 lg:block" :class="showFilters ? 'block' : 'hidden'">
             <!-- Search -->
             <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
                 <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Pencarian</span>

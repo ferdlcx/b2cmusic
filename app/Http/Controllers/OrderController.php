@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\PaymentSuccess;
 
 class OrderController extends Controller
 {
@@ -55,6 +56,8 @@ class OrderController extends Controller
             'status' => 'paid',
             'paid_at' => now(),
         ]);
+
+        $user->notify(new PaymentSuccess($order));
 
         return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan Anda kini sedang diproses.');
     }
@@ -137,6 +140,10 @@ class OrderController extends Controller
 
             // Update Order
             $order->update(['status' => $orderStatus]);
+
+            if ($orderStatus === 'paid') {
+                $order->user->notify(new PaymentSuccess($order));
+            }
 
             // Update Payment
             if ($order->payment) {

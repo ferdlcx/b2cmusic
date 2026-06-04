@@ -10,7 +10,7 @@
             <span>ARTISAN TOKO MUSIK B2C</span>
         </div>
         <div class="max-w-3xl">
-            <h1 class="font-display text-5xl md:text-6xl lg:text-[4.5rem] leading-tight font-black uppercase tracking-tight text-slate-950">
+            <h1 class="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] leading-tight font-black uppercase tracking-tight text-slate-950">
                 Suara Murni.<br />Craftsmanship<br />
                 <span class="text-indigo-600">Ikonik.</span>
             </h1>
@@ -19,10 +19,10 @@
             Selamat datang di MusicStore Luxe. Kami menyediakan instrumen musik kelas dunia, piringan hitam legendaris, dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-2">
-            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4.5 bg-indigo-600 text-white rounded-2xl text-sm font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/25 transition duration-300">
-                <i data-lucide="shopping-bag" class="w-4.5 h-4.5"></i> Jelajahi Toko
+            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/25 transition duration-300">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i> Jelajahi Toko
             </a>
-            <a href="#collections" class="inline-flex items-center justify-center px-8 py-4.5 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-semibold tracking-wider hover:border-indigo-600 hover:text-indigo-600 transition duration-300">
+            <a href="#collections" class="inline-flex items-center justify-center px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-semibold tracking-wider hover:border-indigo-600 hover:text-indigo-600 transition duration-300">
                 Lihat Kategori
             </a>
         </div>
@@ -53,19 +53,19 @@
         ],
         next() { this.activeSlide = (this.activeSlide + 1) % this.slides.length },
         prev() { this.activeSlide = (this.activeSlide - 1 + this.slides.length) % this.slides.length }
-    }" x-init="setInterval(() => next(), 5000)" class="relative overflow-hidden rounded-[36px] bg-slate-950 shadow-2xl h-[420px] lg:h-[480px] group border border-slate-900">
+    }" x-init="setInterval(() => next(), 5000)" class="relative overflow-hidden rounded-[36px] bg-slate-950 shadow-2xl h-[320px] sm:h-[400px] lg:h-[480px] group border border-slate-900">
         <!-- Slides -->
         <template x-for="(slide, index) in slides" :key="index">
             <div x-show="activeSlide === index" 
                  x-transition:enter="transition ease-out duration-700"
-                 x-transition:enter-start="opacity-0 scale-102 translate-x-4"
+                 x-transition:enter-start="opacity-0 scale-[1.02] translate-x-4"
                  x-transition:enter-end="opacity-100 scale-100 translate-x-0"
                  x-transition:leave="transition ease-in duration-500"
                  x-transition:leave-start="opacity-100 scale-100 translate-x-0"
                  x-transition:leave-end="opacity-0 scale-98 -translate-x-4"
                  class="absolute inset-0 w-full h-full">
                 <!-- Background Image -->
-                <img :src="slide.image" alt="" class="h-full w-full object-cover opacity-60 transform group-hover:scale-102 transition duration-700" />
+                <img :src="slide.image" alt="" class="h-full w-full object-cover opacity-60 transform group-hover:scale-[1.02] transition duration-700" />
                 <!-- Overlay Gradient -->
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
                 <!-- Slide Content -->
@@ -126,7 +126,7 @@
                     elseif (str_contains($slug, 'tradisional')) $icon = 'award';
                     elseif (str_contains($slug, 'aksesoris') || str_contains($slug, 'senar') || str_contains($slug, 'capo')) $icon = 'sliders';
                 @endphp
-                <a href="{{ route('catalog', ['category' => $cat->slug]) }}" class="group overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm hover:shadow-xl hover:border-indigo-600/40 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between h-[230px]">
+                <a href="{{ route('catalog', ['category' => $cat->slug]) }}" class="group overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm hover:shadow-xl hover:border-indigo-600/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-[230px]">
                     <div class="flex items-center justify-between">
                         <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
                             <i data-lucide="{{ $icon }}" class="w-6 h-6"></i>
@@ -155,10 +155,10 @@
     
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         @forelse($products as $product)
-            <article class="group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
+            <article class="group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1 duration-300 flex flex-col justify-between h-full">
                 <a href="{{ route('products.show', $product->slug) }}" class="block">
                     <div class="h-64 overflow-hidden bg-slate-100 flex items-center justify-center relative">
-                        <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-103" />
+                        <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                         
                         <!-- Badges -->
                         <div class="absolute top-4 left-4 flex flex-col gap-2">
@@ -217,12 +217,12 @@
         </p>
     </div>
     <div class="grid gap-6 sm:grid-cols-2">
-        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1.5 transition duration-300">
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1 transition duration-300">
             <div class="text-4xl font-black text-indigo-600">01</div>
             <div class="text-xs uppercase tracking-widest text-slate-900 font-bold">Produk Terkurasi</div>
             <p class="text-xs text-slate-500 leading-relaxed">Setiap gitar dan piringan hitam diuji kualitas bunyinya oleh ahli audio kami sebelum masuk daftar display.</p>
         </div>
-        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1.5 transition duration-300">
+        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1 transition duration-300">
             <div class="text-4xl font-black text-indigo-600">02</div>
             <div class="text-xs uppercase tracking-widest text-slate-900 font-bold">Garansi Resmi</div>
             <p class="text-xs text-slate-500 leading-relaxed">Kami menjamin orisinalitas semua produk premium dengan opsi pengembalian dana penuh jika cacat.</p>

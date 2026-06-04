@@ -29,15 +29,16 @@
         <div class="grid gap-10 lg:grid-cols-[1fr_380px]">
             <!-- Items List -->
             <div class="space-y-6">
-                <div class="overflow-hidden rounded-[32px] border border-slate-200/80 bg-white shadow-sm">
+                <!-- Desktop Item List (Hidden on mobile) -->
+                <div class="hidden sm:block overflow-hidden rounded-[32px] border border-slate-200/80 bg-white shadow-sm">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="text-xs uppercase tracking-widest text-slate-400 bg-slate-50 border-b border-slate-200/60">
                                 <tr>
-                                    <th class="px-6 py-4.5 font-bold">Produk</th>
-                                    <th class="px-6 py-4.5 font-bold text-center">Jumlah</th>
-                                    <th class="px-6 py-4.5 font-bold text-right">Subtotal</th>
-                                    <th class="px-6 py-4.5 font-bold text-center">Aksi</th>
+                                    <th class="px-6 py-4 font-bold">Produk</th>
+                                    <th class="px-6 py-4 text-center font-bold">Jumlah</th>
+                                    <th class="px-6 py-4 text-right font-bold">Subtotal</th>
+                                    <th class="px-6 py-4 text-center font-bold">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,7 +55,7 @@
                                             </div>
                                         </td>
 
-                                        <!-- Quantity Update Form (Alpine-powered Auto-submit) -->
+                                        <!-- Quantity Update Form -->
                                         <td class="px-6 py-5 text-center">
                                             <div class="inline-block">
                                                 <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" class="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50 w-28 shadow-sm">
@@ -86,6 +87,47 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Mobile Item Cards (Only on mobile screens) -->
+                <div class="sm:hidden space-y-4">
+                    @foreach($cartItems as $item)
+                        <div class="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-sm space-y-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200/60 flex-shrink-0 flex items-center justify-center">
+                                    <img src="{{ $item->product->primaryImage ? $item->product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=80&q=80' }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="min-w-0 flex-1 space-y-1">
+                                    <span class="text-[0.65rem] uppercase tracking-wider text-slate-400 font-bold block">{{ $item->product->category->name }}</span>
+                                    <a href="{{ route('products.show', $item->product->slug) }}" class="font-display font-bold text-slate-900 hover:text-indigo-600 transition line-clamp-2 text-xs uppercase tracking-tight">{{ $item->product->name }}</a>
+                                    <span class="text-xs text-slate-500 font-semibold block">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-100 gap-2">
+                                <!-- Quantity Controls -->
+                                <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" class="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50 w-24 shadow-sm">
+                                    @csrf
+                                    <button type="button" @click="if (qty > 1) { qty--; $nextTick(() => $el.form.submit()) }" class="px-2.5 py-1.5 hover:bg-slate-100 text-slate-500 font-black focus:outline-none transition">-</button>
+                                    <input type="number" name="quantity" x-model="qty" readonly class="w-full bg-transparent text-center text-xs font-black text-slate-800 focus:outline-none" />
+                                    <button type="button" @click="if (qty < {{ $item->product->stock }}) { qty++; $nextTick(() => $el.form.submit()) }" class="px-2.5 py-1.5 hover:bg-slate-100 text-slate-500 font-black focus:outline-none transition">+</button>
+                                </form>
+                                
+                                <div class="text-right flex-1 pr-2">
+                                    <span class="text-[0.65rem] uppercase tracking-wider text-slate-400 font-bold block">Subtotal</span>
+                                    <span class="text-xs font-black text-slate-900">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
+                                </div>
+                                
+                                <form action="{{ route('cart.remove', $item->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 hover:text-rose-700 rounded-xl transition duration-300" title="Hapus Produk">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
 
                 <!-- Clear Cart & Continue -->

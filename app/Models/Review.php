@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['product_id', 'user_id', 'order_id', 'title', 'rating', 'comment', 'status'])]
+#[Fillable(['product_id', 'user_id', 'order_id', 'title', 'rating', 'comment', 'photo', 'status'])]
 class Review extends Model
 {
     protected $casts = [

@@ -35,14 +35,14 @@
     <div>
         <!-- Navbar -->
         <header x-data="{ mobileMenuOpen: false }" class="bg-white/80 backdrop-blur-xl border-b border-slate-100/85 sticky top-0 z-50 transition duration-300">
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-4.5 flex items-center justify-between">
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
                 <!-- Mobile Menu Button -->
                 <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none transition">
                     <template x-if="!mobileMenuOpen">
-                        <i data-lucide="menu" class="w-5.5 h-5.5"></i>
+                        <i data-lucide="menu" class="w-5 h-5"></i>
                     </template>
                     <template x-if="mobileMenuOpen">
-                        <i data-lucide="x" class="w-5.5 h-5.5"></i>
+                        <i data-lucide="x" class="w-5 h-5"></i>
                     </template>
                 </button>
 
@@ -50,7 +50,7 @@
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-slate-900 hover:opacity-90 transition">
                     <span class="font-display font-black text-xl tracking-tight uppercase flex items-center gap-1.5">
                         <i data-lucide="music-4" class="w-6 h-6 text-indigo-600"></i>
-                        MusicStore <span class="text-indigo-600 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5">LUXE</span>
+                        MusicStore <span class="text-indigo-600 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5 hidden sm:inline-block">LUXE</span>
                     </span>
                 </a>
 
@@ -82,17 +82,17 @@
                             @endif
                         </a>
 
-                        <!-- Orders -->
-                        <a href="{{ route('orders.history') }}" class="p-2.5 rounded-2xl hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition" title="Riwayat Pesanan">
+                        <!-- Orders (Desktop Only) -->
+                        <a href="{{ route('orders.history') }}" class="hidden md:inline-flex p-2.5 rounded-2xl hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition" title="Riwayat Pesanan">
                             <i data-lucide="clipboard-list" class="w-5 h-5"></i>
                         </a>
 
                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
-                            <a href="{{ route('admin.dashboard') }}" class="hidden sm:inline-flex text-xs font-semibold tracking-wider bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-xl hover:bg-indigo-600 hover:text-white transition">Admin</a>
+                            <a href="{{ route('admin.dashboard') }}" class="hidden md:inline-flex text-xs font-semibold tracking-wider bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-xl hover:bg-indigo-600 hover:text-white transition">Admin</a>
                         @endif
 
-                        <!-- User Profile Dropdown -->
-                        <div x-data="{ open: false }" @click.away="open = false" class="relative">
+                        <!-- User Profile Dropdown (Desktop Only) -->
+                        <div x-data="{ open: false }" @click.away="open = false" class="relative hidden md:block">
                             <button @click="open = !open" class="flex items-center gap-1.5 focus:outline-none hover:text-indigo-600 transition py-1.5 px-2.5 rounded-xl hover:bg-slate-100">
                                 <div class="w-7 h-7 bg-indigo-100 text-indigo-700 flex items-center justify-center rounded-full text-xs font-bold uppercase">
                                     {{ substr(auth()->user()->name, 0, 1) }}
@@ -134,8 +134,8 @@
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="text-slate-600 hover:text-indigo-600 text-xs font-semibold tracking-wider uppercase transition">Masuk</a>
-                        <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-4.5 py-2.5 bg-indigo-600 text-white rounded-2xl text-xs font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">Daftar</a>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex text-slate-600 hover:text-indigo-600 text-xs font-semibold tracking-wider uppercase transition">Masuk</a>
+                        <a href="{{ route('register') }}" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-2xl text-xs font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">Daftar</a>
                     @endauth
                 </div>
             </div>
@@ -156,6 +156,34 @@
                 <a href="{{ route('catalog') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
                     <i data-lucide="shopping-bag" class="w-5 h-5"></i> Shop Catalog
                 </a>
+                @auth
+                    <hr class="border-slate-100 my-2" />
+                    <a href="{{ route('orders.history') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
+                        <i data-lucide="clipboard-list" class="w-5 h-5"></i> Riwayat Pesanan
+                    </a>
+                    <a href="{{ route('profile.show') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
+                        <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                    </a>
+                    @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i> Panel Admin
+                        </a>
+                    @endif
+                    <form action="{{ route('logout') }}" method="POST" class="w-full pt-2">
+                        @csrf
+                        <button type="submit" class="flex w-full items-center gap-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition text-left">
+                            <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
+                        </button>
+                    </form>
+                @else
+                    <hr class="border-slate-100 my-2" />
+                    <a href="{{ route('login') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
+                        <i data-lucide="log-in" class="w-5 h-5"></i> Masuk
+                    </a>
+                    <a href="{{ route('register') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i> Daftar
+                    </a>
+                @endauth
             </div>
         </header>
 

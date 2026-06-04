@@ -209,4 +209,30 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Alamat utama berhasil diubah.');
     }
+
+    /**
+     * Upload profile photo.
+     */
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => ['required', 'image', 'max:2048'],
+        ]);
+
+        $user = Auth::user();
+
+        if ($request->hasFile('profile_photo')) {
+            // Delete old photo if exists
+            if ($user->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $user->update(['profile_photo' => $path]);
+
+            return back()->with('success', 'Foto profil berhasil diperbarui.');
+        }
+
+        return back()->withErrors(['profile_photo' => 'Gagal mengunggah foto profil.']);
+    }
 }

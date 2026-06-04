@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('title', 'Admin Dashboard - MusicStore Luxe')
 
-@section('content')
+@section('admin_content')
 <div class="space-y-10 py-4">
     <!-- Header -->
     <div class="border-b border-slate-100 pb-8 flex items-center justify-between">

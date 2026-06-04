@@ -23,6 +23,19 @@ Route::get('/shop', [ProductController::class, 'index'])->name('catalog');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/midtrans/webhook', [OrderController::class, 'handleWebhook'])->name('midtrans.webhook');
 
+// Test SMTP Route
+Route::get('/dmail', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('Halo! Ini adalah email percobaan untuk menguji konfigurasi SMTP Google Anda. Jika Anda menerima email ini, berarti SMTP Google di DjudasMS sudah berjalan dengan sempurna!', function ($message) {
+            $message->to('gakdi940@gmail.com')
+                    ->subject('Test SMTP Berhasil - DjudasMS');
+        });
+        return "Email percobaan berhasil dikirim ke gakdi940@gmail.com! Silakan cek kotak masuk Anda.";
+    } catch (\Exception $e) {
+        return "Gagal mengirim email. Error: " . $e->getMessage();
+    }
+});
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

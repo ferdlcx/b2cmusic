@@ -14,6 +14,7 @@
         showEditAddressModal: false,
         provinces: [],
         cities: [],
+        rajaongkirFailed: false,
         addMap: null,
         addMarker: null,
         editMap: null,
@@ -40,13 +41,19 @@
             try {
                 let res = await fetch('{{ route('api.provinces') }}');
                 if (res.ok) {
-                    this.provinces = await res.json();
+                    let data = await res.json();
+                    if (data && data.length > 0) {
+                        this.provinces = data;
+                        this.rajaongkirFailed = false;
+                    } else {
+                        this.rajaongkirFailed = true;
+                    }
                 } else {
-                    alert('Gagal memuat data provinsi dari RajaOngkir. Cek koneksi atau konfigurasi API Key.');
+                    this.rajaongkirFailed = true;
                 }
             } catch (err) {
                 console.error('Error fetching provinces:', err);
-                alert('Gagal memuat data provinsi dari RajaOngkir. (Network Error)');
+                this.rajaongkirFailed = true;
             }
         },
         async handleProvinceChange(e, type) {
@@ -430,39 +437,53 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <!-- Province Select (RajaOngkir) -->
-                    <div class="space-y-1" x-data="{
-                        pNameInput: ''
-                    }">
+                    <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
-                        <input type="hidden" name="province" :value="pNameInput" />
-                        <select name="province_id" required 
-                                @change="handleProvinceChange($event, 'add'); 
-                                         let sel = $event.target; 
-                                         pNameInput = sel.options[sel.selectedIndex].text" 
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
-                            <option value="">Pilih Provinsi</option>
-                            <template x-for="p in provinces" :key="p.province_id">
-                                <option :value="p.province_id" x-text="p.province"></option>
-                            </template>
-                        </select>
+                        <template x-if="!rajaongkirFailed">
+                            <div x-data="{ pNameInput: '' }">
+                                <input type="hidden" name="province" :value="pNameInput" />
+                                <select name="province_id" required 
+                                        @change="handleProvinceChange($event, 'add'); 
+                                                 let sel = $event.target; 
+                                                 pNameInput = sel.options[sel.selectedIndex].text" 
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                    <option value="">Pilih Provinsi</option>
+                                    <template x-for="p in provinces" :key="p.province_id">
+                                        <option :value="p.province_id" x-text="p.province"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+                        <template x-if="rajaongkirFailed">
+                            <input type="text" name="province" required
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
+                                   placeholder="Masukkan Provinsi Anda (e.g. Jawa Barat)" />
+                        </template>
                     </div>
 
                     <!-- City Select (RajaOngkir) -->
-                    <div class="space-y-1" x-data="{
-                        cNameInput: ''
-                    }">
+                    <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota / Kabupaten</label>
-                        <input type="hidden" name="city" :value="cNameInput" />
-                        <select name="city_id" required 
-                                @change="let sel = $event.target; 
-                                         cNameInput = sel.options[sel.selectedIndex].text"
-                                :disabled="cities.length === 0"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
-                            <option value="">Pilih Kota</option>
-                            <template x-for="c in cities" :key="c.city_id">
-                                <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
-                            </template>
-                        </select>
+                        <template x-if="!rajaongkirFailed">
+                            <div x-data="{ cNameInput: '' }">
+                                <input type="hidden" name="city" :value="cNameInput" />
+                                <select name="city_id" required 
+                                        @change="let sel = $event.target; 
+                                                 cNameInput = sel.options[sel.selectedIndex].text"
+                                        :disabled="cities.length === 0"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="">Pilih Kota</option>
+                                    <template x-for="c in cities" :key="c.city_id">
+                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+                        <template x-if="rajaongkirFailed">
+                            <input type="text" name="city" required
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
+                                   placeholder="Masukkan Kota / Kabupaten (e.g. Kota Bandung)" />
+                        </template>
                     </div>
                 </div>
 
@@ -552,35 +573,53 @@
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
-                    <!-- Province Select (RajaOngkir) -->
+                    <!-- Province -->
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
-                        <input type="hidden" name="province" :value="editAddressData.province" />
-                        <select name="province_id" required 
-                                x-model="editAddressData.province_id"
-                                @change="handleProvinceChange($event, 'edit')"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
-                            <option value="">Pilih Provinsi</option>
-                            <template x-for="p in provinces" :key="p.province_id">
-                                <option :value="p.province_id" x-text="p.province" :selected="p.province_id == editAddressData.province_id"></option>
-                            </template>
-                        </select>
+                        <template x-if="!rajaongkirFailed">
+                            <div>
+                                <input type="hidden" name="province" :value="editAddressData.province" />
+                                <select name="province_id" required 
+                                        x-model="editAddressData.province_id"
+                                        @change="handleProvinceChange($event, 'edit')"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                    <option value="">Pilih Provinsi</option>
+                                    <template x-for="p in provinces" :key="p.province_id">
+                                        <option :value="p.province_id" x-text="p.province" :selected="p.province_id == editAddressData.province_id"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+                        <template x-if="rajaongkirFailed">
+                            <input type="text" name="province" required x-model="editAddressData.province"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
+                                   placeholder="Masukkan Provinsi Anda" />
+                        </template>
                     </div>
 
-                    <!-- City Select (RajaOngkir) -->
+                    <!-- City / Kabupaten -->
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota / Kabupaten</label>
-                        <input type="hidden" name="city" :value="editAddressData.city" />
-                        <select name="city_id" required 
-                                x-model="editAddressData.city_id"
-                                @change="handleCityChange($event, 'edit')"
-                                :disabled="cities.length === 0"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
-                            <option value="">Pilih Kota</option>
-                            <template x-for="c in cities" :key="c.city_id">
-                                <option :value="c.city_id" x-text="c.type + ' ' + c.city_name" :selected="c.city_id == editAddressData.city_id"></option>
-                            </template>
-                        </select>
+                        <template x-if="!rajaongkirFailed">
+                            <div>
+                                <input type="hidden" name="city" :value="editAddressData.city" />
+                                <select name="city_id" required 
+                                        x-model="editAddressData.city_id"
+                                        @change="handleCityChange($event, 'edit')"
+                                        :disabled="cities.length === 0"
+                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <option value="">Pilih Kota</option>
+                                    <template x-for="c in cities" :key="c.city_id">
+                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name" :selected="c.city_id == editAddressData.city_id"></option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+                        <template x-if="rajaongkirFailed">
+                            <input type="text" name="city" required x-model="editAddressData.city"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
+                                   placeholder="Masukkan Kota / Kabupaten" />
+                        </template>
                     </div>
                 </div>
 

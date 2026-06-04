@@ -41,47 +41,8 @@ class CheckoutController extends Controller
             return $item->price * $item->quantity;
         });
 
-        // Calculate shipping cost using RajaOngkir cost API if key is set
+        // Use flat rates or calculate shipping cost via frontend in the future
         $shippingCost = 25000; // default flat rate
-        $apiKey = config('services.rajaongkir.api_key');
-        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
-        
-        if ($apiKey && $defaultAddress && $defaultAddress->city_id) {
-            try {
-                // Calculate total weight of cart
-                $totalWeight = $cartItems->sum(function($item) {
-                    return ($item->product->weight ?: 1000) * $item->quantity;
-                });
-                
-                $response = Http::withHeaders([
-                    'key' => $apiKey
-                ])->post('https://api.rajaongkir.com/starter/cost', [
-                    'origin' => (int) $originCity,
-                    'destination' => (int) $defaultAddress->city_id,
-                    'weight' => (int) $totalWeight,
-                    'courier' => 'jne' // default courier for estimation
-                ]);
-                
-                if ($response->successful()) {
-                    $results = $response->json('rajaongkir.results.0.costs');
-                    if ($results && count($results) > 0) {
-                        $costVal = null;
-                        foreach ($results as $c) {
-                            if (str_contains(strtoupper($c['service']), 'REG')) {
-                                $costVal = $c['cost'][0]['value'];
-                                break;
-                            }
-                        }
-                        if (is_null($costVal)) {
-                            $costVal = $results[0]['cost'][0]['value'];
-                        }
-                        $shippingCost = $costVal;
-                    }
-                }
-            } catch (\Exception $e) {
-                logger()->error('RajaOngkir Cost API failed in index: ' . $e->getMessage());
-            }
-        }
 
         return view('cart.checkout', compact('cartItems', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost'));
     }
@@ -118,24 +79,26 @@ class CheckoutController extends Controller
             return $item->price * $item->quantity;
         });
 
-        // Calculate shipping cost using RajaOngkir cost API if key is set
-        $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default flat rate
-        $apiKey = config('services.rajaongkir.api_key');
-        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
-        
         // Calculate total weight of cart
         $totalWeight = $cartItems->sum(function($item) {
             return ($item->product->weight ?: 1000) * $item->quantity;
         });
 
+        // Calculate shipping cost using RajaOngkir cost API if key is set
+        $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default fallback
+        $apiKey = config('services.rajaongkir.api_key');
+        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
+        
         $selectedCourier = 'jne';
         if (str_contains(strtolower($request->courier), 'pos')) {
             $selectedCourier = 'pos';
+        } elseif (str_contains(strtolower($request->courier), 'jnt')) {
+            $selectedCourier = 'tiki'; // Starter API only supports jne, pos, tiki
         }
 
         if ($apiKey && $address->city_id) {
             try {
-                $response = Http::withHeaders([
+                $response = Http::withoutVerifying()->timeout(5)->withHeaders([
                     'key' => $apiKey
                 ])->post('https://api.rajaongkir.com/starter/cost', [
                     'origin' => (int) $originCity,
@@ -248,6 +211,7 @@ class CheckoutController extends Controller
 
             // 4. Request Midtrans Snap Token
             $snapToken = null;
+            $redirectUrl = null;
             $midtransServerKey = config('services.midtrans.server_key');
             
             if ($midtransServerKey) {
@@ -280,12 +244,29 @@ class CheckoutController extends Controller
                         ];
                     }
                     
+                    $enabledPayments = [];
+                    switch ($request->payment_method) {
+                        case 'qris':
+                            $enabledPayments = ['gopay', 'shopeepay', 'other_qris'];
+                            break;
+                        case 'va':
+                            $enabledPayments = ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'other_va'];
+                            break;
+                        case 'credit_card':
+                            $enabledPayments = ['credit_card'];
+                            break;
+                        case 'ewallet':
+                            $enabledPayments = ['gopay', 'shopeepay'];
+                            break;
+                    }
+
                     $payload = [
                         'transaction_details' => [
                             'order_id' => $orderCode,
                             'gross_amount' => (int) $total,
                         ],
                         'item_details' => $itemDetails,
+                        'enabled_payments' => $enabledPayments,
                         'customer_details' => [
                             'first_name' => $user->name,
                             'email' => $user->email,
@@ -305,9 +286,12 @@ class CheckoutController extends Controller
                                 'postal_code' => $address->postal_code,
                             ],
                         ],
+                        'callbacks' => [
+                            'finish' => route('orders.show', $orderCode)
+                        ]
                     ];
                     
-                    $response = Http::withHeaders([
+                    $response = Http::withoutVerifying()->timeout(10)->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
                     ])->withBasicAuth($midtransServerKey, '')
@@ -315,6 +299,7 @@ class CheckoutController extends Controller
                       
                     if ($response->successful()) {
                         $snapToken = $response->json('token');
+                        $redirectUrl = $response->json('redirect_url');
                     } else {
                         logger()->error('Midtrans Snap error: ' . $response->body());
                     }
@@ -365,10 +350,55 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            return redirect()->route('orders.history')->with('success', "Pesanan Anda #{$orderCode} berhasil dibuat! Silakan lakukan pembayaran.");
+            if ($redirectUrl) {
+                return redirect($redirectUrl);
+            }
+
+            return redirect()->route('orders.show', $orderCode)->with('success', "Pesanan Anda #{$orderCode} berhasil dibuat! Silakan selesaikan pembayaran.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan saat memproses pesanan Anda: ' . $e->getMessage());
+        }
+    }
+
+    public function calculateShipping(Request $request)
+    {
+        $request->validate([
+            'city_id' => 'required|integer',
+            'weight' => 'required|integer',
+            'courier' => 'required|string'
+        ]);
+
+        $apiKey = config('services.rajaongkir.api_key');
+        $originCity = config('services.rajaongkir.origin_city_id', 152);
+
+        if (!$apiKey) {
+            return response()->json(['error' => 'API Key not configured'], 500);
+        }
+
+        try {
+            $selectedCourier = 'jne';
+            if (str_contains(strtolower($request->courier), 'pos')) {
+                $selectedCourier = 'pos';
+            } elseif (str_contains(strtolower($request->courier), 'jnt')) {
+                $selectedCourier = 'tiki';
+            }
+
+            $response = Http::withoutVerifying()->timeout(5)->withHeaders([
+                'key' => $apiKey
+            ])->post('https://api.rajaongkir.com/starter/cost', [
+                'origin' => (int) $originCity,
+                'destination' => (int) $request->city_id,
+                'weight' => (int) $request->weight,
+                'courier' => $selectedCourier
+            ]);
+            
+            if ($response->successful()) {
+                return response()->json($response->json('rajaongkir.results.0.costs'));
+            }
+            return response()->json(['error' => 'RajaOngkir API Error: ' . $response->body()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

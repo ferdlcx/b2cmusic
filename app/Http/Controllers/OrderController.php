@@ -41,37 +41,63 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    public function pay($id)
+    public function checkStatus($id)
     {
         $user = Auth::user();
         $order = Order::with('payment')->where('user_id', $user->id)->findOrFail($id);
 
-        if ($order->status !== 'pending') {
-            return back()->with('error', 'Pesanan ini tidak dapat dibayar.');
+        if ($order->status !== 'pending' || !$order->payment || !$order->payment->snap_token) {
+            return back()->with('error', 'Status pesanan ini tidak dapat dicek ke Midtrans.');
         }
 
-        // Simulate payment completion
-        $order->update(['status' => 'paid']);
-        $order->payment->update([
-            'status' => 'paid',
-            'paid_at' => now(),
-        ]);
+        $serverKey = config('services.midtrans.server_key');
+        if (!$serverKey) {
+            return back()->with('error', 'Konfigurasi Midtrans belum lengkap.');
+        }
 
         try {
-            \App\Models\ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'payment_simulated',
-                'model_type' => Order::class,
-                'model_id' => $order->id,
-                'description' => "Simulasi pembayaran lunas untuk pesanan {$order->order_code}",
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ]);
-        } catch (\Exception $e) {}
+            $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                ->get("https://api.sandbox.midtrans.com/v2/{$order->order_code}/status");
 
-        $user->notify(new PaymentSuccess($order));
+            if ($response->successful()) {
+                $statusData = $response->json();
+                $transactionStatus = $statusData['transaction_status'] ?? null;
+                $fraudStatus = $statusData['fraud_status'] ?? null;
 
-        return back()->with('success', 'Pembayaran berhasil disimulasikan! Pesanan Anda kini sedang diproses.');
+                if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $fraudStatus == 'accept')) {
+                    DB::beginTransaction();
+                    $order->update(['status' => 'paid']);
+                    $order->payment->update([
+                        'status' => 'paid',
+                        'paid_at' => now(),
+                        'transaction_id' => $statusData['transaction_id'] ?? $order->payment->transaction_id,
+                    ]);
+                    $user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
+                    DB::commit();
+
+                    return back()->with('success', 'Pembayaran berhasil dikonfirmasi dari Midtrans! Pesanan Anda kini sedang diproses.');
+                } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                    DB::beginTransaction();
+                    $order->update(['status' => 'canceled']);
+                    $order->payment->update(['status' => 'failed']);
+                    // Restore stock
+                    foreach ($order->items as $item) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            $product->increment('stock', $item->quantity);
+                        }
+                    }
+                    DB::commit();
+                    return back()->with('error', 'Pesanan dibatalkan/kadaluwarsa sesuai status Midtrans.');
+                }
+
+                return back()->with('success', 'Status pesanan saat ini di Midtrans: ' . strtoupper($transactionStatus) . '. (Belum Lunas)');
+            } else {
+                return back()->with('error', 'Gagal mengecek status ke Midtrans. Pastikan pesanan sudah pernah dibayar di simulator.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan jaringan saat mengecek status: ' . $e->getMessage());
+        }
     }
 
     public function handleWebhook(Request $request)
@@ -154,7 +180,7 @@ class OrderController extends Controller
             $order->update(['status' => $orderStatus]);
 
             if ($orderStatus === 'paid') {
-                $order->user->notify(new PaymentSuccess($order));
+                $order->user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
             }
 
             // Update Payment

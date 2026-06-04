@@ -206,14 +206,24 @@
                                     });
                                 };
                             </script>
-                        @else
-                            <form action="{{ route('orders.pay', $order->id) }}" method="POST">
+
+                            <form action="{{ route('orders.checkStatus', $order->id) }}" method="POST" class="mt-3">
                                 @csrf
                                 <button type="submit" 
-                                    class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
-                                    <i data-lucide="shield-alert" class="w-4 h-4"></i> Simulasi Bayar Lokal
+                                    class="w-full py-3.5 bg-white border-2 border-indigo-600 text-indigo-600 rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-50 transition duration-300 flex items-center justify-center gap-2">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Cek Status Pembayaran (Manual)
                                 </button>
                             </form>
+                        @elseif(in_array($order->status, ['processing', 'shipped', 'completed']))
+                            <a href="{{ route('orders.track', $order->id) }}" 
+                                class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
+                                <i data-lucide="map" class="w-4 h-4"></i> Lacak Pengiriman Pesanan
+                            </a>
+                        @else
+                            <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs flex flex-col gap-2">
+                                <span class="font-bold flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Gagal Memuat Pembayaran</span>
+                                <p>Terjadi kesalahan saat memuat link pembayaran Midtrans. Silakan coba kembali atau hubungi support kami.</p>
+                            </div>
                         @endif
                     </div>
                 @endif

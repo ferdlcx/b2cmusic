@@ -15,10 +15,57 @@
               addressId: '{{ $defaultAddress ? $defaultAddress->id : '' }}',
               courier: 'JNE_REG',
               paymentMethod: 'va',
-              shippingCost: 25000,
+              shippingCost: {{ $shippingCost }},
+              shippingLoading: false,
+              totalWeight: {{ $cartItems->sum(function($item) { return ($item->product->weight ?: 1000) * $item->quantity; }) }},
+              selectedCityId: {{ $defaultAddress ? ($defaultAddress->city_id ?: 'null') : 'null' }},
               couponCode: '',
               discount: 0,
               subtotal: {{ $subtotal }},
+              async calculateShipping() {
+                  if (!this.selectedCityId) return;
+                  
+                  this.shippingLoading = true;
+                  try {
+                      let res = await fetch('{{ route('checkout.shippingCost') }}', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                          },
+                          body: JSON.stringify({
+                              city_id: this.selectedCityId,
+                              weight: this.totalWeight,
+                              courier: this.courier
+                          })
+                      });
+
+                      if (res.ok) {
+                          let results = await res.json();
+                          if (results && results.length > 0) {
+                              let costVal = null;
+                              let isYes = this.courier.includes('YES');
+                              for (let c of results) {
+                                  if (isYes && c.service.toUpperCase().includes('YES')) {
+                                      costVal = c.cost[0].value;
+                                      break;
+                                  } else if (!isYes && c.service.toUpperCase().includes('REG')) {
+                                      costVal = c.cost[0].value;
+                                      break;
+                                  }
+                              }
+                              if (costVal === null) {
+                                  costVal = results[0].cost[0].value;
+                              }
+                              this.shippingCost = costVal;
+                          }
+                      }
+                  } catch (e) {
+                      console.error('Shipping calculate error:', e);
+                  } finally {
+                      this.shippingLoading = false;
+                  }
+              },
               applyCoupon() {
                   let code = this.couponCode.toUpperCase().trim();
                   if (code === 'MUSIC10') {
@@ -64,40 +111,40 @@
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label Alamat</label>
-                                    <input type="text" name="new_address_label" value="Rumah" placeholder="Rumah/Kantor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_label" value="Rumah" placeholder="Rumah/Kantor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Penerima</label>
-                                    <input type="text" name="new_address_name" value="{{ auth()->user()->name }}" placeholder="Nama Penerima" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_name" value="{{ auth()->user()->name }}" placeholder="Nama Penerima" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon</label>
-                                    <input type="text" name="new_address_phone" value="{{ auth()->user()->phone }}" placeholder="No. Telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_phone" value="{{ auth()->user()->phone }}" placeholder="No. Telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
-                                    <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                                <textarea name="new_address_detail" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
+                                <textarea name="new_address_detail" rows="2" placeholder="Nama Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
                             </div>
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota</label>
-                                    <input type="text" name="new_address_city" placeholder="Kota" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_city" placeholder="Kota" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
-                                    <input type="text" name="new_address_province" placeholder="Provinsi" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                                    <input type="text" name="new_address_province" placeholder="Provinsi" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
                                 </div>
                             </div>
                         </div>
                     @else
                         <div class="space-y-4">
                             @foreach($addresses as $addr)
-                                <div @click="addressId = '{{ $addr->id }}'" 
+                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->city_id }}'; calculateShipping()" 
                                      :class="addressId == '{{ $addr->id }}' ? 'border-indigo-600 bg-indigo-50/20' : 'border-slate-200/80'"
                                      class="flex gap-4 p-5 border-2 rounded-2xl cursor-pointer hover:bg-slate-50/50 transition duration-300">
                                     <div class="pt-0.5">
@@ -130,52 +177,40 @@
                     </div>
                     <div class="grid gap-4 sm:grid-cols-3">
                         <!-- JNE OKE -->
-                        <div @click="courier = 'JNE_REG'; shippingCost = 25000" 
-                             :class="courier === 'JNE_REG' ? 'border-indigo-600 bg-indigo-50/20' : 'border-slate-200/80'"
-                             class="p-5 border-2 rounded-2xl flex flex-col justify-between cursor-pointer hover:bg-slate-50/50 transition duration-300 min-h-[140px]">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-900 text-xs">JNE REG</span>
-                                <div :class="courier === 'JNE_REG' ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'" class="w-4 h-4 rounded-full border flex items-center justify-center transition">
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        <label class="block p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-600 transition flex items-center justify-between"
+                                :class="courier === 'JNE_REG' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : ''">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="courier" value="JNE_REG" x-model="courier" class="text-indigo-600 focus:ring-indigo-600" @change="calculateShipping()">
+                                <div>
+                                    <span class="block text-sm font-bold">JNE Reguler</span>
+                                    <span class="block text-xs text-slate-500">Estimasi 2-3 hari</span>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-[0.6rem] uppercase tracking-wider text-slate-400 block font-bold">Reguler (2-4 hari)</span>
-                                <span class="text-sm font-black text-slate-900 mt-1 block">Rp 25.000</span>
-                            </div>
-                        </div>
+                        </label>
 
                         <!-- JNE YES -->
-                        <div @click="courier = 'JNE_YES'; shippingCost = 40000" 
-                             :class="courier === 'JNE_YES' ? 'border-indigo-600 bg-indigo-50/20' : 'border-slate-200/80'"
-                             class="p-5 border-2 rounded-2xl flex flex-col justify-between cursor-pointer hover:bg-slate-50/50 transition duration-300 min-h-[140px]">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-900 text-xs">JNE YES</span>
-                                <div :class="courier === 'JNE_YES' ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'" class="w-4 h-4 rounded-full border flex items-center justify-center transition">
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        <label class="block p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-600 transition flex items-center justify-between"
+                                :class="courier === 'JNE_YES' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : ''">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="courier" value="JNE_YES" x-model="courier" class="text-indigo-600 focus:ring-indigo-600" @change="calculateShipping()">
+                                <div>
+                                    <span class="block text-sm font-bold">JNE YES</span>
+                                    <span class="block text-xs text-slate-500">Yakin Esok Sampai</span>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-[0.6rem] uppercase tracking-wider text-slate-400 block font-bold">Express (1 hari)</span>
-                                <span class="text-sm font-black text-slate-900 mt-1 block">Rp 40.000</span>
-                            </div>
-                        </div>
+                        </label>
 
                         <!-- JNT -->
-                        <div @click="courier = 'JNT'; shippingCost = 25000" 
-                             :class="courier === 'JNT' ? 'border-indigo-600 bg-indigo-50/20' : 'border-slate-200/80'"
-                             class="p-5 border-2 rounded-2xl flex flex-col justify-between cursor-pointer hover:bg-slate-50/50 transition duration-300 min-h-[140px]">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-900 text-xs">J&T Reguler</span>
-                                <div :class="courier === 'JNT' ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'" class="w-4 h-4 rounded-full border flex items-center justify-center transition">
-                                    <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        <label class="block p-4 border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-600 transition flex items-center justify-between"
+                                :class="courier === 'JNT' ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600' : ''">
+                            <div class="flex items-center gap-3">
+                                <input type="radio" name="courier" value="JNT" x-model="courier" class="text-indigo-600 focus:ring-indigo-600" @change="calculateShipping()">
+                                <div>
+                                    <span class="block text-sm font-bold">J&T Express</span>
+                                    <span class="block text-xs text-slate-500">Estimasi 2-4 hari</span>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <span class="text-[0.6rem] uppercase tracking-wider text-slate-400 block font-bold">Reguler (2-3 hari)</span>
-                                <span class="text-sm font-black text-slate-900 mt-1 block">Rp 25.000</span>
-                            </div>
-                        </div>
+                        </label>
                     </div>
                 </div>
 
@@ -264,7 +299,7 @@
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kupon Promo</label>
                         <div class="flex gap-2">
                             <input type="text" x-model="couponCode" placeholder="Kode Kupon" 
-                                class="min-w-0 flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white" />
+                                class="min-w-0 flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white" />
                             <button type="button" @click="applyCoupon()" class="px-4 py-2.5 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition">
                                 Gunakan
                             </button>
@@ -280,7 +315,12 @@
                         </div>
                         <div class="flex justify-between">
                             <span>Biaya Pengiriman</span>
-                            <span class="text-slate-900 font-bold" x-text="'Rp ' + shippingCost.toLocaleString('id-ID')">Rp 25.000</span>
+                            <span class="font-bold text-slate-800" x-show="!shippingLoading">
+                                Rp <span x-text="new Intl.NumberFormat('id-ID').format(shippingCost)"></span>
+                            </span>
+                            <span class="font-bold text-slate-400 text-xs flex items-center gap-2" x-show="shippingLoading" style="display: none;">
+                                <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Menghitung...
+                            </span>
                         </div>
                         <div class="flex justify-between text-emerald-600" x-show="discount > 0" style="display: none;">
                             <span>Diskon Kupon</span>
@@ -296,7 +336,7 @@
                     </div>
 
                     <button type="submit" 
-                        class="w-full py-4.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">
+                        class="w-full py-4.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-sm tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">
                         Buat Pesanan Sekarang
                     </button>
                 </div>

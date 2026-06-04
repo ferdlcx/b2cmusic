@@ -127,7 +127,7 @@ class AuthController extends Controller
                 ]);
             } catch (\Exception $e) {}
 
-            if ($user->role === 'admin') {
+            if (in_array($user->role, ['admin', 'super_admin'])) {
                 return redirect()->intended('/admin/dashboard');
             }
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,12 +67,15 @@ Route::middleware('auth')->group(function () {
     // Checkout Routes
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::post('/checkout/shipping-cost', [CheckoutController::class, 'calculateShipping'])->name('checkout.shippingCost');
 
     // Order Routes
     Route::get('/orders', [OrderController::class, 'history'])->name('orders.history');
     Route::get('/order/{order_code}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/order/{id}/pay', [OrderController::class, 'pay'])->name('orders.pay');
+    Route::post('/order/{id}/check-status', [OrderController::class, 'checkStatus'])->name('orders.checkStatus');
     Route::get('/order/{order_code}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
+    Route::get('/order/{id}/track', [TrackingController::class, 'track'])->name('orders.track');
+    Route::post('/order/{id}/delivered', [TrackingController::class, 'simulateDelivery'])->name('orders.delivered');
 
     // Review Routes
     Route::post('/review', [ReviewController::class, 'store'])->name('reviews.store');
@@ -176,12 +180,6 @@ $adminRoutes = function () {
     Route::get('/activity-log', [AdminController::class, 'activityLog'])->name('activityLog');
 };
 
-// 1. Subdomain routing (admin.domain.com)
-$appHost = parse_url(config('app.url'), PHP_URL_HOST);
-if ($appHost && !app()->runningInConsole()) {
-    Route::domain('admin.' . $appHost)->middleware(['auth', 'admin'])->name('admin.')->group($adminRoutes);
-}
-
 // 2. Path prefix routing (domain.com/admin)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group($adminRoutes);
+Route::middleware(['auth', 'admin', 'ip_whitelist'])->prefix('admin')->name('admin.')->group($adminRoutes);
 

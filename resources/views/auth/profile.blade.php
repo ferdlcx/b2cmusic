@@ -41,9 +41,12 @@
                 let res = await fetch('{{ route('api.provinces') }}');
                 if (res.ok) {
                     this.provinces = await res.json();
+                } else {
+                    alert('Gagal memuat data provinsi dari RajaOngkir. Cek koneksi atau konfigurasi API Key.');
                 }
             } catch (err) {
                 console.error('Error fetching provinces:', err);
+                alert('Gagal memuat data provinsi dari RajaOngkir. (Network Error)');
             }
         },
         async handleProvinceChange(e, type) {
@@ -165,6 +168,10 @@
                 is_default: addr.is_default
             };
             
+            // Show modal immediately so it doesn't feel slow
+            this.showEditAddressModal = true;
+            this.initMap('edit');
+            
             // Load cities for the current province of address
             if (addr.province_id) {
                 try {
@@ -176,8 +183,6 @@
                     console.error('Error fetching cities for edit:', err);
                 }
             }
-            this.showEditAddressModal = true;
-            this.initMap('edit');
         }
      }">
      
@@ -404,22 +409,22 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label Alamat</label>
-                        <input type="text" name="label" required placeholder="Contoh: Rumah, Kantor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="label" required placeholder="Contoh: Rumah, Kantor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Penerima</label>
-                        <input type="text" name="name" required placeholder="Nama Penerima" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="name" required placeholder="Nama Penerima" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon Penerima</label>
-                        <input type="text" name="phone" required placeholder="No. Telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="phone" required placeholder="No. Telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" required placeholder="Kode Pos" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="postal_code" required placeholder="Kode Pos" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
@@ -434,7 +439,7 @@
                                 @change="handleProvinceChange($event, 'add'); 
                                          let sel = $event.target; 
                                          pNameInput = sel.options[sel.selectedIndex].text" 
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
                             <option value="">Pilih Provinsi</option>
                             <template x-for="p in provinces" :key="p.province_id">
                                 <option :value="p.province_id" x-text="p.province"></option>
@@ -452,7 +457,7 @@
                                 @change="let sel = $event.target; 
                                          cNameInput = sel.options[sel.selectedIndex].text"
                                 :disabled="cities.length === 0"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
                             <option value="">Pilih Kota</option>
                             <template x-for="c in cities" :key="c.city_id">
                                 <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
@@ -464,17 +469,17 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
-                        <input type="text" name="district" required placeholder="Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="district" required placeholder="Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
-                        <input type="text" name="village" required placeholder="Kelurahan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="village" required placeholder="Kelurahan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
                 <div class="space-y-1">
                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                    <textarea name="address" required rows="3" placeholder="Nama Jalan, Blok, No. Rumah, RT/RW" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
+                    <textarea name="address" required rows="3" placeholder="Nama Jalan, Blok, No. Rumah, RT/RW" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
                 </div>
 
                 <div class="space-y-1">
@@ -486,11 +491,11 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
-                        <input type="text" name="latitude" id="add-latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                        <input type="text" name="latitude" id="add-latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
-                        <input type="text" name="longitude" id="add-longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                        <input type="text" name="longitude" id="add-longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
                     </div>
                 </div>
 
@@ -527,22 +532,22 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label Alamat</label>
-                        <input type="text" name="label" required x-model="editAddressData.label" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="label" required x-model="editAddressData.label" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Penerima</label>
-                        <input type="text" name="name" required x-model="editAddressData.name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="name" required x-model="editAddressData.name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon Penerima</label>
-                        <input type="text" name="phone" required x-model="editAddressData.phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="phone" required x-model="editAddressData.phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" required x-model="editAddressData.postal_code" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="postal_code" required x-model="editAddressData.postal_code" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
@@ -554,7 +559,7 @@
                         <select name="province_id" required 
                                 x-model="editAddressData.province_id"
                                 @change="handleProvinceChange($event, 'edit')"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
                             <option value="">Pilih Provinsi</option>
                             <template x-for="p in provinces" :key="p.province_id">
                                 <option :value="p.province_id" x-text="p.province" :selected="p.province_id == editAddressData.province_id"></option>
@@ -570,7 +575,7 @@
                                 x-model="editAddressData.city_id"
                                 @change="handleCityChange($event, 'edit')"
                                 :disabled="cities.length === 0"
-                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
                             <option value="">Pilih Kota</option>
                             <template x-for="c in cities" :key="c.city_id">
                                 <option :value="c.city_id" x-text="c.type + ' ' + c.city_name" :selected="c.city_id == editAddressData.city_id"></option>
@@ -582,17 +587,17 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
-                        <input type="text" name="district" required x-model="editAddressData.district" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="district" required x-model="editAddressData.district" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
-                        <input type="text" name="village" required x-model="editAddressData.village" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                        <input type="text" name="village" required x-model="editAddressData.village" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
                     </div>
                 </div>
 
                 <div class="space-y-1">
                     <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                    <textarea name="address" required rows="3" x-model="editAddressData.address" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
+                    <textarea name="address" required rows="3" x-model="editAddressData.address" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
                 </div>
 
                 <div class="space-y-1">
@@ -604,11 +609,11 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
-                        <input type="text" name="latitude" id="edit-latitude" x-model="editAddressData.latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                        <input type="text" name="latitude" id="edit-latitude" x-model="editAddressData.latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
                     </div>
                     <div class="space-y-1">
                         <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
-                        <input type="text" name="longitude" id="edit-longitude" x-model="editAddressData.longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs outline-none cursor-not-allowed text-slate-500" />
+                        <input type="text" name="longitude" id="edit-longitude" x-model="editAddressData.longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
                     </div>
                 </div>
 

@@ -106,13 +106,10 @@
                                     </a>
                                     
                                     @if($order->status === 'pending')
-                                        <form action="{{ route('orders.pay', $order->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            <button type="submit" 
-                                                class="inline-flex items-center gap-1 text-xs uppercase tracking-widest bg-indigo-600 text-white px-3.5 py-2 rounded-xl hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-600/15 transition duration-300 font-semibold shadow-sm">
-                                                <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Bayar
-                                            </button>
-                                        </form>
+                                        <a href="{{ route('orders.show', $order->order_code) }}"
+                                            class="inline-flex items-center gap-1 text-xs uppercase tracking-widest bg-indigo-600 text-white px-3.5 py-2 rounded-xl hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-600/15 transition duration-300 font-semibold shadow-sm">
+                                            <i data-lucide="credit-card" class="w-3.5 h-3.5"></i> Bayar
+                                        </a>
                                     @endif
                                 </td>
                             </tr>

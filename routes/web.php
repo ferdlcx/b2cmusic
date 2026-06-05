@@ -147,19 +147,6 @@ $adminRoutes = function () {
     Route::put('/brands/{id}', [AdminController::class, 'updateBrand'])->name('brands.update');
     Route::delete('/brands/{id}', [AdminController::class, 'destroyBrand'])->name('brands.destroy');
 
-    // Users Management
-    Route::get('/users', [AdminController::class, 'users'])->name('users');
-    Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('users.show');
-    Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('users.toggleStatus');
-
-    // Coupons Management
-    Route::get('/coupons', [AdminController::class, 'coupons'])->name('coupons');
-    Route::get('/coupons/create', [AdminController::class, 'createCoupon'])->name('coupons.create');
-    Route::post('/coupons', [AdminController::class, 'storeCoupon'])->name('coupons.store');
-    Route::get('/coupons/{id}/edit', [AdminController::class, 'editCoupon'])->name('coupons.edit');
-    Route::put('/coupons/{id}', [AdminController::class, 'updateCoupon'])->name('coupons.update');
-    Route::delete('/coupons/{id}', [AdminController::class, 'destroyCoupon'])->name('coupons.destroy');
-
     // Reviews Moderation
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
     Route::post('/reviews/{id}/approve', [AdminController::class, 'approveReview'])->name('reviews.approve');
@@ -170,28 +157,44 @@ $adminRoutes = function () {
     Route::post('/returns/{id}/approve', [AdminController::class, 'approveReturn'])->name('returns.approve');
     Route::post('/returns/{id}/reject', [AdminController::class, 'rejectReturn'])->name('returns.reject');
 
-    // Flash Sales Management
-    Route::get('/flash-sales', [AdminController::class, 'flashSales'])->name('flashSales');
-    Route::get('/flash-sales/create', [AdminController::class, 'createFlashSale'])->name('flashSales.create');
-    Route::post('/flash-sales', [AdminController::class, 'storeFlashSale'])->name('flashSales.store');
-    Route::get('/flash-sales/{id}/edit', [AdminController::class, 'editFlashSale'])->name('flashSales.edit');
-    Route::put('/flash-sales/{id}', [AdminController::class, 'updateFlashSale'])->name('flashSales.update');
-    Route::delete('/flash-sales/{id}', [AdminController::class, 'destroyFlashSale'])->name('flashSales.destroy');
-
     // Orders Management
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
 
-    // Reports & Analytics
-    Route::get('/reports/sales', [ReportController::class, 'salesReport'])->name('reports.sales');
-    Route::get('/reports/products', [ReportController::class, 'productReport'])->name('reports.products');
-    Route::get('/reports/customers', [ReportController::class, 'customerReport'])->name('reports.customers');
-    Route::get('/reports/export/sales/pdf', [ReportController::class, 'exportSalesPdf'])->name('reports.export.sales.pdf');
-    Route::get('/reports/export/sales/excel', [ReportController::class, 'exportSalesExcel'])->name('reports.export.sales.excel');
+    // --- SUPER ADMIN ONLY FEATURES ---
+    Route::middleware('super_admin')->group(function () {
+        // Users Management
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('users.show');
+        Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('users.toggleStatus');
 
-    // Activity Log
-    Route::get('/activity-log', [AdminController::class, 'activityLog'])->name('activityLog');
+        // Coupons Management
+        Route::get('/coupons', [AdminController::class, 'coupons'])->name('coupons');
+        Route::get('/coupons/create', [AdminController::class, 'createCoupon'])->name('coupons.create');
+        Route::post('/coupons', [AdminController::class, 'storeCoupon'])->name('coupons.store');
+        Route::get('/coupons/{id}/edit', [AdminController::class, 'editCoupon'])->name('coupons.edit');
+        Route::put('/coupons/{id}', [AdminController::class, 'updateCoupon'])->name('coupons.update');
+        Route::delete('/coupons/{id}', [AdminController::class, 'destroyCoupon'])->name('coupons.destroy');
+
+        // Flash Sales Management
+        Route::get('/flash-sales', [AdminController::class, 'flashSales'])->name('flashSales');
+        Route::get('/flash-sales/create', [AdminController::class, 'createFlashSale'])->name('flashSales.create');
+        Route::post('/flash-sales', [AdminController::class, 'storeFlashSale'])->name('flashSales.store');
+        Route::get('/flash-sales/{id}/edit', [AdminController::class, 'editFlashSale'])->name('flashSales.edit');
+        Route::put('/flash-sales/{id}', [AdminController::class, 'updateFlashSale'])->name('flashSales.update');
+        Route::delete('/flash-sales/{id}', [AdminController::class, 'destroyFlashSale'])->name('flashSales.destroy');
+
+        // Reports & Analytics
+        Route::get('/reports/sales', [ReportController::class, 'salesReport'])->name('reports.sales');
+        Route::get('/reports/products', [ReportController::class, 'productReport'])->name('reports.products');
+        Route::get('/reports/customers', [ReportController::class, 'customerReport'])->name('reports.customers');
+        Route::get('/reports/export/sales/pdf', [ReportController::class, 'exportSalesPdf'])->name('reports.export.sales.pdf');
+        Route::get('/reports/export/sales/excel', [ReportController::class, 'exportSalesExcel'])->name('reports.export.sales.excel');
+
+        // Activity Log
+        Route::get('/activity-log', [AdminController::class, 'activityLog'])->name('activityLog');
+    });
 };
 
 // 2. Path prefix routing (domain.com/admin)

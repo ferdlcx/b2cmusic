@@ -242,6 +242,13 @@
             background: rgba(99, 102, 241, 0.2);
             color: #312e81;
         }
+
+        /* Mobile Responsive Table Scrolling */
+        @media (max-width: 1024px) {
+            div.overflow-hidden:has(table) {
+                overflow-x: auto !important;
+            }
+        }
     </style>
 </head>
 <body class="font-sans text-slate-900 bg-[#f8f8f8] min-h-screen flex flex-col justify-between overflow-x-hidden">

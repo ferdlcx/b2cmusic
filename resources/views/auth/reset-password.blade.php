@@ -25,24 +25,36 @@
         <form class="relative z-10 mt-8 space-y-6" action="{{ route('password.update') }}" method="POST">
             @csrf
             
-            <!-- Password Reset Token -->
-            <input type="hidden" name="token" value="{{ $token }}">
+             <div class="space-y-4">
+                 <div class="space-y-2">
+                     <label for="email" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email</label>
+                     <div class="relative">
+                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                             <i data-lucide="mail" class="w-4 h-4"></i>
+                         </div>
+                         <input id="email" name="email" type="email" autocomplete="email" required 
+                             class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
+                             value="{{ old('email', request()->email ?? $email) }}">
+                     </div>
+                     @error('email')
+                         <p class="text-rose-500 text-xs font-bold mt-1.5">{{ $message }}</p>
+                     @enderror
+                 </div>
 
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <label for="email" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                            <i data-lucide="mail" class="w-4 h-4"></i>
-                        </div>
-                        <input id="email" name="email" type="email" autocomplete="email" required 
-                            class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
-                            value="{{ old('email', request()->email) }}" readonly>
-                    </div>
-                    @error('email')
-                        <p class="text-rose-500 text-xs font-bold mt-1.5">{{ $message }}</p>
-                    @enderror
-                </div>
+                 <div class="space-y-2">
+                     <label for="otp_code" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode OTP Reset Password</label>
+                     <div class="relative">
+                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                             <i data-lucide="key-round" class="w-4 h-4"></i>
+                         </div>
+                         <input id="otp_code" name="otp_code" type="text" maxlength="6" required 
+                             class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 focus:bg-white transition-all duration-300" 
+                             placeholder="123456" value="{{ old('otp_code') }}">
+                     </div>
+                     @error('otp_code')
+                         <p class="text-rose-500 text-xs font-bold mt-1.5">{{ $message }}</p>
+                     @enderror
+                 </div>
 
                 <div class="space-y-2">
                     <label for="password" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password Baru</label>

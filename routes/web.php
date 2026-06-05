@@ -36,6 +36,18 @@ Route::get('/dmail', function () {
     }
 });
 
+Route::get('/sendmail', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('Halo! Ini adalah email uji coba dari DjudasMS (gakdi940@gmail.com) menuju jetthan09@gmail.com menggunakan SMTP Gmail yang sudah aktif.', function ($message) {
+            $message->to('jetthan09@gmail.com')
+                    ->subject('Test SMTP DjudasMS - Sukses');
+        });
+        return "SUKSES: Email uji coba berhasil dikirim ke jetthan09@gmail.com!";
+    } catch (\Exception $e) {
+        return "GAGAL: " . $e->getMessage();
+    }
+});
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

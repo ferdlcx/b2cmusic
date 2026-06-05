@@ -56,7 +56,9 @@ class AuthController extends Controller
 
         try {
             Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim OTP ke ' . $user->email . ': ' . $e->getMessage());
+        }
 
         Auth::login($user);
 
@@ -281,7 +283,9 @@ class AuthController extends Controller
 
         try {
             Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim OTP (Resend) ke ' . $user->email . ': ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Kode OTP baru telah dikirim ke alamat email Anda.');
     }

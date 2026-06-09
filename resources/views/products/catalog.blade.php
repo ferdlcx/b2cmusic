@@ -99,7 +99,7 @@
             </div>
         @else
             <!-- Changed grid layout to be full width without sidebar, supporting 2-4 columns based on screen width -->
-            <div class="grid gap-x-8 gap-y-12 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="grid gap-x-8 gap-y-20 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 @foreach($products as $product)
                     <article class="group flex flex-col h-full">
                         <!-- Swapped fixed height for aspect-square for a perfectly proportional box -->
@@ -123,7 +123,9 @@
                         <div class="space-y-2 flex-1 flex flex-col justify-between">
                             <div>
                                 <span class="text-[0.6rem] uppercase tracking-[0.2em] text-gold-600 font-bold">{{ $product->category->name }}</span>
-                                <h3 class="font-display text-[0.95rem] font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-1 group-hover:text-gold-600 transition line-clamp-2">{{ $product->name }}</h3>
+                                <h3 class="font-display text-[0.95rem] font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-1 group-hover:text-gold-600 transition line-clamp-2">
+                                    <a href="{{ route('products.show', $product->slug) }}" class="block">{{ $product->name }}</a>
+                                </h3>
                             </div>
                             
                             <div class="flex items-center justify-between pt-3 border-t border-walnut-800/10 mt-auto">

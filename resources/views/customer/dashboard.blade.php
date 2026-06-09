@@ -3,164 +3,149 @@
 @section('title', 'Dashboard Saya - DjudasMS')
 
 @section('content')
-<div class="space-y-8">
+<div class="space-y-12 py-8">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="font-display text-4xl font-black uppercase tracking-tight text-slate-950">Dashboard Saya</h1>
-            <p class="text-sm text-slate-500 font-normal">Halo, <span class="font-bold text-slate-800">{{ auth()->user()->name }}</span>! Kelola pesanan, alamat, dan wishlist Anda di sini.</p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-walnut-800/10">
+        <div class="space-y-2">
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block">Area Anggota</span>
+            <h1 class="font-display text-4xl font-black uppercase tracking-tighter text-walnut-950">Dashboard.</h1>
+            <p class="text-sm text-muted font-medium pt-2">Halo, <span class="font-bold text-walnut-950">{{ auth()->user()->name }}</span>! Kelola profil dan pantau riwayat koleksi Anda.</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('returns.index') }}" class="inline-flex items-center justify-center px-5 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
-                <i data-lucide="refresh-cw" class="w-4 h-4 mr-2 text-rose-400"></i> Riwayat Retur
+            <a href="{{ route('returns.index') }}" class="inline-flex items-center px-4 py-2 border border-walnut-800/20 bg-transparent text-[0.65rem] font-bold uppercase tracking-widest text-walnut-900 hover:border-gold-500 hover:text-gold-600 transition">
+                Riwayat Retur
             </a>
-            <a href="{{ route('profile.show') }}" class="inline-flex items-center justify-center px-5 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
-                <i data-lucide="user" class="w-4 h-4 mr-2 text-slate-400"></i> Edit Profil
+            <a href="{{ route('profile.show') }}" class="inline-flex items-center px-4 py-2 border border-walnut-800/20 bg-transparent text-[0.65rem] font-bold uppercase tracking-widest text-walnut-900 hover:border-gold-500 hover:text-gold-600 transition">
+                Profil
             </a>
-            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center px-5 py-3 bg-indigo-600 rounded-2xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">
-                <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i> Belanja
+            <a href="{{ route('catalog') }}" class="inline-flex items-center px-5 py-2 bg-walnut-900 text-gold-500 text-[0.65rem] font-bold uppercase tracking-widest hover:bg-gold-600 hover:text-white transition duration-300">
+                Lanjut Belanja
             </a>
         </div>
     </div>
 
     <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Wishlist -->
-        <div class="bg-white border border-slate-200/80 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 shrink-0">
-                <i data-lucide="heart" class="w-5 h-5"></i>
-            </div>
+        <div class="bg-cream-50 border border-walnut-800/10 p-6 flex items-center justify-between group hover:border-gold-500 transition">
             <div>
-                <p class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold">Wishlist</p>
-                <p class="text-2xl font-black text-slate-950 mt-0.5">{{ $wishlistCount }} <span class="text-xs font-normal text-slate-500">item</span></p>
-                <a href="{{ route('wishlist.index') }}" class="text-[0.7rem] text-indigo-600 font-bold hover:underline block mt-1">Lihat Wishlist &rarr;</a>
+                <p class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Wishlist</p>
+                <p class="text-3xl font-display font-black text-walnut-950 mt-1">{{ $wishlistCount }}</p>
+                <a href="{{ route('wishlist.index') }}" class="text-[0.65rem] text-gold-600 uppercase tracking-widest font-bold hover:text-walnut-950 block mt-2">Lihat &rarr;</a>
             </div>
+            <i data-lucide="heart" class="w-8 h-8 text-walnut-800/20 group-hover:text-gold-500 transition"></i>
         </div>
 
         <!-- Alamat -->
-        <div class="bg-white border border-slate-200/80 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shrink-0">
-                <i data-lucide="map-pin" class="w-5 h-5"></i>
-            </div>
+        <div class="bg-cream-50 border border-walnut-800/10 p-6 flex items-center justify-between group hover:border-gold-500 transition">
             <div>
-                <p class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold">Alamat Tersimpan</p>
-                <p class="text-2xl font-black text-slate-950 mt-0.5">{{ $addressesCount }} <span class="text-xs font-normal text-slate-500">alamat</span></p>
-                <a href="{{ route('profile.show') }}" class="text-[0.7rem] text-indigo-600 font-bold hover:underline block mt-1">Kelola Alamat &rarr;</a>
+                <p class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Alamat</p>
+                <p class="text-3xl font-display font-black text-walnut-950 mt-1">{{ $addressesCount }}</p>
+                <a href="{{ route('profile.show') }}" class="text-[0.65rem] text-gold-600 uppercase tracking-widest font-bold hover:text-walnut-950 block mt-2">Kelola &rarr;</a>
             </div>
+            <i data-lucide="map-pin" class="w-8 h-8 text-walnut-800/20 group-hover:text-gold-500 transition"></i>
         </div>
 
         <!-- Total Transaksi -->
-        <div class="bg-white border border-slate-200/80 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shrink-0">
-                <i data-lucide="wallet" class="w-5 h-5"></i>
-            </div>
+        <div class="bg-cream-50 border border-walnut-800/10 p-6 flex items-center justify-between group hover:border-gold-500 transition">
             <div>
-                <p class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold">Total Transaksi</p>
-                <p class="text-2xl font-black text-slate-950 mt-0.5">{{ $totalOrdersCount }} <span class="text-xs font-normal text-slate-500">pesanan</span></p>
-                <a href="{{ route('orders.history') }}" class="text-[0.7rem] text-indigo-600 font-bold hover:underline block mt-1">Riwayat Pesanan &rarr;</a>
+                <p class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Pesanan</p>
+                <p class="text-3xl font-display font-black text-walnut-950 mt-1">{{ $totalOrdersCount }}</p>
+                <a href="{{ route('orders.history') }}" class="text-[0.65rem] text-gold-600 uppercase tracking-widest font-bold hover:text-walnut-950 block mt-2">Riwayat &rarr;</a>
             </div>
+            <i data-lucide="shopping-bag" class="w-8 h-8 text-walnut-800/20 group-hover:text-gold-500 transition"></i>
         </div>
 
         <!-- Kupon -->
-        <div class="bg-white border border-slate-200/80 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shrink-0">
-                <i data-lucide="ticket" class="w-5 h-5"></i>
-            </div>
+        <div class="bg-cream-50 border border-walnut-800/10 p-6 flex items-center justify-between group hover:border-gold-500 transition">
             <div>
-                <p class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold">Kupon Aktif</p>
-                <p class="text-2xl font-black text-slate-950 mt-0.5">{{ $activeCoupons->count() }} <span class="text-xs font-normal text-slate-500">tersedia</span></p>
-                <a href="#coupons-section" class="text-[0.7rem] text-indigo-600 font-bold hover:underline block mt-1">Lihat Kupon &rarr;</a>
+                <p class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Privilege</p>
+                <p class="text-3xl font-display font-black text-walnut-950 mt-1">{{ $activeCoupons->count() }}</p>
+                <a href="#coupons-section" class="text-[0.65rem] text-gold-600 uppercase tracking-widest font-bold hover:text-walnut-950 block mt-2">Kupon &rarr;</a>
             </div>
+            <i data-lucide="ticket" class="w-8 h-8 text-walnut-800/20 group-hover:text-gold-500 transition"></i>
         </div>
     </div>
 
     <!-- Main Layout Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         
-        <!-- Left 2 Cols: Orders & History -->
-        <div class="lg:col-span-2 space-y-8">
+        <!-- Left Col: Orders & History -->
+        <div class="lg:col-span-8 space-y-12">
             <!-- Order status summary cards -->
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                    <i data-lucide="activity" class="w-4 h-4 text-indigo-600"></i> Status Pesanan Anda
-                </h3>
+            <div class="space-y-6">
+                <h3 class="text-[0.7rem] font-bold uppercase tracking-widest text-walnut-950 border-b border-walnut-800/10 pb-2">Status Pesanan Aktif</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="bg-slate-50 rounded-2xl p-4 text-center border border-slate-100">
-                        <span class="text-2xl font-black text-slate-950">{{ $pendingOrdersCount }}</span>
-                        <span class="text-[0.65rem] block text-slate-500 font-bold uppercase tracking-wider mt-1">Belum Bayar</span>
+                    <div class="border border-walnut-800/20 p-5 text-center bg-transparent">
+                        <span class="text-3xl font-display font-black text-walnut-950">{{ $pendingOrdersCount }}</span>
+                        <span class="text-[0.6rem] block text-muted font-bold uppercase tracking-widest mt-2">Pending</span>
                     </div>
-                    <div class="bg-indigo-50/50 rounded-2xl p-4 text-center border border-indigo-100/50">
-                        <span class="text-2xl font-black text-indigo-700">{{ $paidOrdersCount + $processingOrdersCount }}</span>
-                        <span class="text-[0.65rem] block text-indigo-600 font-bold uppercase tracking-wider mt-1">Diproses</span>
+                    <div class="border border-walnut-800/20 p-5 text-center bg-transparent">
+                        <span class="text-3xl font-display font-black text-walnut-950">{{ $paidOrdersCount + $processingOrdersCount }}</span>
+                        <span class="text-[0.6rem] block text-muted font-bold uppercase tracking-widest mt-2">Diproses</span>
                     </div>
-                    <div class="bg-blue-50/50 rounded-2xl p-4 text-center border border-blue-100/50">
-                        <span class="text-2xl font-black text-blue-700">{{ $shippedOrdersCount }}</span>
-                        <span class="text-[0.65rem] block text-blue-600 font-bold uppercase tracking-wider mt-1">Dikirim</span>
+                    <div class="border border-walnut-800/20 p-5 text-center bg-transparent">
+                        <span class="text-3xl font-display font-black text-walnut-950">{{ $shippedOrdersCount }}</span>
+                        <span class="text-[0.6rem] block text-muted font-bold uppercase tracking-widest mt-2">Dikirim</span>
                     </div>
-                    <div class="bg-emerald-50/50 rounded-2xl p-4 text-center border border-emerald-100/50">
-                        <span class="text-2xl font-black text-emerald-700">{{ $completedOrdersCount }}</span>
-                        <span class="text-[0.65rem] block text-emerald-600 font-bold uppercase tracking-wider mt-1">Selesai</span>
+                    <div class="border border-gold-500/50 p-5 text-center bg-gold-50/30">
+                        <span class="text-3xl font-display font-black text-gold-600">{{ $completedOrdersCount }}</span>
+                        <span class="text-[0.6rem] block text-gold-600 font-bold uppercase tracking-widest mt-2">Selesai</span>
                     </div>
                 </div>
             </div>
 
             <!-- Transaction History Table -->
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                        <i data-lucide="clipboard-list" class="w-4 h-4 text-indigo-600"></i> Riwayat Transaksi Terakhir
-                    </h3>
-                    <a href="{{ route('orders.history') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition">Semua Pesanan &rarr;</a>
+            <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-walnut-800/10 pb-2">
+                    <h3 class="text-[0.7rem] font-bold uppercase tracking-widest text-walnut-950">Riwayat Terkini</h3>
+                    <a href="{{ route('orders.history') }}" class="text-[0.65rem] font-bold uppercase tracking-widest text-gold-600 hover:text-walnut-950 transition">Semua &rarr;</a>
                 </div>
 
                 @if($orders->isEmpty())
-                    <div class="text-center py-12 space-y-3 bg-slate-50 rounded-2xl border border-slate-100">
-                        <i data-lucide="shopping-bag" class="w-10 h-10 text-slate-300 mx-auto"></i>
-                        <p class="text-xs text-slate-500 font-semibold">Anda belum memiliki riwayat transaksi.</p>
+                    <div class="text-center py-16 space-y-4 bg-cream-50 border border-walnut-800/10">
+                        <i data-lucide="inbox" class="w-8 h-8 text-walnut-800/20 mx-auto"></i>
+                        <p class="text-[0.75rem] text-muted font-bold uppercase tracking-widest">Belum ada riwayat koleksi.</p>
                     </div>
                 @else
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left">
                             <thead>
-                                <tr class="border-b border-slate-100">
-                                    <th class="pb-4 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">Kode</th>
-                                    <th class="pb-4 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">Tanggal</th>
-                                    <th class="pb-4 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">Total</th>
-                                    <th class="pb-4 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">Status</th>
-                                    <th class="pb-4 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400 text-right">Aksi</th>
+                                <tr class="border-b border-walnut-800/20 text-[0.65rem] font-bold uppercase tracking-widest text-muted">
+                                    <th class="pb-4">Referensi</th>
+                                    <th class="pb-4">Tanggal</th>
+                                    <th class="pb-4">Investasi</th>
+                                    <th class="pb-4">Status</th>
+                                    <th class="pb-4 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($orders as $order)
-                                    <tr class="border-b border-slate-50 last:border-b-0 hover:bg-slate-50/50 transition">
-                                        <td class="py-4.5 font-display text-xs font-black uppercase text-slate-950">#{{ $order->order_code }}</td>
-                                        <td class="py-4.5 text-xs text-slate-500 font-medium">{{ $order->created_at->format('d M Y, H:i') }}</td>
-                                        <td class="py-4.5 text-xs text-slate-800 font-bold">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                                        <td class="py-4.5">
+                                    <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-50 transition">
+                                        <td class="py-5 font-display text-[0.8rem] font-black uppercase tracking-tight text-walnut-950">#{{ $order->order_code }}</td>
+                                        <td class="py-5 text-[0.75rem] text-muted font-medium">{{ $order->created_at->format('d M Y') }}</td>
+                                        <td class="py-5 text-[0.75rem] text-walnut-900 font-bold tracking-wider">IDR {{ number_format($order->total, 0, ',', '.') }}</td>
+                                        <td class="py-5">
                                             @if($order->status === 'pending')
-                                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded-full">Belum Bayar</span>
+                                                <span class="text-[0.6rem] font-bold uppercase tracking-widest text-walnut-500 border border-walnut-500 px-2 py-1">Pending</span>
                                             @elseif($order->status === 'paid' || $order->status === 'processing')
-                                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1 rounded-full">Diproses</span>
+                                                <span class="text-[0.6rem] font-bold uppercase tracking-widest text-walnut-900 border border-walnut-900 px-2 py-1">Diproses</span>
                                             @elseif($order->status === 'shipped')
-                                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded-full">Dikirim</span>
+                                                <span class="text-[0.6rem] font-bold uppercase tracking-widest text-gold-600 border border-gold-500 px-2 py-1">Dikirim</span>
                                             @elseif($order->status === 'completed')
-                                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-full">Selesai</span>
+                                                <span class="text-[0.6rem] font-bold uppercase tracking-widest bg-walnut-900 text-gold-500 px-2 py-1 border border-walnut-900">Selesai</span>
                                             @else
-                                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-2 py-1 rounded-full">Batal</span>
+                                                <span class="text-[0.6rem] font-bold uppercase tracking-widest text-red-600 border border-red-600 px-2 py-1">Batal</span>
                                             @endif
                                         </td>
-                                        <td class="py-4.5 text-right space-x-2">
-                                            <a href="{{ route('orders.show', $order->order_code) }}" class="text-[0.7rem] font-bold text-indigo-600 hover:text-indigo-700">Detail</a>
+                                        <td class="py-5 text-right space-x-3">
+                                            <a href="{{ route('orders.show', $order->order_code) }}" class="text-[0.65rem] font-bold uppercase tracking-widest text-gold-600 hover:text-walnut-950 transition">Detail</a>
                                             
                                             @if($order->status === 'pending')
                                                 <form action="{{ route('orders.pay', $order->id) }}" method="POST" class="inline">
                                                     @csrf
-                                                    <button type="submit" class="text-[0.7rem] font-black text-amber-600 hover:text-amber-700 uppercase">Bayar</button>
+                                                    <button type="submit" class="text-[0.65rem] font-bold uppercase tracking-widest text-walnut-950 hover:text-gold-600 transition">Bayar</button>
                                                 </form>
-                                            @endif
-
-                                            @if($order->status === 'completed' || $order->status === 'shipped' || $order->status === 'paid')
-                                                <a href="{{ route('orders.invoice', $order->order_code) }}" class="text-[0.7rem] font-bold text-slate-500 hover:text-slate-700">Invoice</a>
                                             @endif
                                         </td>
                                     </tr>
@@ -168,103 +153,81 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="pt-4">
-                        {{ $orders->links() }}
-                    </div>
                 @endif
             </div>
         </div>
 
         <!-- Right Col: Last Order details & Coupons list -->
-        <div class="space-y-8">
+        <div class="lg:col-span-4 space-y-12">
             <!-- Last Order Status Card -->
             @if($lastOrder)
-                <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 shadow-sm space-y-5">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                        <i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> Pesanan Terakhir
-                    </h3>
+                <div class="space-y-4">
+                    <h3 class="text-[0.7rem] font-bold uppercase tracking-widest text-walnut-950 border-b border-walnut-800/10 pb-2">Pesanan Terakhir</h3>
                     
-                    <div class="bg-slate-50 border border-slate-200/50 rounded-2xl p-5 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-slate-500 font-semibold">Kode Pesanan</span>
-                            <span class="font-display text-xs font-black text-slate-900">#{{ $lastOrder->order_code }}</span>
+                    <div class="bg-cream-50 border border-walnut-800/10 p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-walnut-800/10 pb-4">
+                            <span class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Referensi</span>
+                            <span class="font-display text-[0.8rem] font-black uppercase text-walnut-950">#{{ $lastOrder->order_code }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-slate-500 font-semibold">Total Tagihan</span>
-                            <span class="text-xs font-bold text-slate-900">Rp {{ number_format($lastOrder->total, 0, ',', '.') }}</span>
+                        <div class="flex items-center justify-between border-b border-walnut-800/10 pb-4">
+                            <span class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Total</span>
+                            <span class="text-[0.75rem] font-bold tracking-widest text-walnut-950">IDR {{ number_format($lastOrder->total, 0, ',', '.') }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-slate-500 font-semibold">Status</span>
+                        <div class="flex items-center justify-between pb-2">
+                            <span class="text-[0.65rem] uppercase tracking-widest text-muted font-bold">Status</span>
                             <span>
                                 @if($lastOrder->status === 'pending')
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">Belum Bayar</span>
+                                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-walnut-500">Pending</span>
                                 @elseif($lastOrder->status === 'paid' || $lastOrder->status === 'processing')
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">Diproses</span>
+                                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-walnut-900">Diproses</span>
                                 @elseif($lastOrder->status === 'shipped')
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">Dikirim</span>
+                                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-gold-600">Dikirim</span>
                                 @elseif($lastOrder->status === 'completed')
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">Selesai</span>
+                                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-gold-600">Selesai</span>
                                 @else
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full">Batal</span>
+                                    <span class="text-[0.6rem] font-bold uppercase tracking-widest text-red-600">Batal</span>
                                 @endif
                             </span>
                         </div>
                         
-                        <div class="border-t border-slate-200 pt-3 flex items-center justify-between">
-                            <a href="{{ route('orders.show', $lastOrder->order_code) }}" class="text-[0.7rem] text-indigo-600 font-bold hover:underline">Detail Pesanan &rarr;</a>
-                            
-                            @if($lastOrder->status === 'completed' && $lastOrder->updated_at->addDays(30)->isFuture())
-                                @php
-                                    $hasReturn = \App\Models\ReturnRequest::where('order_id', $lastOrder->id)->exists();
-                                @endphp
-                                @if(!$hasReturn)
-                                    <a href="{{ route('returns.create', $lastOrder->id) }}" class="text-[0.7rem] text-rose-600 font-bold hover:underline" title="Garansi Sisa {{ max(0, 30 - $lastOrder->updated_at->diffInDays(now())) }} Hari">Ajukan Retur</a>
-                                @else
-                                    <span class="text-[0.6rem] text-slate-400 font-semibold">Retur Diajukan</span>
-                                @endif
-                            @endif
+                        <div class="pt-4">
+                            <a href="{{ route('orders.show', $lastOrder->order_code) }}" class="block w-full py-3 text-center border border-walnut-800/20 text-[0.65rem] uppercase tracking-widest font-bold text-walnut-900 hover:border-gold-500 hover:text-gold-600 transition">Lacak Pesanan</a>
                         </div>
                     </div>
                 </div>
             @endif
 
             <!-- Coupons Section -->
-            <div id="coupons-section" class="bg-white border border-slate-200/80 rounded-[32px] p-6 shadow-sm space-y-5">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                    <i data-lucide="ticket" class="w-4 h-4 text-indigo-600"></i> Kupon yang Anda Miliki
-                </h3>
+            <div id="coupons-section" class="space-y-4">
+                <h3 class="text-[0.7rem] font-bold uppercase tracking-widest text-walnut-950 border-b border-walnut-800/10 pb-2">Privilege Code</h3>
 
                 @if($activeCoupons->isEmpty())
-                    <div class="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
-                        <p class="text-xs text-slate-500 font-semibold">Saat ini tidak ada kupon yang tersedia.</p>
+                    <div class="text-center py-8 bg-cream-50 border border-walnut-800/10">
+                        <p class="text-[0.65rem] text-muted font-bold uppercase tracking-widest">Tidak ada kode tersedia.</p>
                     </div>
                 @else
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach($activeCoupons as $coupon)
-                            <div class="relative bg-indigo-50 border border-dashed border-indigo-300 rounded-2xl p-4 flex items-center justify-between overflow-hidden">
-                                <!-- Deco circles for coupon look -->
-                                <div class="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 bg-white border-r border-indigo-200 rounded-full"></div>
-                                <div class="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 bg-white border-l border-indigo-200 rounded-full"></div>
-                                
-                                <div class="pl-2.5">
-                                    <p class="text-[0.6rem] uppercase tracking-wider text-indigo-600 font-bold">{{ $coupon->type === 'fixed' ? 'Potongan Langsung' : 'Diskon' }}</p>
-                                    <p class="text-sm font-black text-slate-950 mt-0.5">
+                            <div class="border border-walnut-800/20 p-5 flex items-center justify-between bg-transparent">
+                                <div class="space-y-1">
+                                    <p class="text-[0.6rem] uppercase tracking-widest text-gold-600 font-bold">{{ $coupon->type === 'fixed' ? 'Potongan Langsung' : 'Diskon Spesial' }}</p>
+                                    <p class="font-display text-lg font-black text-walnut-950 uppercase">
                                         @if($coupon->type === 'fixed')
-                                            Rp {{ number_format($coupon->value, 0, ',', '.') }}
+                                            IDR {{ number_format($coupon->value, 0, ',', '.') }}
                                         @else
-                                            {{ intval($coupon->value) }}% Off
+                                            {{ intval($coupon->value) }}% OFF
                                         @endif
                                     </p>
                                     @if($coupon->min_purchase > 0)
-                                        <p class="text-[0.65rem] text-slate-500 font-medium mt-1">Min. Belanja: Rp {{ number_format($coupon->min_purchase, 0, ',', '.') }}</p>
+                                        <p class="text-[0.6rem] text-muted font-medium">Min. Pembelian IDR {{ number_format($coupon->min_purchase, 0, ',', '.') }}</p>
                                     @endif
                                 </div>
-                                <div class="text-right pr-2.5">
-                                    <span class="inline-block text-[0.65rem] font-mono font-black uppercase bg-indigo-600 text-white rounded-lg px-2.5 py-1.5 shadow-sm border border-indigo-700/10">
+                                <div class="text-right">
+                                    <span class="block text-[0.65rem] font-bold uppercase tracking-widest bg-walnut-900 text-gold-500 px-3 py-1.5 mb-2">
                                         {{ $coupon->code }}
                                     </span>
                                     @if($coupon->end_date)
-                                        <p class="text-[0.6rem] text-slate-400 font-semibold mt-1">Hingga: {{ $coupon->end_date->format('d M Y') }}</p>
+                                        <p class="text-[0.55rem] uppercase tracking-widest text-muted font-bold">Exp: {{ $coupon->end_date->format('d M y') }}</p>
                                     @endif
                                 </div>
                             </div>

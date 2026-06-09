@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<div class="max-w-[1200px] mx-auto px-4 md:px-8 py-8" 
+<div class="py-8" 
      x-data="{ 
         activeTab: 'profile',
         showAddAddressModal: false,
@@ -37,7 +37,6 @@
             is_default: false
         },
         async init() {
-            // Load provinces list
             try {
                 let res = await fetch('{{ route('api.provinces') }}');
                 if (res.ok) {
@@ -52,7 +51,6 @@
                     this.rajaongkirFailed = true;
                 }
             } catch (err) {
-                console.error('Error fetching provinces:', err);
                 this.rajaongkirFailed = true;
             }
         },
@@ -61,15 +59,12 @@
             let provinceObj = this.provinces.find(p => p.province_id == pId);
             let pName = provinceObj ? provinceObj.province : '';
             
-            if (type === 'add') {
-                // Done automatically via form inputs or bindings
-            } else {
+            if (type !== 'add') {
                 this.editAddressData.province = pName;
                 this.editAddressData.city_id = '';
                 this.editAddressData.city = '';
             }
             
-            // Load cities
             this.cities = [];
             if (pId) {
                 try {
@@ -77,9 +72,7 @@
                     if (res.ok) {
                         this.cities = await res.json();
                     }
-                } catch (err) {
-                    console.error('Error fetching cities:', err);
-                }
+                } catch (err) {}
             }
         },
         handleCityChange(e, type) {
@@ -95,20 +88,13 @@
                 const defaultLat = -6.200000;
                 const defaultLng = 106.816666;
                 if (type === 'add') {
-                    let lat = defaultLat;
-                    let lng = defaultLng;
-                    
                     if (this.addMap) {
                         this.addMap.invalidateSize();
                         return;
                     }
-                    
-                    this.addMap = L.map('map-add').setView([lat, lng], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(this.addMap);
-                    
-                    this.addMarker = L.marker([lat, lng], { draggable: true }).addTo(this.addMap);
+                    this.addMap = L.map('map-add').setView([defaultLat, defaultLng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.addMap);
+                    this.addMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.addMap);
                     
                     this.addMarker.on('dragend', (e) => {
                         let position = this.addMarker.getLatLng();
@@ -122,8 +108,8 @@
                         document.getElementById('add-longitude').value = e.latlng.lng.toFixed(6);
                     });
                     
-                    document.getElementById('add-latitude').value = lat.toFixed(6);
-                    document.getElementById('add-longitude').value = lng.toFixed(6);
+                    document.getElementById('add-latitude').value = defaultLat.toFixed(6);
+                    document.getElementById('add-longitude').value = defaultLng.toFixed(6);
                 } else if (type === 'edit') {
                     let lat = parseFloat(this.editAddressData.latitude) || defaultLat;
                     let lng = parseFloat(this.editAddressData.longitude) || defaultLng;
@@ -134,12 +120,8 @@
                         this.editMap.invalidateSize();
                         return;
                     }
-                    
                     this.editMap = L.map('map-edit').setView([lat, lng], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(this.editMap);
-                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.editMap);
                     this.editMarker = L.marker([lat, lng], { draggable: true }).addTo(this.editMap);
                     
                     this.editMarker.on('dragend', (e) => {
@@ -175,98 +157,90 @@
                 is_default: addr.is_default
             };
             
-            // Show modal immediately so it doesn't feel slow
             this.showEditAddressModal = true;
             this.initMap('edit');
             
-            // Load cities for the current province of address
             if (addr.province_id) {
                 try {
                     let res = await fetch(`{{ route('api.cities') }}?province_id=${addr.province_id}`);
                     if (res.ok) {
                         this.cities = await res.json();
                     }
-                } catch (err) {
-                    console.error('Error fetching cities for edit:', err);
-                }
+                } catch (err) {}
             }
         }
      }">
      
     <!-- Header -->
-    <div class="border-b border-slate-200/60 pb-6 mb-8 space-y-2">
-        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Manajemen Akun</span>
-        <h1 class="font-display text-4xl md:text-5xl font-black uppercase tracking-tight text-slate-950">Profil Saya</h1>
+    <div class="border-b border-walnut-800/10 pb-8 mb-12 space-y-4">
+        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block">Manajemen Akun</span>
+        <h1 class="font-display text-4xl md:text-5xl font-black uppercase tracking-tighter text-walnut-950">Profil <span class="text-gold-500">Saya.</span></h1>
     </div>
 
-    <div class="grid gap-8 lg:grid-cols-[280px_1fr]">
+    <div class="grid gap-12 lg:grid-cols-[280px_1fr]">
         <!-- Left Side: Nav Menu -->
-        <div class="space-y-2">
+        <div class="space-y-4">
             <button @click="activeTab = 'profile'" 
-                    :class="activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-100'"
-                    class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-semibold tracking-wide transition duration-300">
-                <i data-lucide="user" class="w-4.5 h-4.5"></i>
-                Detail Profil
+                    :class="activeTab === 'profile' ? 'text-gold-600 border-gold-500' : 'text-muted border-transparent hover:text-walnut-950 hover:border-walnut-800/20'"
+                    class="w-full flex items-center justify-between py-4 border-b font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                Detail Profil <i data-lucide="user" class="w-4 h-4"></i>
             </button>
             <button @click="activeTab = 'addresses'" 
-                    :class="activeTab === 'addresses' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-100'"
-                    class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-semibold tracking-wide transition duration-300">
-                <i data-lucide="map-pin" class="w-4.5 h-4.5"></i>
-                Daftar Alamat
+                    :class="activeTab === 'addresses' ? 'text-gold-600 border-gold-500' : 'text-muted border-transparent hover:text-walnut-950 hover:border-walnut-800/20'"
+                    class="w-full flex items-center justify-between py-4 border-b font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                Daftar Alamat <i data-lucide="map-pin" class="w-4 h-4"></i>
             </button>
             <button @click="activeTab = 'password'" 
-                    :class="activeTab === 'password' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-100'"
-                    class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-semibold tracking-wide transition duration-300">
-                <i data-lucide="lock" class="w-4.5 h-4.5"></i>
-                Keamanan & Sandi
+                    :class="activeTab === 'password' ? 'text-gold-600 border-gold-500' : 'text-muted border-transparent hover:text-walnut-950 hover:border-walnut-800/20'"
+                    class="w-full flex items-center justify-between py-4 border-b font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                Keamanan & Sandi <i data-lucide="lock" class="w-4 h-4"></i>
             </button>
             <a href="{{ route('orders.history') }}" 
-               class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-semibold tracking-wide bg-white text-slate-700 hover:bg-slate-50 border border-slate-100 transition duration-300">
-                <i data-lucide="package" class="w-4.5 h-4.5"></i>
-                Riwayat Pesanan
+               class="w-full flex items-center justify-between py-4 border-b border-transparent text-muted hover:text-walnut-950 hover:border-walnut-800/20 font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                Riwayat Pesanan <i data-lucide="package" class="w-4 h-4"></i>
             </a>
         </div>
 
         <!-- Right Side: Content Area -->
-        <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 md:p-8 shadow-sm">
+        <div class="bg-transparent border-none">
             
             <!-- Tab Content: Detail Profil -->
-            <div x-show="activeTab === 'profile'" class="space-y-6">
-                <div>
-                    <h3 class="font-display text-xl font-bold text-slate-950 uppercase tracking-tight">Detail Profil</h3>
-                    <p class="text-xs text-slate-500">Perbarui data nama dan nomor telepon Anda.</p>
+            <div x-show="activeTab === 'profile'" class="space-y-8" x-transition.opacity>
+                <div class="border-b border-walnut-800/10 pb-4">
+                    <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Detail Profil</h3>
+                    <p class="text-[0.8rem] text-muted font-medium mt-1">Perbarui data diri dan nomor kontak Anda.</p>
                 </div>
                 
                 <form action="{{ route('profile.update') }}" method="POST" class="space-y-6 max-w-lg">
                     @csrf
                     
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Lengkap</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Nama Lengkap</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                               class="w-full px-4.5 py-3 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition outline-none" />
+                               class="w-full bg-transparent border-b border-walnut-800/20 py-3 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.8rem] font-medium" />
                         @error('name')
-                            <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-[0.7rem] mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Email (Tidak dapat diubah)</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Alamat Email (Tidak dapat diubah)</label>
                         <input type="email" value="{{ $user->email }}" disabled
-                               class="w-full px-4.5 py-3 bg-slate-100 border border-slate-200 text-slate-400 rounded-xl text-sm outline-none cursor-not-allowed" />
+                               class="w-full bg-cream-50 border-b border-walnut-800/10 py-3 text-walnut-500 cursor-not-allowed text-[0.8rem] font-medium px-2" />
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon / WhatsApp</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">No. Telepon / WhatsApp</label>
                         <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
-                               class="w-full px-4.5 py-3 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition outline-none" />
+                               class="w-full bg-transparent border-b border-walnut-800/20 py-3 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.8rem] font-medium" />
                         @error('phone')
-                            <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-[0.7rem] mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="pt-2">
+                    <div class="pt-6">
                         <button type="submit" 
-                                class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition duration-300">
+                                class="inline-flex items-center justify-center px-8 py-4 bg-walnut-900 hover:bg-gold-600 text-gold-500 hover:text-white text-[0.7rem] font-bold uppercase tracking-widest transition duration-500">
                             Simpan Perubahan
                         </button>
                     </div>
@@ -274,42 +248,42 @@
             </div>
 
             <!-- Tab Content: Keamanan & Sandi -->
-            <div x-show="activeTab === 'password'" class="space-y-6" style="display: none;">
-                <div>
-                    <h3 class="font-display text-xl font-bold text-slate-950 uppercase tracking-tight">Ubah Password</h3>
-                    <p class="text-xs text-slate-500">Amankan akun Anda dengan mengganti sandi lama secara berkala.</p>
+            <div x-show="activeTab === 'password'" class="space-y-8" style="display: none;" x-transition.opacity>
+                <div class="border-b border-walnut-800/10 pb-4">
+                    <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Ubah Password</h3>
+                    <p class="text-[0.8rem] text-muted font-medium mt-1">Amankan akun Anda dengan mengganti sandi lama.</p>
                 </div>
                 
                 <form action="{{ route('profile.password') }}" method="POST" class="space-y-6 max-w-lg">
                     @csrf
                     
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password Saat Ini</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Password Saat Ini</label>
                         <input type="password" name="current_password" required
-                               class="w-full px-4.5 py-3 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition outline-none" />
+                               class="w-full bg-transparent border-b border-walnut-800/20 py-3 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.8rem] font-medium" />
                         @error('current_password')
-                            <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-[0.7rem] mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Password Baru</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Password Baru</label>
                         <input type="password" name="password" required
-                               class="w-full px-4.5 py-3 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition outline-none" />
+                               class="w-full bg-transparent border-b border-walnut-800/20 py-3 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.8rem] font-medium" />
                         @error('password')
-                            <p class="text-rose-600 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-red-600 text-[0.7rem] mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Ulangi Password Baru</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Ulangi Password Baru</label>
                         <input type="password" name="password_confirmation" required
-                               class="w-full px-4.5 py-3 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 rounded-xl text-sm transition outline-none" />
+                               class="w-full bg-transparent border-b border-walnut-800/20 py-3 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.8rem] font-medium" />
                     </div>
 
-                    <div class="pt-2">
+                    <div class="pt-6">
                         <button type="submit" 
-                                class="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition duration-300">
+                                class="inline-flex items-center justify-center px-8 py-4 bg-walnut-900 hover:bg-gold-600 text-gold-500 hover:text-white text-[0.7rem] font-bold uppercase tracking-widest transition duration-500">
                             Perbarui Password
                         </button>
                     </div>
@@ -317,73 +291,62 @@
             </div>
 
             <!-- Tab Content: Daftar Alamat -->
-            <div x-show="activeTab === 'addresses'" class="space-y-6" style="display: none;">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div x-show="activeTab === 'addresses'" class="space-y-8" style="display: none;" x-transition.opacity>
+                <div class="flex items-center justify-between border-b border-walnut-800/10 pb-4">
                     <div>
-                        <h3 class="font-display text-xl font-bold text-slate-950 uppercase tracking-tight">Daftar Alamat Pengiriman</h3>
-                        <p class="text-xs text-slate-500">Kelola beberapa alamat tujuan pengiriman barang Anda.</p>
+                        <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Daftar Alamat Pengiriman</h3>
                     </div>
                     <button @click="showAddAddressModal = true; initMap('add')" 
-                            class="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition duration-300">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        Tambah
+                            class="inline-flex items-center px-4 py-2 bg-transparent border border-walnut-800/20 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-widest hover:border-gold-500 hover:text-gold-600 transition">
+                        + Tambah
                     </button>
                 </div>
 
                 @if($addresses->isEmpty())
-                    <div class="text-center py-12 bg-slate-50/50 rounded-[24px] border border-dashed border-slate-200">
-                        <i data-lucide="map" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
-                        <p class="text-xs font-bold text-slate-600">Belum ada alamat tersimpan</p>
-                        <p class="text-[0.7rem] text-slate-400 mt-1">Silakan tambahkan alamat pengiriman pertama Anda untuk mempermudah checkout.</p>
+                    <div class="text-center py-16 bg-cream-50 border border-walnut-800/10">
+                        <i data-lucide="map" class="w-8 h-8 text-walnut-800/20 mx-auto mb-4"></i>
+                        <p class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-950">Belum ada alamat tersimpan</p>
+                        <p class="text-[0.75rem] text-muted font-medium mt-2">Silakan tambahkan alamat pengiriman Anda.</p>
                     </div>
                 @else
                     <div class="grid gap-6 md:grid-cols-2">
                         @foreach($addresses as $addr)
-                            <div class="border {{ $addr->is_default ? 'border-indigo-200 bg-indigo-50/10' : 'border-slate-200/80 bg-white' }} rounded-2xl p-5 flex flex-col justify-between hover:shadow-md hover:border-slate-300/80 transition duration-300 relative">
+                            <div class="border {{ $addr->is_default ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20 bg-transparent' }} p-6 flex flex-col justify-between hover:border-gold-500 hover:bg-cream-50 transition duration-300 relative">
                                 @if($addr->is_default)
-                                    <span class="absolute top-4 right-4 bg-indigo-600 text-white text-[0.55rem] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Utama</span>
+                                    <span class="absolute top-4 right-4 bg-walnut-900 text-gold-500 text-[0.55rem] font-bold px-2 py-1 uppercase tracking-widest">Utama</span>
                                 @endif
                                 
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-1.5">
-                                        <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-400"></i>
-                                        <span class="text-xs font-bold text-slate-900">{{ $addr->label }}</span>
-                                    </div>
-                                    <p class="text-xs font-bold text-slate-700">{{ $addr->name }}</p>
-                                    <p class="text-xs text-slate-500 leading-relaxed">
+                                <div class="space-y-2 pr-12">
+                                    <span class="text-[0.65rem] font-bold uppercase tracking-widest text-muted">{{ $addr->label }}</span>
+                                    <p class="text-[0.8rem] font-bold text-walnut-950">{{ $addr->name }}</p>
+                                    <p class="text-[0.75rem] text-muted font-medium leading-relaxed">
                                         {{ $addr->address }}, 
                                         @if($addr->village) Kel. {{ $addr->village }}, @endif
                                         @if($addr->district) Kec. {{ $addr->district }}, @endif
                                         {{ $addr->city }}, {{ $addr->province }}, {{ $addr->postal_code }}
                                     </p>
-                                    <p class="text-xs text-slate-600 font-medium">Telp: {{ $addr->phone }}</p>
-                                    @if($addr->latitude && $addr->longitude)
-                                        <div class="flex items-center gap-1 text-[0.65rem] text-slate-400 pt-1">
-                                            <i data-lucide="map" class="w-3 h-3 text-indigo-500"></i>
-                                            <span>{{ $addr->latitude }}, {{ $addr->longitude }}</span>
-                                        </div>
-                                    @endif
+                                    <p class="text-[0.75rem] text-walnut-900 font-bold tracking-widest">TELP: {{ $addr->phone }}</p>
                                 </div>
 
-                                <div class="flex items-center gap-3 pt-5 border-t border-slate-100/80 mt-4">
+                                <div class="flex items-center gap-4 pt-6 border-t border-walnut-800/10 mt-6">
                                     <button @click="openEditAddress({{ json_encode($addr) }})" 
-                                            class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition flex items-center gap-1">
-                                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit
+                                            class="text-[0.65rem] uppercase tracking-widest text-gold-600 hover:text-walnut-950 font-bold transition">
+                                        Edit
                                     </button>
                                     
                                     @if(!$addr->is_default)
                                         <form action="{{ route('profile.address.default', $addr->id) }}" method="POST" class="inline">
                                             @csrf
-                                            <button type="submit" class="text-xs text-slate-600 hover:text-slate-900 font-bold transition">
+                                            <button type="submit" class="text-[0.65rem] uppercase tracking-widest text-walnut-600 hover:text-walnut-950 font-bold transition">
                                                 Set Utama
                                             </button>
                                         </form>
                                         
-                                        <form action="{{ route('profile.address.destroy', $addr->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus alamat ini?')">
+                                        <form action="{{ route('profile.address.destroy', $addr->id) }}" method="POST" class="inline ml-auto" onsubmit="return confirm('Hapus alamat ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-xs text-red-600 hover:text-red-700 font-bold transition flex items-center gap-1">
-                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus
+                                            <button type="submit" class="text-[0.65rem] uppercase tracking-widest text-red-600 hover:text-red-800 font-bold transition">
+                                                Hapus
                                             </button>
                                         </form>
                                     @endif
@@ -399,54 +362,52 @@
 
     <!-- Modal: Tambah Alamat Baru -->
     <div x-show="showAddAddressModal" 
-         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         class="fixed inset-0 bg-walnut-950/80 flex items-center justify-center p-4 z-50"
          style="display: none;"
          x-transition>
-        <div class="bg-white rounded-[32px] w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8" @click.away="showAddAddressModal = false">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-                <h3 class="font-display text-lg font-bold text-slate-950 uppercase tracking-tight">Tambah Alamat Baru</h3>
-                <button @click="showAddAddressModal = false" class="p-1 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+        <div class="bg-cream-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 md:p-12 border border-walnut-800/10 relative" @click.away="showAddAddressModal = false">
+            <button @click="showAddAddressModal = false" class="absolute top-6 right-6 text-walnut-400 hover:text-walnut-950 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="pb-6 border-b border-walnut-800/10 mb-8">
+                <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Alamat Baru</h3>
             </div>
 
-            <form action="{{ route('profile.address.store') }}" method="POST" class="space-y-4">
+            <form action="{{ route('profile.address.store') }}" method="POST" class="space-y-6">
                 @csrf
                 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label Alamat</label>
-                        <input type="text" name="label" required placeholder="Contoh: Rumah, Kantor" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Label Alamat</label>
+                        <input type="text" name="label" required placeholder="Rumah / Kantor" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Penerima</label>
-                        <input type="text" name="name" required placeholder="Nama Penerima" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon Penerima</label>
-                        <input type="text" name="phone" required placeholder="No. Telepon" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" required placeholder="Kode Pos" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Nama Penerima</label>
+                        <input type="text" name="name" required placeholder="Nama Lengkap" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <!-- Province Select (RajaOngkir) -->
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">No. Telepon</label>
+                        <input type="text" name="phone" required placeholder="Contoh: 0812345678" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kode Pos</label>
+                        <input type="text" name="postal_code" required placeholder="12345" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                    </div>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Provinsi</label>
                         <template x-if="!rajaongkirFailed">
                             <div x-data="{ pNameInput: '' }">
                                 <input type="hidden" name="province" :value="pNameInput" />
                                 <select name="province_id" required 
-                                        @change="handleProvinceChange($event, 'add'); 
-                                                 let sel = $event.target; 
-                                                 pNameInput = sel.options[sel.selectedIndex].text" 
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                        @change="handleProvinceChange($event, 'add'); pNameInput = $event.target.options[$event.target.selectedIndex].text" 
+                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
                                     <option value="">Pilih Provinsi</option>
                                     <template x-for="p in provinces" :key="p.province_id">
                                         <option :value="p.province_id" x-text="p.province"></option>
@@ -455,23 +416,18 @@
                             </div>
                         </template>
                         <template x-if="rajaongkirFailed">
-                            <input type="text" name="province" required
-                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
-                                   placeholder="Masukkan Provinsi Anda (e.g. Jawa Barat)" />
+                            <input type="text" name="province" required placeholder="Provinsi" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                         </template>
                     </div>
 
-                    <!-- City Select (RajaOngkir) -->
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota / Kabupaten</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kota / Kabupaten</label>
                         <template x-if="!rajaongkirFailed">
                             <div x-data="{ cNameInput: '' }">
                                 <input type="hidden" name="city" :value="cNameInput" />
                                 <select name="city_id" required 
-                                        @change="let sel = $event.target; 
-                                                 cNameInput = sel.options[sel.selectedIndex].text"
-                                        :disabled="cities.length === 0"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                        @change="cNameInput = $event.target.options[$event.target.selectedIndex].text" 
+                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
                                     <option value="">Pilih Kota</option>
                                     <template x-for="c in cities" :key="c.city_id">
                                         <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
@@ -480,54 +436,40 @@
                             </div>
                         </template>
                         <template x-if="rajaongkirFailed">
-                            <input type="text" name="city" required
-                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
-                                   placeholder="Masukkan Kota / Kabupaten (e.g. Kota Bandung)" />
+                            <input type="text" name="city" required placeholder="Kota" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                         </template>
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
-                        <input type="text" name="district" required placeholder="Kecamatan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan</label>
+                        <input type="text" name="district" placeholder="Kecamatan" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
-                        <input type="text" name="village" required placeholder="Kelurahan" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                    <textarea name="address" required rows="3" placeholder="Nama Jalan, Blok, No. Rumah, RT/RW" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Pinpoint Lokasi (Peta)</label>
-                    <p class="text-[0.65rem] text-slate-400 pb-1">Geser pin atau klik pada peta untuk menentukan koordinat.</p>
-                    <div id="map-add" class="h-48 rounded-xl border border-slate-200" style="position: relative; outline: none; z-index: 10;"></div>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
-                        <input type="text" name="latitude" id="add-latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
-                        <input type="text" name="longitude" id="add-longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kelurahan / Desa</label>
+                        <input type="text" name="village" placeholder="Kelurahan" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" name="is_default" value="1" id="is_default_add" class="rounded text-indigo-600 focus:ring-indigo-500" />
-                    <label for="is_default_add" class="text-xs text-slate-600 select-none">Jadikan sebagai alamat utama</label>
+                <div class="space-y-2">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Detail Alamat Lengkap</label>
+                    <textarea name="address" required rows="3" placeholder="Nama jalan, nomor bangunan, detail patokan..." class="w-full bg-transparent border border-walnut-800/20 p-4 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium resize-none"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-6">
-                    <button type="button" @click="showAddAddressModal = false" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition duration-300">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition duration-300 shadow-md shadow-indigo-600/10">Simpan</button>
+                <div class="space-y-3">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Sematkan Lokasi Peta (Opsional)</label>
+                    <div id="map-add" class="w-full h-48 border border-walnut-800/20 bg-walnut-100 z-10"></div>
+                    <div class="flex gap-4">
+                        <input type="text" id="add-latitude" name="latitude" readonly placeholder="Latitude" class="w-1/2 bg-cream-50 border-b border-walnut-800/10 py-2 text-muted text-[0.7rem] cursor-not-allowed" />
+                        <input type="text" id="add-longitude" name="longitude" readonly placeholder="Longitude" class="w-1/2 bg-cream-50 border-b border-walnut-800/10 py-2 text-muted text-[0.7rem] cursor-not-allowed" />
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit" class="w-full py-4 bg-walnut-900 hover:bg-gold-600 text-gold-500 hover:text-white text-[0.7rem] font-bold uppercase tracking-widest transition duration-500">
+                        Simpan Alamat Baru
+                    </button>
                 </div>
             </form>
         </div>
@@ -535,144 +477,118 @@
 
     <!-- Modal: Edit Alamat -->
     <div x-show="showEditAddressModal" 
-         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         class="fixed inset-0 bg-walnut-950/80 flex items-center justify-center p-4 z-50"
          style="display: none;"
          x-transition>
-        <div class="bg-white rounded-[32px] w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8" @click.away="showEditAddressModal = false">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-                <h3 class="font-display text-lg font-bold text-slate-950 uppercase tracking-tight">Edit Alamat</h3>
-                <button @click="showEditAddressModal = false" class="p-1 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-800 transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+        <div class="bg-cream-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 md:p-12 border border-walnut-800/10 relative" @click.away="showEditAddressModal = false">
+            <button @click="showEditAddressModal = false" class="absolute top-6 right-6 text-walnut-400 hover:text-walnut-950 transition">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="pb-6 border-b border-walnut-800/10 mb-8">
+                <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Edit Alamat</h3>
             </div>
 
-            <form :action="`{{ route('profile.address.store') }}/${editAddressData.id}`" method="POST" class="space-y-4">
+            <form :action="`{{ url('profile/address') }}/${editAddressData.id}`" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
                 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Label Alamat</label>
-                        <input type="text" name="label" required x-model="editAddressData.label" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Label Alamat</label>
+                        <input type="text" name="label" x-model="editAddressData.label" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Penerima</label>
-                        <input type="text" name="name" required x-model="editAddressData.name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">No. Telepon Penerima</label>
-                        <input type="text" name="phone" required x-model="editAddressData.phone" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" required x-model="editAddressData.postal_code" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Nama Penerima</label>
+                        <input type="text" name="name" x-model="editAddressData.name" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <!-- Province -->
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Provinsi</label>
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">No. Telepon</label>
+                        <input type="text" name="phone" x-model="editAddressData.phone" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kode Pos</label>
+                        <input type="text" name="postal_code" x-model="editAddressData.postal_code" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                    </div>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Provinsi</label>
                         <template x-if="!rajaongkirFailed">
                             <div>
-                                <input type="hidden" name="province" :value="editAddressData.province" />
-                                <select name="province_id" required 
-                                        x-model="editAddressData.province_id"
-                                        @change="handleProvinceChange($event, 'edit')"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none">
+                                <input type="hidden" name="province" x-model="editAddressData.province" />
+                                <select name="province_id" x-model="editAddressData.province_id" required 
+                                        @change="handleProvinceChange($event, 'edit')" 
+                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
                                     <option value="">Pilih Provinsi</option>
                                     <template x-for="p in provinces" :key="p.province_id">
-                                        <option :value="p.province_id" x-text="p.province" :selected="p.province_id == editAddressData.province_id"></option>
+                                        <option :value="p.province_id" x-text="p.province"></option>
                                     </template>
                                 </select>
                             </div>
                         </template>
                         <template x-if="rajaongkirFailed">
-                            <input type="text" name="province" required x-model="editAddressData.province"
-                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
-                                   placeholder="Masukkan Provinsi Anda" />
+                            <input type="text" name="province" x-model="editAddressData.province" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                         </template>
                     </div>
 
-                    <!-- City / Kabupaten -->
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kota / Kabupaten</label>
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kota / Kabupaten</label>
                         <template x-if="!rajaongkirFailed">
                             <div>
-                                <input type="hidden" name="city" :value="editAddressData.city" />
-                                <select name="city_id" required 
-                                        x-model="editAddressData.city_id"
-                                        @change="handleCityChange($event, 'edit')"
-                                        :disabled="cities.length === 0"
-                                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none disabled:opacity-60 disabled:cursor-not-allowed">
+                                <input type="hidden" name="city" x-model="editAddressData.city" />
+                                <select name="city_id" x-model="editAddressData.city_id" required 
+                                        @change="handleCityChange($event, 'edit')" 
+                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
                                     <option value="">Pilih Kota</option>
                                     <template x-for="c in cities" :key="c.city_id">
-                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name" :selected="c.city_id == editAddressData.city_id"></option>
+                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
                                     </template>
                                 </select>
                             </div>
                         </template>
                         <template x-if="rajaongkirFailed">
-                            <input type="text" name="city" required x-model="editAddressData.city"
-                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"
-                                   placeholder="Masukkan Kota / Kabupaten" />
+                            <input type="text" name="city" x-model="editAddressData.city" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                         </template>
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kecamatan</label>
-                        <input type="text" name="district" required x-model="editAddressData.district" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan</label>
+                        <input type="text" name="district" x-model="editAddressData.district" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Kelurahan</label>
-                        <input type="text" name="village" required x-model="editAddressData.village" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none" />
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Alamat Lengkap</label>
-                    <textarea name="address" required rows="3" x-model="editAddressData.address" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-600 outline-none"></textarea>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Pinpoint Lokasi (Peta)</label>
-                    <p class="text-[0.65rem] text-slate-400 pb-1">Geser pin atau klik pada peta untuk menentukan koordinat.</p>
-                    <div id="map-edit" class="h-48 rounded-xl border border-slate-200" style="position: relative; outline: none; z-index: 10;"></div>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Latitude</label>
-                        <input type="text" name="latitude" id="edit-latitude" x-model="editAddressData.latitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Longitude</label>
-                        <input type="text" name="longitude" id="edit-longitude" x-model="editAddressData.longitude" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm outline-none cursor-not-allowed text-slate-500" />
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kelurahan / Desa</label>
+                        <input type="text" name="village" x-model="editAddressData.village" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" name="is_default" value="1" id="is_default_edit" x-model="editAddressData.is_default" class="rounded text-indigo-600 focus:ring-indigo-500" />
-                    <label for="is_default_edit" class="text-xs text-slate-600 select-none">Jadikan sebagai alamat utama</label>
+                <div class="space-y-2">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Detail Alamat Lengkap</label>
+                    <textarea name="address" x-model="editAddressData.address" required rows="3" class="w-full bg-transparent border border-walnut-800/20 p-4 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium resize-none"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-6">
-                    <button type="button" @click="showEditAddressModal = false" class="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition duration-300">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition duration-300 shadow-md shadow-indigo-600/10">Simpan Perubahan</button>
+                <div class="space-y-3">
+                    <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Perbarui Lokasi Peta</label>
+                    <div id="map-edit" class="w-full h-48 border border-walnut-800/20 bg-walnut-100 z-10"></div>
+                    <div class="flex gap-4">
+                        <input type="text" name="latitude" x-model="editAddressData.latitude" readonly class="w-1/2 bg-cream-50 border-b border-walnut-800/10 py-2 text-muted text-[0.7rem] cursor-not-allowed" />
+                        <input type="text" name="longitude" x-model="editAddressData.longitude" readonly class="w-1/2 bg-cream-50 border-b border-walnut-800/10 py-2 text-muted text-[0.7rem] cursor-not-allowed" />
+                    </div>
+                </div>
+
+                <div class="pt-6 flex justify-end">
+                    <button type="submit" class="w-full py-4 bg-walnut-900 hover:bg-gold-600 text-gold-500 hover:text-white text-[0.7rem] font-bold uppercase tracking-widest transition duration-500">
+                        Perbarui Alamat
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        lucide.createIcons();
-    });
-</script>
 @endsection

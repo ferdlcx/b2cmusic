@@ -3,32 +3,30 @@
 @section('title', 'Wishlist Saya - DjudasMS')
 
 @section('content')
-<div class="space-y-8">
+<div class="space-y-12 py-8">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <span class="text-[0.65rem] uppercase tracking-[0.4em] text-rose-600 font-bold bg-rose-50 px-3.5 py-1.5 rounded-full inline-block">Favorit</span>
-            <h1 class="font-display text-4xl font-black uppercase tracking-tight text-slate-950 mt-2">Wishlist Saya</h1>
-            <p class="text-sm text-slate-500 font-normal">Daftar produk yang Anda sukai dan simpan untuk dibeli nanti.</p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-walnut-800/10">
+        <div class="space-y-2">
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block">Koleksi Tersimpan</span>
+            <h1 class="font-display text-4xl font-black uppercase tracking-tighter text-walnut-950">Wishlist <span class="text-gold-500">Saya.</span></h1>
+            <p class="text-sm text-muted font-medium pt-2">Daftar mahakarya yang Anda kurasi untuk dimiliki.</p>
         </div>
-        <a href="{{ route('customer.dashboard') }}" class="inline-flex items-center justify-center px-5 py-3 border border-slate-200 bg-white rounded-2xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 text-slate-400"></i> Kembali ke Dashboard
+        <a href="{{ route('customer.dashboard') }}" class="inline-flex items-center px-5 py-2.5 bg-transparent border border-walnut-800/20 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-widest hover:border-gold-500 hover:text-gold-600 transition">
+            Kembali ke Dashboard
         </a>
     </div>
 
     <!-- Wishlist Items Grid -->
     @if($wishlistItems->isEmpty())
-        <div class="text-center py-20 bg-white border border-slate-200/80 rounded-[32px] shadow-sm space-y-4 max-w-2xl mx-auto">
-            <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto">
-                <i data-lucide="heart" class="w-7 h-7"></i>
+        <div class="text-center py-24 bg-cream-50 border border-walnut-800/10 space-y-6 max-w-2xl mx-auto">
+            <i data-lucide="heart" class="w-10 h-10 text-walnut-800/20 mx-auto"></i>
+            <div class="space-y-2">
+                <h3 class="font-display text-xl font-black uppercase tracking-tighter text-walnut-950">Belum Ada Wishlist</h3>
+                <p class="text-[0.8rem] text-muted max-w-sm mx-auto font-medium">Jelajahi dan temukan instrumen impian Anda di galeri kami.</p>
             </div>
-            <div class="space-y-1">
-                <h3 class="font-display text-lg font-bold uppercase tracking-tight text-slate-950">Wishlist Anda Kosong</h3>
-                <p class="text-xs text-slate-500 max-w-sm mx-auto">Cari produk-produk instrumen musik impian Anda di katalog toko kami dan masukkan ke wishlist.</p>
-            </div>
-            <div class="pt-2">
-                <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center px-6 py-3.5 bg-indigo-600 rounded-2xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">
-                    Mulai Belanja &rarr;
+            <div class="pt-4">
+                <a href="{{ route('catalog') }}" class="inline-flex items-center px-8 py-4 bg-walnut-900 text-gold-500 text-[0.65rem] font-bold uppercase tracking-widest hover:bg-gold-600 hover:text-white transition duration-500">
+                    Jelajahi Galeri
                 </a>
             </div>
         </div>
@@ -38,57 +36,56 @@
                 @php
                     $product = $item->product;
                 @endphp
-                <div class="bg-white border border-slate-200/80 rounded-[28px] overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                <div class="group border border-walnut-800/10 flex flex-col justify-between hover:border-gold-500 transition duration-500">
                     <!-- Product Image -->
-                    <div class="relative bg-slate-50 aspect-square overflow-hidden group">
+                    <div class="relative bg-cream-50 aspect-[4/5] overflow-hidden">
                         <a href="{{ route('products.show', $product->slug) }}">
                             @if($product->primaryImage)
-                                <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                                <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 group-hover:opacity-100 transition duration-700" />
                             @else
-                                <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                <div class="w-full h-full flex items-center justify-center text-walnut-300">
                                     <i data-lucide="image" class="w-12 h-12"></i>
                                 </div>
                             @endif
                         </a>
                         
                         <!-- Delete Button (Top Right) -->
-                        <form action="{{ route('wishlist.destroy', $item->id) }}" method="POST" class="absolute top-4 right-4">
+                        <form action="{{ route('wishlist.destroy', $item->id) }}" method="POST" class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition duration-300">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-slate-400 hover:text-rose-600 hover:scale-105 shadow-sm transition" title="Hapus dari wishlist">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <button type="submit" class="w-8 h-8 bg-walnut-900 text-gold-500 flex items-center justify-center hover:bg-red-600 hover:text-white transition duration-300" title="Hapus dari wishlist">
+                                <i data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </form>
                     </div>
 
                     <!-- Product Details -->
-                    <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
-                        <div class="space-y-1">
-                            <span class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">{{ $product->category->name }}</span>
-                            <a href="{{ route('products.show', $product->slug) }}" class="font-display font-black text-sm uppercase tracking-tight text-slate-950 hover:text-indigo-600 transition line-clamp-1">
+                    <div class="p-6 space-y-4 flex-1 flex flex-col justify-between bg-transparent">
+                        <div class="space-y-2">
+                            <span class="text-[0.55rem] uppercase tracking-[0.2em] text-gold-600 font-bold block">{{ $product->category->name }}</span>
+                            <a href="{{ route('products.show', $product->slug) }}" class="font-display font-black text-[0.9rem] uppercase tracking-tighter text-walnut-950 hover:text-gold-600 transition line-clamp-2">
                                 {{ $product->name }}
                             </a>
-                            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">{{ $product->short_description }}</p>
                         </div>
 
-                        <div class="pt-2 flex flex-col gap-3">
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-sm font-black text-indigo-600">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                        <div class="pt-4 flex flex-col gap-4 border-t border-walnut-800/10">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[0.8rem] font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</span>
                                 @if($product->stock < 1)
-                                    <span class="text-[0.6rem] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">Habis</span>
+                                    <span class="text-[0.55rem] font-bold uppercase tracking-widest text-red-600 border border-red-600 px-2 py-0.5">Sold Out</span>
                                 @endif
                             </div>
 
                             @if($product->stock > 0)
                                 <form action="{{ route('wishlist.toCart', $item->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase text-[0.65rem] tracking-widest hover:bg-indigo-700 hover:shadow-md transition duration-300 flex items-center justify-center gap-1.5">
-                                        <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Pindahkan ke Keranjang
+                                    <button type="submit" class="w-full py-3 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-500">
+                                        Pindah ke Keranjang
                                     </button>
                                 </form>
                             @else
-                                <button disabled class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl font-bold uppercase text-[0.65rem] tracking-widest cursor-not-allowed flex items-center justify-center gap-1.5 border border-slate-200/50">
-                                    <i data-lucide="slash" class="w-3.5 h-3.5"></i> Stok Kosong
+                                <button disabled class="w-full py-3 bg-cream-100 text-walnut-400 font-bold uppercase text-[0.65rem] tracking-widest cursor-not-allowed border border-walnut-800/10">
+                                    Tidak Tersedia
                                 </button>
                             @endif
                         </div>

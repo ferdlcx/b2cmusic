@@ -76,6 +76,9 @@
                   } else if (code === 'HEBATSOUND') {
                       this.discount = Math.min(100000, this.subtotal);
                       alert('Kupon HEBATSOUND Berhasil Diterapkan (Diskon Rp 100.000)!');
+                  } else if (code === 'DEMODJUDAS') {
+                      this.discount = Math.min(this.subtotal * 0.2, 1500000);
+                      alert('Kupon DEMODJUDAS Berhasil Diterapkan (Diskon 20%)!');
                   } else {
                       this.discount = 0;
                       alert('Kupon tidak valid atau kadaluarsa.');
@@ -308,6 +311,7 @@
                     <!-- Coupon Input -->
                     <div class="pt-6 border-t border-walnut-800/10 space-y-4">
                         <span class="text-[0.65rem] uppercase tracking-widest text-walnut-800 font-bold block">Privilege Code</span>
+                        <p class="text-[0.65rem] text-muted font-bold -mt-2">Gunakan kode <span class="text-gold-600">DEMODJUDAS</span> untuk demo diskon 20%</p>
                         <div class="flex gap-2">
                             <input type="text" x-model="couponCode" placeholder="Kode" class="flex-1 bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium uppercase" />
                             <button type="button" @click="applyCoupon()" class="px-4 bg-walnut-900 text-gold-500 text-[0.6rem] font-bold uppercase tracking-widest hover:bg-gold-600 hover:text-white transition">

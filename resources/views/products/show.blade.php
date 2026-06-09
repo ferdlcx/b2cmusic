@@ -116,7 +116,7 @@
                         <div x-data="{ qty: 1, maxQty: {{ $product->stock }} }" class="space-y-4">
                             <div class="flex items-center border border-walnut-800/20 w-32">
                                 <button type="button" @click="if (qty > 1) qty--" class="w-10 py-3 text-walnut-500 hover:text-gold-600 font-bold transition">-</button>
-                                <input type="number" name="quantity" :value="qty" readonly class="flex-1 bg-transparent text-center text-[0.8rem] font-bold text-walnut-950 focus:outline-none appearance-none m-0" />
+                                <input type="number" name="quantity" :value="qty" readonly class="flex-1 w-full min-w-0 bg-transparent text-center text-[0.8rem] font-bold text-walnut-950 focus:outline-none appearance-none m-0" />
                                 <button type="button" @click="if (qty < maxQty) qty++" class="w-10 py-3 text-walnut-500 hover:text-gold-600 font-bold transition">+</button>
                             </div>
                             

@@ -108,7 +108,7 @@ class RealProductSeeder extends Seeder
                     'weight' => 5000, // Default 5kg
                     'stock' => 10,
                     'sku' => strtoupper(Str::random(8)),
-                    'status' => 'published',
+                    'status' => true,
                 ]
             );
 

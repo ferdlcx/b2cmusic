@@ -277,7 +277,7 @@
         @endif
 
         <!-- Content -->
-        <main class="flex-grow w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-12">
+        <main class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
             @yield('content')
         </main>
     </div>

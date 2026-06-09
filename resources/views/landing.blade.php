@@ -1,8 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'DjudasMS - Premium Instruments & Records')
+@section('title', 'DjudasMS - Premium Music Instruments')
 
 @section('content')
+@php
+    $wishlistProductIds = [];
+    $wishlistItemsMapping = [];
+    if(auth()->check() && auth()->user()->wishlist) {
+        $wishlistItems = auth()->user()->wishlist->items;
+        foreach($wishlistItems as $item) {
+            $wishlistProductIds[] = $item->product_id;
+            $wishlistItemsMapping[$item->product_id] = $item->id;
+        }
+    }
+@endphp
+
 <!-- Editorial Hero Section -->
 <section class="relative w-screen left-1/2 -ml-[50vw] -mt-[5.5rem] pt-[8.5rem] pb-16 overflow-hidden bg-cream-100" 
          x-data="{ scrollY: 0 }" 
@@ -156,14 +168,40 @@
                     
                     <div class="flex items-center justify-between pt-4 border-t border-walnut-800/10 mt-auto">
                         <p class="text-sm font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</p>
-                        <form action="{{ route('cart.add') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="text-walnut-800 hover:text-gold-600 transition" title="Tambah ke Keranjang">
-                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                            </button>
-                        </form>
+                        
+                        <div class="flex items-center gap-4">
+                            @php
+                                $inWishlist = in_array($product->id, $wishlistProductIds);
+                                $wishlistItemId = $inWishlist ? $wishlistItemsMapping[$product->id] : null;
+                            @endphp
+
+                            @if($inWishlist)
+                                <form action="{{ route('wishlist.destroy', $wishlistItemId) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-gold-600 hover:text-red-600 transition" title="Hapus dari Wishlist">
+                                        <i data-lucide="heart" class="w-4 h-4 fill-gold-600"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('wishlist.add') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <button type="submit" class="text-walnut-400 hover:text-gold-600 transition" title="Tambah ke Wishlist">
+                                        <i data-lucide="heart" class="w-4 h-4"></i>
+                                    </button>
+                                </form>
+                            @endif
+
+                            <form action="{{ route('cart.add') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="text-walnut-800 hover:text-gold-600 transition" title="Tambah ke Keranjang">
+                                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </article>

@@ -3,6 +3,17 @@
 @section('title', 'Katalog - DjudasMS')
 
 @section('content')
+@php
+    $wishlistProductIds = [];
+    $wishlistItemsMapping = [];
+    if(auth()->check() && auth()->user()->wishlist) {
+        $wishlistItems = auth()->user()->wishlist->items;
+        foreach($wishlistItems as $item) {
+            $wishlistProductIds[] = $item->product_id;
+            $wishlistItemsMapping[$item->product_id] = $item->id;
+        }
+    }
+@endphp
 <div class="space-y-12 py-8">
     <!-- Header -->
     <div class="border-b border-walnut-800/10 pb-12 space-y-4 text-center md:text-left">
@@ -175,13 +186,28 @@
                                     <p class="text-sm font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</p>
                                     
                                     <div class="flex items-center gap-4">
-                                        <form action="{{ route('wishlist.add') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="text-walnut-400 hover:text-gold-600 transition" title="Tambah ke Wishlist">
-                                                <i data-lucide="heart" class="w-4 h-4"></i>
-                                            </button>
-                                        </form>
+                                        @php
+                                            $inWishlist = in_array($product->id, $wishlistProductIds);
+                                            $wishlistItemId = $inWishlist ? $wishlistItemsMapping[$product->id] : null;
+                                        @endphp
+
+                                        @if($inWishlist)
+                                            <form action="{{ route('wishlist.destroy', $wishlistItemId) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-gold-600 hover:text-red-600 transition" title="Hapus dari Wishlist">
+                                                    <i data-lucide="heart" class="w-4 h-4 fill-gold-600"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('wishlist.add') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                                <button type="submit" class="text-walnut-400 hover:text-gold-600 transition" title="Tambah ke Wishlist">
+                                                    <i data-lucide="heart" class="w-4 h-4"></i>
+                                                </button>
+                                            </form>
+                                        @endif
 
                                         @if($product->stock > 0)
                                             <form action="{{ route('cart.add') }}" method="POST">

@@ -3,6 +3,17 @@
 @section('title', $product->name . ' - DjudasMS')
 
 @section('content')
+@php
+    $inWishlist = false;
+    $wishlistItemId = null;
+    if(auth()->check() && auth()->user()->wishlist) {
+        $wishlistItem = auth()->user()->wishlist->items->where('product_id', $product->id)->first();
+        if($wishlistItem) {
+            $inWishlist = true;
+            $wishlistItemId = $wishlistItem->id;
+        }
+    }
+@endphp
 <div class="space-y-24 py-8">
     <!-- Breadcrumb -->
     <nav class="text-[0.65rem] font-bold uppercase tracking-widest text-muted flex items-center gap-2">
@@ -122,14 +133,25 @@
                 @endif
 
                 <!-- Add to Wishlist Form -->
-                <form action="{{ route('wishlist.add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <button type="submit" 
-                        class="w-full py-3.5 bg-transparent border-b border-walnut-800/20 text-walnut-900 font-bold uppercase text-[0.65rem] tracking-[0.2em] hover:border-gold-500 hover:text-gold-600 transition duration-300 flex items-center justify-center gap-2">
-                        <i data-lucide="heart" class="w-3.5 h-3.5"></i> Simpan ke Wishlist
-                    </button>
-                </form>
+                @if($inWishlist)
+                    <form action="{{ route('wishlist.destroy', $wishlistItemId) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                            class="w-full py-3.5 bg-transparent border-b border-gold-500 text-gold-600 font-bold uppercase text-[0.65rem] tracking-[0.2em] hover:border-red-600 hover:text-red-600 transition duration-300 flex items-center justify-center gap-2">
+                            <i data-lucide="heart" class="w-3.5 h-3.5 fill-gold-600"></i> Hapus dari Wishlist
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('wishlist.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <button type="submit" 
+                            class="w-full py-3.5 bg-transparent border-b border-walnut-800/20 text-walnut-900 font-bold uppercase text-[0.65rem] tracking-[0.2em] hover:border-gold-500 hover:text-gold-600 transition duration-300 flex items-center justify-center gap-2">
+                            <i data-lucide="heart" class="w-3.5 h-3.5"></i> Simpan ke Wishlist
+                        </button>
+                    </form>
+                @endif
             </div>
 
             <!-- Short Description -->

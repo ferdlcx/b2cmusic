@@ -18,9 +18,13 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
-Route::get('/', [ProductController::class, 'home'])->name('home');
-Route::get('/shop', [ProductController::class, 'index'])->name('catalog');
+Route::get('/', [ProductController::class, 'landing'])->name('home');
+Route::get('/catalog', [ProductController::class, 'index'])->name('catalog');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+// Static Pages
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/midtrans/webhook', [OrderController::class, 'handleWebhook'])->name('midtrans.webhook');
 
 // Test SMTP Route

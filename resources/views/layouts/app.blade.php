@@ -218,40 +218,40 @@
                  x-transition:leave="transition ease-in duration-150" 
                  x-transition:leave-start="opacity-100 translate-y-0" 
                  x-transition:leave-end="opacity-0 -translate-y-4" 
-                 class="md:hidden bg-white border-b border-slate-100 px-6 py-4 space-y-3 shadow-lg"
+                 class="md:hidden bg-cream-50 border-b border-walnut-800/10 px-6 py-4 space-y-4 shadow-sm"
                  style="display: none;">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-                    <i data-lucide="home" class="w-5 h-5"></i> Home
+                <a href="{{ route('home') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                    <i data-lucide="home" class="w-4 h-4"></i> Home
                 </a>
-                <a href="{{ route('catalog') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i> Shop Catalog
+                <a href="{{ route('catalog') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i> Shop Catalog
                 </a>
                 @auth
-                    <hr class="border-slate-100 my-2" />
-                    <a href="{{ route('orders.history') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-                        <i data-lucide="clipboard-list" class="w-5 h-5"></i> Riwayat Pesanan
+                    <hr class="border-walnut-800/10 my-2" />
+                    <a href="{{ route('orders.history') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Riwayat Pesanan
                     </a>
-                    <a href="{{ route('profile.show') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-                        <i data-lucide="user" class="w-5 h-5"></i> Profil Saya
+                    <a href="{{ route('profile.show') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                     </a>
                     @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">
-                            <i data-lucide="shield-check" class="w-5 h-5"></i> Panel Admin
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-900 hover:text-gold-600 transition">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Panel Admin
                         </a>
                     @endif
                     <form action="{{ route('logout') }}" method="POST" class="w-full pt-2">
                         @csrf
-                        <button type="submit" class="flex w-full items-center gap-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition text-left">
-                            <i data-lucide="log-out" class="w-5 h-5"></i> Keluar
+                        <button type="submit" class="flex w-full items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-red-700 hover:text-red-800 transition text-left">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
                         </button>
                     </form>
                 @else
-                    <hr class="border-slate-100 my-2" />
-                    <a href="{{ route('login') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition">
-                        <i data-lucide="log-in" class="w-5 h-5"></i> Masuk
+                    <hr class="border-walnut-800/10 my-2" />
+                    <a href="{{ route('login') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="log-in" class="w-4 h-4"></i> Masuk
                     </a>
-                    <a href="{{ route('register') }}" class="flex items-center gap-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i> Daftar
+                    <a href="{{ route('register') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Daftar
                     </a>
                 @endauth
             </div>
@@ -277,7 +277,7 @@
         @endif
 
         <!-- Content -->
-        <main class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
+        <main class="flex-grow w-full max-w-[1280px] mx-auto px-6 lg:px-12 py-12">
             @yield('content')
         </main>
     </div>
@@ -305,8 +305,8 @@
                     <div class="space-y-5">
                         <div class="text-walnut-950 opacity-50">Eksplorasi</div>
                         <div><a href="{{ route('catalog') }}" class="hover:text-gold-600 transition">Semua Produk</a></div>
-                        <div><a href="#" class="hover:text-gold-600 transition">Tentang Kami</a></div>
-                        <div><a href="#" class="hover:text-gold-600 transition">Kontak</a></div>
+                        <div><a href="{{ route('about') }}" class="hover:text-gold-600 transition">Tentang Kami</a></div>
+                        <div><a href="{{ route('contact') }}" class="hover:text-gold-600 transition">Kontak</a></div>
                     </div>
                 </div>
                 <div class="space-y-5 text-[0.7rem] uppercase tracking-[0.2em] font-bold">

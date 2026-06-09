@@ -54,11 +54,11 @@
 
                                     <!-- Quantity -->
                                     <td class="py-6 text-center">
-                                        <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" class="inline-flex items-center border border-walnut-800/20 w-28 bg-transparent">
+                                        <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" x-ref="formDesktop" class="inline-flex items-center border border-walnut-800/20 w-28 bg-transparent">
                                             @csrf
-                                            <button type="button" @click="if (qty > 1) { qty--; $nextTick(() => $el.form.submit()) }" class="w-8 py-2 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">-</button>
-                                            <input type="number" name="quantity" x-model="qty" readonly class="flex-1 bg-transparent text-center text-[0.75rem] font-bold text-walnut-950 focus:outline-none" />
-                                            <button type="button" @click="if (qty < {{ $item->product->stock }}) { qty++; $nextTick(() => $el.form.submit()) }" class="w-8 py-2 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">+</button>
+                                            <button type="button" @click="if (qty > 1) { qty--; $nextTick(() => $refs.formDesktop.submit()) }" class="w-8 py-2 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">-</button>
+                                            <input type="number" name="quantity" :value="qty" readonly class="flex-1 bg-transparent text-center text-[0.75rem] font-bold text-walnut-950 focus:outline-none appearance-none m-0" />
+                                            <button type="button" @click="if (qty < {{ $item->product->stock }}) { qty++; $nextTick(() => $refs.formDesktop.submit()) }" class="w-8 py-2 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">+</button>
                                         </form>
                                     </td>
 
@@ -98,11 +98,11 @@
                             </div>
                             
                             <div class="flex items-center justify-between pt-2">
-                                <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" class="inline-flex items-center border border-walnut-800/20 w-24">
+                                <form action="{{ route('cart.update', $item->id) }}" method="POST" x-data="{ qty: {{ $item->quantity }} }" x-ref="formMobile" class="inline-flex items-center border border-walnut-800/20 w-24">
                                     @csrf
-                                    <button type="button" @click="if (qty > 1) { qty--; $nextTick(() => $el.form.submit()) }" class="w-8 py-1.5 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">-</button>
-                                    <input type="number" name="quantity" x-model="qty" readonly class="flex-1 bg-transparent text-center text-[0.7rem] font-bold text-walnut-950 focus:outline-none" />
-                                    <button type="button" @click="if (qty < {{ $item->product->stock }}) { qty++; $nextTick(() => $el.form.submit()) }" class="w-8 py-1.5 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">+</button>
+                                    <button type="button" @click="if (qty > 1) { qty--; $nextTick(() => $refs.formMobile.submit()) }" class="w-8 py-1.5 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">-</button>
+                                    <input type="number" name="quantity" :value="qty" readonly class="flex-1 bg-transparent text-center text-[0.7rem] font-bold text-walnut-950 focus:outline-none appearance-none m-0" />
+                                    <button type="button" @click="if (qty < {{ $item->product->stock }}) { qty++; $nextTick(() => $refs.formMobile.submit()) }" class="w-8 py-1.5 hover:text-gold-600 text-walnut-500 font-bold focus:outline-none transition">+</button>
                                 </form>
                                 
                                 <div class="text-right">

@@ -3,6 +3,17 @@
 @section('title', 'Katalog - DjudasMS')
 
 @section('content')
+@php
+    $wishlistProductIds = [];
+    $wishlistItemsMapping = [];
+    if(auth()->check() && auth()->user()->wishlist) {
+        $wishlistItems = auth()->user()->wishlist->items;
+        foreach($wishlistItems as $item) {
+            $wishlistProductIds[] = $item->product_id;
+            $wishlistItemsMapping[$item->product_id] = $item->id;
+        }
+    }
+@endphp
 <div class="space-y-12 py-4">
     <!-- Header -->
     <div class="border-b border-walnut-800/10 pb-8 space-y-4">

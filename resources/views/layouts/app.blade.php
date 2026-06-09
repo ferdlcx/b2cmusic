@@ -92,6 +92,16 @@
             background: var(--color-gold-500);
         }
 
+        /* Hide number input spin buttons */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
         /* Mobile Responsive Table Scrolling */
         @media (max-width: 1024px) {
             div.overflow-hidden:has(table) {
@@ -137,6 +147,11 @@
                 <!-- Auth & Cart Actions -->
                 <div class="flex items-center gap-5">
                     @auth
+                        <!-- Wishlist -->
+                        <a href="{{ route('wishlist.index') }}" class="hidden md:inline-flex relative text-walnut-800 hover:text-gold-600 transition" title="Wishlist Saya">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                        </a>
+
                         <!-- Cart -->
                         <a href="{{ route('cart.index') }}" class="relative text-walnut-800 hover:text-gold-600 transition" title="Keranjang Belanja">
                             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
@@ -192,6 +207,9 @@
                                 <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-walnut-800 hover:bg-cream-100">
                                     <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                                 </a>
+                                <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-walnut-800 hover:bg-cream-100">
+                                    <i data-lucide="heart" class="w-4 h-4"></i> Wishlist Saya
+                                </a>
                                 <a href="{{ route('orders.history') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-walnut-800 hover:bg-cream-100">
                                     <i data-lucide="package" class="w-4 h-4"></i> Pesanan Saya
                                 </a>
@@ -231,6 +249,9 @@
                     <a href="{{ route('orders.history') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
                         <i data-lucide="clipboard-list" class="w-4 h-4"></i> Riwayat Pesanan
                     </a>
+                    <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="heart" class="w-4 h-4"></i> Wishlist Saya
+                    </a>
                     <a href="{{ route('profile.show') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
                         <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                     </a>
@@ -259,19 +280,29 @@
 
         <!-- Flash Messages -->
         @if(session('success'))
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6">
-                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-4 rounded-2xl flex items-center justify-between shadow-[0_10px_30px_rgba(16,185,129,0.05)]">
-                    <span class="text-sm font-medium">{{ session('success') }}</span>
-                    <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 text-xs font-bold uppercase ml-4">Close</button>
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
+                <div class="bg-cream-50 border-l-4 border-gold-500 px-6 py-4 flex items-center justify-between shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-gold-500"></i>
+                        <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">{{ session('success') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-walnut-400 hover:text-gold-600 transition ml-4">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6">
-                <div class="bg-rose-50 border border-rose-200 text-rose-800 px-5 py-4 rounded-2xl flex items-center justify-between shadow-[0_10px_30px_rgba(244,63,94,0.05)]">
-                    <span class="text-sm font-medium">{{ session('error') }}</span>
-                    <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-800 text-xs font-bold uppercase ml-4">Close</button>
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
+                <div class="bg-cream-50 border-l-4 border-red-600 px-6 py-4 flex items-center justify-between shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
+                        <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">{{ session('error') }}</span>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-walnut-400 hover:text-red-600 transition ml-4">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
         @endif

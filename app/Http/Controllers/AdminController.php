@@ -862,4 +862,22 @@ class AdminController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function simulateCourierArrived($id)
+    {
+        $order = Order::with('shipment')->findOrFail($id);
+        
+        if ($order->status !== 'shipped' || !$order->shipment) {
+            return back()->with('error', 'Hanya pesanan yang sedang dikirim yang dapat disimulasikan tiba.');
+        }
+
+        $order->shipment->update([
+            'status' => 'delivered',
+            'delivered_at' => now(),
+        ]);
+
+        $this->logActivity('simulate_courier_arrived', Order::class, $order->id, "Simulasi kurir tiba untuk pesanan: {$order->order_code}");
+
+        return back()->with('success', 'Simulasi: Kurir telah tiba di alamat tujuan (Delivered).');
+    }
 }

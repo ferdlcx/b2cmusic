@@ -277,14 +277,26 @@
             @endif
 
             @if($order->status === 'shipped')
-                <div class="pt-2">
-                    <form action="{{ route('orders.delivered', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin telah menerima pesanan ini dengan baik?');">
-                        @csrf
-                        <button type="submit" 
-                            class="w-full py-3.5 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300">
-                            Pesanan Diterima
-                        </button>
-                    </form>
+                <div class="pt-2 border border-walnut-800/10 p-6 bg-cream-50 mt-6">
+                    @if($order->shipment && $order->shipment->status === 'delivered')
+                        <p class="text-[0.65rem] text-red-600 font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i> Perhatian PENTING
+                        </p>
+                        <p class="text-[0.7rem] text-muted font-medium mb-4 leading-relaxed">
+                            Pastikan paket telah Anda terima dalam kondisi baik. <strong>Tanpa melampirkan video unboxing, semua bentuk komplain atau pengajuan retur akan ditolak otomatis oleh sistem.</strong>
+                        </p>
+                        <form action="{{ route('orders.delivered', $order->id) }}" method="POST" onsubmit="return confirm('PENTING: Apakah Anda sudah merekam video unboxing dan yakin ingin menyelesaikan pesanan ini?');">
+                            @csrf
+                            <button type="submit" 
+                                class="w-full py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.7rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300 shadow-lg hover:shadow-xl">
+                                Pesanan Telah Diterima
+                            </button>
+                        </form>
+                    @else
+                        <p class="text-[0.7rem] text-muted font-medium text-center italic">
+                            Tombol konfirmasi penerimaan akan aktif setelah status pengiriman berubah menjadi "Tiba di Tujuan".
+                        </p>
+                    @endif
                 </div>
             @endif
 

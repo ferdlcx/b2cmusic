@@ -178,6 +178,7 @@ $adminRoutes = function () {
     Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
+    Route::post('/orders/{id}/arrive', [AdminController::class, 'simulateCourierArrived'])->name('orders.arrive');
 
     // --- SUPER ADMIN ONLY FEATURES ---
     Route::middleware('super_admin')->group(function () {

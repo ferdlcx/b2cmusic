@@ -18,7 +18,7 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
-Route::get('/', [ProductController::class, 'landing'])->name('home');
+Route::get('/', [ProductController::class, 'home'])->name('home');
 Route::get('/catalog', [ProductController::class, 'index'])->name('catalog');
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('products.show');
 

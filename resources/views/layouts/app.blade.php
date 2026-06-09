@@ -32,42 +32,6 @@
     @endif
 
     <style>
-        /* Floating Orbs */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.15;
-            animation: float-orb 20s ease-in-out infinite;
-        }
-        .orb-1 {
-            width: 600px; height: 600px;
-            background: linear-gradient(135deg, #6366f1, #a78bfa);
-            top: -10%; left: -5%;
-            animation-delay: 0s;
-            animation-duration: 25s;
-        }
-        .orb-2 {
-            width: 500px; height: 500px;
-            background: linear-gradient(135deg, #ec4899, #f97316);
-            top: 50%; right: -10%;
-            animation-delay: -8s;
-            animation-duration: 30s;
-        }
-        .orb-3 {
-            width: 400px; height: 400px;
-            background: linear-gradient(135deg, #06b6d4, #10b981);
-            bottom: -10%; left: 30%;
-            animation-delay: -15s;
-            animation-duration: 22s;
-        }
-        @keyframes float-orb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(80px, -60px) scale(1.1); }
-            50% { transform: translate(-40px, 80px) scale(0.95); }
-            75% { transform: translate(60px, 40px) scale(1.05); }
-        }
-
         /* Fade-in-up animation */
         @keyframes fade-in-up {
             from { opacity: 0; transform: translateY(30px); }
@@ -92,90 +56,6 @@
         }
         .animate-scroll-dot { animation: scroll-dot 1.8s ease-in-out infinite; }
 
-        /* Card shine hover effect */
-        .card-shine {
-            position: relative;
-            overflow: hidden;
-        }
-        .card-shine::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(transparent, rgba(255,255,255,0.05), transparent);
-            transform: rotate(30deg);
-            transition: 0.6s;
-            opacity: 0;
-        }
-        .card-shine:hover::after {
-            opacity: 1;
-            transform: rotate(30deg) translateY(-30%);
-        }
-
-        /* ===== GLOBAL DYNAMIC ENHANCEMENTS ===== */
-
-        /* Premium Button Hover Effects */
-        a[class*='bg-indigo-600']:hover,
-        button[class*='bg-indigo-600']:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px -8px rgba(79, 70, 229, 0.4);
-        }
-        a[class*='bg-indigo-600'],
-        button[class*='bg-indigo-600'] {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-
-        /* Cards - Global glass/lift effect */
-        [class*='rounded-3xl'][class*='border'][class*='bg-white'],
-        [class*='rounded-[32px]'][class*='border'][class*='bg-white'],
-        [class*='rounded-[36px]'][class*='border'][class*='bg-white'],
-        [class*='rounded-2xl'][class*='border'][class*='bg-white'] {
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            background: rgba(255,255,255,0.85) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-        }
-        [class*='rounded-3xl'][class*='border'][class*='bg-white']:hover,
-        [class*='rounded-[32px]'][class*='border'][class*='bg-white']:hover,
-        [class*='rounded-[36px]'][class*='border'][class*='bg-white']:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1), 0 0 0 1px rgba(99, 102, 241, 0.08);
-        }
-
-        /* Image zoom on hover inside cards */
-        [class*='overflow-hidden'] img {
-            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-        [class*='overflow-hidden']:hover img {
-            transform: scale(1.06);
-        }
-
-        /* Badge/Tag pulse glow */
-        [class*='bg-indigo-50'][class*='text-indigo-600'] {
-            transition: all 0.3s ease;
-        }
-        [class*='bg-indigo-50'][class*='text-indigo-600']:hover {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-        }
-
-        /* Status badge micro-animation */
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Input focus glow */
-        input:focus, select:focus, textarea:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
-            transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
-        }
-
-        /* Smooth section dividers */
-        section + section {
-            position: relative;
-        }
-
         /* Typography - subtle text gradient on headings */
         .font-display {
             text-rendering: optimizeLegibility;
@@ -196,51 +76,20 @@
         .grid > *:nth-child(3) { animation-delay: 0.15s; }
         .grid > *:nth-child(4) { animation-delay: 0.2s; }
         .grid > *:nth-child(5) { animation-delay: 0.25s; }
-        .grid > *:nth-child(6) { animation-delay: 0.3s; }
-        .grid > *:nth-child(7) { animation-delay: 0.35s; }
-        .grid > *:nth-child(8) { animation-delay: 0.4s; }
-        .grid > *:nth-child(9) { animation-delay: 0.45s; }
-        .grid > *:nth-child(10) { animation-delay: 0.5s; }
-        .grid > *:nth-child(11) { animation-delay: 0.55s; }
-        .grid > *:nth-child(12) { animation-delay: 0.6s; }
-
-        /* Page container subtle entrance */
-        .max-w-\[1440px\] > main,
-        .max-w-\[1440px\] > .space-y-10 {
-            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Footer lift on scroll */
-        footer {
-            transition: transform 0.5s ease;
-        }
-
-        /* Toast/Alert notification animation */
-        [class*='bg-emerald-50'][class*='border-emerald'],
-        [class*='bg-rose-50'][class*='border-rose'],
-        [class*='bg-amber-50'][class*='border-amber'] {
-            animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
 
         /* Smooth scrollbar for webkit */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: var(--color-cream-100);
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #a5b4fc, #6366f1);
+            background: var(--color-gold-400);
             border-radius: 100px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #818cf8, #4f46e5);
-        }
-
-        /* Selection color */
-        ::selection {
-            background: rgba(99, 102, 241, 0.2);
-            color: #312e81;
+            background: var(--color-gold-500);
         }
 
         /* Mobile Responsive Table Scrolling */
@@ -251,20 +100,14 @@
         }
     </style>
 </head>
-<body class="font-sans text-slate-900 bg-[#f8f8f8] min-h-screen flex flex-col justify-between overflow-x-hidden">
-    <!-- Floating Orbs Background -->
-    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+<body class="font-sans text-walnut-900 bg-cream-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
 
     <div>
         <!-- Navbar -->
-        <header x-data="{ mobileMenuOpen: false }" class="bg-white/80 backdrop-blur-xl border-b border-slate-100/85 sticky top-0 z-50 transition duration-300">
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+        <header x-data="{ mobileMenuOpen: false }" class="bg-cream-100/90 backdrop-blur-md border-b border-walnut-800/10 sticky top-0 z-50 transition duration-300">
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 py-5 flex items-center justify-between">
                 <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:outline-none transition">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-xl text-walnut-800 hover:bg-cream-200 transition">
                     <template x-if="!mobileMenuOpen">
                         <i data-lucide="menu" class="w-5 h-5"></i>
                     </template>
@@ -274,58 +117,58 @@
                 </button>
 
                 <!-- Logo -->
-                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-slate-900 hover:opacity-90 transition">
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-walnut-950 hover:opacity-80 transition">
                     <span class="font-display font-black text-xl tracking-tight uppercase flex items-center gap-1.5">
-                        <i data-lucide="music-4" class="w-6 h-6 text-indigo-600"></i>
-                        DjudasMS <span class="text-indigo-600 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5 hidden sm:inline-block">LUXE</span>
+                        <i data-lucide="disc" class="w-6 h-6 text-gold-500"></i>
+                        DjudasMS <span class="text-gold-500 font-semibold text-[0.7rem] tracking-[0.25em] self-end mb-0.5 hidden sm:inline-block">LUXE</span>
                     </span>
                 </a>
 
                 <!-- Navigation Links (Desktop) -->
-                <nav class="hidden md:flex items-center gap-8 text-[0.85rem] font-medium tracking-wider text-slate-600">
-                    <a href="{{ route('home') }}" class="hover:text-indigo-600 transition flex items-center gap-1.5 {{ request()->routeIs('home') ? 'text-indigo-600 font-bold' : '' }}">
-                        <i data-lucide="home" class="w-4 h-4"></i> Home
+                <nav class="hidden md:flex items-center gap-10 text-[0.8rem] font-semibold tracking-[0.1em] text-walnut-800 uppercase">
+                    <a href="{{ route('home') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('home') ? 'text-gold-600' : '' }}">
+                        Home
                     </a>
-                    <a href="{{ route('catalog') }}" class="hover:text-indigo-600 transition flex items-center gap-1.5 {{ request()->routeIs('catalog') ? 'text-indigo-600 font-bold' : '' }}">
-                        <i data-lucide="shopping-bag" class="w-4 h-4"></i> Shop Catalog
+                    <a href="{{ route('catalog') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('catalog') ? 'text-gold-600' : '' }}">
+                        Shop Catalog
                     </a>
                 </nav>
 
                 <!-- Auth & Cart Actions -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-5">
                     @auth
                         <!-- Cart -->
-                        <a href="{{ route('cart.index') }}" class="relative p-2.5 rounded-2xl hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition" title="Keranjang Belanja">
-                            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        <a href="{{ route('cart.index') }}" class="relative text-walnut-800 hover:text-gold-600 transition" title="Keranjang Belanja">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                             @php
                                 $cartCount = \App\Models\CartItem::whereHas('cart', function($q) {
                                     $q->where('user_id', auth()->id());
                                 })->sum('quantity');
                             @endphp
                             @if($cartCount > 0)
-                                <span class="absolute top-1 right-1 bg-indigo-600 text-white text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border border-white">
+                                <span class="absolute -top-1.5 -right-1.5 bg-gold-500 text-white text-[0.55rem] font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center">
                                     {{ $cartCount }}
                                 </span>
                             @endif
                         </a>
 
                         <!-- Orders (Desktop Only) -->
-                        <a href="{{ route('orders.history') }}" class="hidden md:inline-flex p-2.5 rounded-2xl hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition" title="Riwayat Pesanan">
-                            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                        <a href="{{ route('orders.history') }}" class="hidden md:inline-flex text-walnut-800 hover:text-gold-600 transition" title="Riwayat Pesanan">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
                         </a>
 
                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
-                            <a href="{{ route('admin.dashboard') }}" class="hidden md:inline-flex text-xs font-semibold tracking-wider bg-indigo-50 border border-indigo-200 text-indigo-700 px-3 py-1.5 rounded-xl hover:bg-indigo-600 hover:text-white transition">Admin</a>
+                            <a href="{{ route('admin.dashboard') }}" class="hidden md:inline-flex text-[0.65rem] font-bold tracking-[0.2em] border border-walnut-800 text-walnut-900 px-3 py-1.5 uppercase hover:bg-walnut-900 hover:text-white transition">Admin</a>
                         @endif
 
                         <!-- User Profile Dropdown (Desktop Only) -->
                         <div x-data="{ open: false }" @click.away="open = false" class="relative hidden md:block">
-                            <button @click="open = !open" class="flex items-center gap-1.5 focus:outline-none hover:text-indigo-600 transition py-1.5 px-2.5 rounded-xl hover:bg-slate-100">
-                                <div class="w-7 h-7 bg-indigo-100 text-indigo-700 flex items-center justify-center rounded-full text-xs font-bold uppercase">
+                            <button @click="open = !open" class="flex items-center gap-2 focus:outline-none hover:text-gold-600 transition">
+                                <div class="w-7 h-7 border border-walnut-800 text-walnut-800 flex items-center justify-center rounded-full text-[0.6rem] font-bold uppercase">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </div>
-                                <span class="text-xs font-semibold text-slate-700 hidden lg:inline">{{ explode(' ', auth()->user()->name)[0] }}</span>
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span class="text-[0.75rem] font-bold tracking-widest text-walnut-800 uppercase hidden lg:inline">{{ explode(' ', auth()->user()->name)[0] }}</span>
+                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-walnut-800"></i>
                             </button>
                             <!-- Dropdown Menu -->
                             <div x-show="open" 
@@ -335,34 +178,34 @@
                                  x-transition:leave="transition ease-in duration-75" 
                                  x-transition:leave-start="opacity-100 scale-100" 
                                  x-transition:leave-end="opacity-0 scale-95" 
-                                 class="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50"
+                                 class="absolute right-0 mt-3 w-56 bg-cream-50 border border-walnut-800/10 py-2 z-50"
                                  style="display: none;">
-                                <div class="px-4 py-2 border-b border-slate-100">
-                                    <p class="text-[0.65rem] text-slate-400 uppercase tracking-wider font-bold">Pengguna</p>
-                                    <p class="text-xs font-semibold text-slate-800 truncate">{{ auth()->user()->email }}</p>
+                                <div class="px-5 py-3 border-b border-walnut-800/10">
+                                    <p class="text-[0.6rem] text-muted uppercase tracking-[0.2em] font-bold">Pengguna</p>
+                                    <p class="text-xs font-semibold text-walnut-950 truncate mt-1">{{ auth()->user()->email }}</p>
                                 </div>
                                 @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
-                                    <a href="{{ route('admin.dashboard') }}" class="flex md:hidden items-center gap-2 px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50">
-                                        <i data-lucide="shield-check" class="w-4 h-4"></i> Panel Admin
+                                    <a href="{{ route('admin.dashboard') }}" class="flex md:hidden items-center gap-3 px-5 py-2.5 text-sm font-medium text-gold-600 hover:bg-cream-100">
+                                        <i data-lucide="shield" class="w-4 h-4"></i> Panel Admin
                                     </a>
                                 @endif
-                                <a href="{{ route('profile.show') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-walnut-800 hover:bg-cream-100">
                                     <i data-lucide="user" class="w-4 h-4"></i> Profil Saya
                                 </a>
-                                <a href="{{ route('orders.history') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                <a href="{{ route('orders.history') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-walnut-800 hover:bg-cream-100">
                                     <i data-lucide="package" class="w-4 h-4"></i> Pesanan Saya
                                 </a>
                                 <form action="{{ route('logout') }}" method="POST" class="w-full">
                                     @csrf
-                                    <button type="submit" class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-rose-50 text-left">
+                                    <button type="submit" class="flex w-full items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-700 hover:bg-red-50 text-left border-t border-walnut-800/5">
                                         <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
                                     </button>
                                 </form>
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="hidden md:inline-flex text-slate-600 hover:text-indigo-600 text-xs font-semibold tracking-wider uppercase transition">Masuk</a>
-                        <a href="{{ route('register') }}" class="hidden md:inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-2xl text-xs font-semibold tracking-wider hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300">Daftar</a>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex text-walnut-800 hover:text-gold-600 text-[0.7rem] font-bold tracking-[0.1em] uppercase transition">Masuk</a>
+                        <a href="{{ route('register') }}" class="hidden md:inline-flex items-center justify-center px-5 py-2.5 bg-walnut-900 text-cream-50 text-[0.7rem] font-bold tracking-[0.1em] uppercase hover:bg-gold-600 transition duration-300">Daftar</a>
                     @endauth
                 </div>
             </div>
@@ -440,41 +283,47 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-16 text-slate-500 mt-20">
+    <footer class="bg-cream-50 border-t border-walnut-800/10 py-20 text-walnut-800 mt-20">
         <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-slate-200">
-                <div class="space-y-4">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 uppercase text-sm tracking-[0.55em] text-slate-900">
-                        <span class="font-black text-lg">MUSICSTORE</span>
-                        <span class="text-slate-500 text-[0.75rem] tracking-[0.7em]">LUXE</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 pb-16 border-b border-walnut-800/10">
+                <div class="space-y-6">
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 uppercase text-sm tracking-[0.5em] text-walnut-950">
+                        <span class="font-black text-xl">DJUDASMS</span>
+                        <span class="text-gold-600 text-[0.65rem] font-bold tracking-[0.6em] self-center">LUXE</span>
                     </a>
-                    <p class="text-sm text-slate-400 max-w-sm leading-relaxed">Destinasi belanja instrumen musik premium, vinyl vintage, dan perlengkapan studio murni dengan kualitas desain editorial.</p>
+                    <p class="text-[0.8rem] text-muted max-w-sm leading-relaxed">
+                        Destinasi belanja instrumen musik premium dan perlengkapan studio dengan kualitas desain editorial murni.
+                    </p>
                 </div>
-                <div class="grid grid-cols-2 gap-6 text-sm uppercase tracking-[0.2em]">
-                    <div class="space-y-4">
-                        <div class="font-semibold text-slate-900">Kategori</div>
-                        <div><a href="{{ route('catalog', ['category' => 'gitar-akustik']) }}" class="hover:text-slate-900">Gitar</a></div>
-                        <div><a href="{{ route('catalog', ['category' => 'keyboard-piano']) }}" class="hover:text-slate-900">Keyboard & Piano</a></div>
-                        <div><a href="{{ route('catalog', ['category' => 'audio-recording']) }}" class="hover:text-slate-900">Audio Gear</a></div>
+                <div class="grid grid-cols-2 gap-8 text-[0.7rem] uppercase tracking-[0.2em] font-bold">
+                    <div class="space-y-5">
+                        <div class="text-walnut-950 opacity-50">Kategori</div>
+                        <div><a href="{{ route('catalog', ['category' => 'gitar-akustik']) }}" class="hover:text-gold-600 transition">Gitar</a></div>
+                        <div><a href="{{ route('catalog', ['category' => 'keyboard-piano']) }}" class="hover:text-gold-600 transition">Keyboard & Piano</a></div>
+                        <div><a href="{{ route('catalog', ['category' => 'audio-recording']) }}" class="hover:text-gold-600 transition">Audio Gear</a></div>
                     </div>
-                    <div class="space-y-4">
-                        <div class="font-semibold text-slate-900">Toko</div>
-                        <div><a href="{{ route('catalog') }}" class="hover:text-slate-900">Semua Produk</a></div>
-                        <div><a href="#" class="hover:text-slate-900">Tentang Kami</a></div>
-                        <div><a href="#" class="hover:text-slate-900">Kontak</a></div>
+                    <div class="space-y-5">
+                        <div class="text-walnut-950 opacity-50">Eksplorasi</div>
+                        <div><a href="{{ route('catalog') }}" class="hover:text-gold-600 transition">Semua Produk</a></div>
+                        <div><a href="#" class="hover:text-gold-600 transition">Tentang Kami</a></div>
+                        <div><a href="#" class="hover:text-gold-600 transition">Kontak</a></div>
                     </div>
                 </div>
-                <div class="space-y-4 text-sm uppercase tracking-[0.2em]">
-                    <div class="font-semibold text-slate-900">Ikuti Kami</div>
-                    <div class="flex gap-4">
-                        <a href="#" class="hover:text-slate-900">Instagram</a>
-                        <a href="#" class="hover:text-slate-900">YouTube</a>
-                        <a href="#" class="hover:text-slate-900">TikTok</a>
+                <div class="space-y-5 text-[0.7rem] uppercase tracking-[0.2em] font-bold">
+                    <div class="text-walnut-950 opacity-50">Ikuti Kami</div>
+                    <div class="flex flex-col gap-4">
+                        <a href="#" class="hover:text-gold-600 transition">Instagram</a>
+                        <a href="#" class="hover:text-gold-600 transition">YouTube</a>
+                        <a href="#" class="hover:text-gold-600 transition">Pinterest</a>
                     </div>
                 </div>
             </div>
-            <div class="pt-8 text-center text-xs text-slate-400 tracking-wider">
-                &copy; {{ date('Y') }} DjudasMS. Dibuat untuk Tugas Kuliah. model B2C E-commerce.
+            <div class="pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-[0.65rem] text-muted tracking-[0.1em] uppercase font-semibold">
+                <div>&copy; {{ date('Y') }} DjudasMS. B2C E-commerce.</div>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-walnut-900 transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-walnut-900 transition">Terms of Service</a>
+                </div>
             </div>
         </div>
     </footer>

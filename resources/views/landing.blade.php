@@ -3,129 +3,116 @@
 @section('title', 'DjudasMS - Premium Instruments & Records')
 
 @section('content')
-<!-- Parallax Hero Section -->
-<section class="relative w-screen left-1/2 -ml-[50vw] -mt-[5.5rem] pt-[6.5rem] overflow-hidden bg-gradient-to-br from-slate-50 via-indigo-50/15 to-slate-100/40" 
+<!-- Editorial Hero Section -->
+<section class="relative w-screen left-1/2 -ml-[50vw] -mt-[5.5rem] pt-[8.5rem] pb-16 overflow-hidden bg-cream-100" 
          x-data="{ scrollY: 0 }" 
          @scroll.window="scrollY = window.scrollY">
     
-    <!-- Animated Light Grid Pattern -->
-    <div class="absolute inset-0 opacity-[0.04] pointer-events-none" style="background-image: radial-gradient(circle, #000 1px, transparent 1px); background-size: 30px 30px;"></div>
-
-    <!-- Soft Background Glowing Orb behind the Guitar -->
-    <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-[450px] h-[450px] bg-indigo-200/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
-    <div class="absolute top-1/3 right-1/3 w-[300px] h-[300px] bg-purple-200/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
-
     <!-- Hero Content Container -->
-    <div class="relative min-h-[85vh] flex flex-col justify-center px-6 lg:px-10 max-w-[1440px] mx-auto z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-12">
+    <div class="relative min-h-[85vh] flex flex-col justify-center px-6 lg:px-12 max-w-[1440px] mx-auto z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center h-full relative">
             
-            <!-- Left Column: Headline and CTA -->
-            <div class="lg:col-span-7 space-y-8 text-left">
-                <!-- Animated Premium Badge -->
-                <div class="inline-flex items-center gap-3 text-[0.65rem] font-bold uppercase tracking-[0.45em] text-indigo-600 bg-indigo-50 border border-indigo-100 px-5 py-2.5 rounded-full animate-fade-in-up" style="animation-delay: 0.2s">
-                    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-                    ARTISAN TOKO MUSIK B2C
+            <!-- Left Column: Typography -->
+            <div class="lg:col-span-8 z-20 flex flex-col justify-center">
+                <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.1s">
+                    <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold">
+                        B2C E-Commerce Model
+                    </span>
                 </div>
                 
-                <!-- Main Heading with Staggered Animation (Dark color for high contrast) -->
-                <h1 class="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[0.9] font-black uppercase tracking-tight text-slate-900">
-                    <span class="block animate-fade-in-up" style="animation-delay: 0.4s">Suara Murni.</span>
-                    <span class="block animate-fade-in-up" style="animation-delay: 0.6s">Craftsmanship</span>
-                    <span class="block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-fade-in-up" style="animation-delay: 0.8s">Ikonik.</span>
+                <!-- Main Heading (Editorial Style) -->
+                <h1 class="font-display text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[10rem] leading-[0.85] font-black uppercase tracking-tighter text-walnut-950 mix-blend-multiply">
+                    <span class="block animate-fade-in-up" style="animation-delay: 0.3s">Pure.</span>
+                    <span class="block animate-fade-in-up" style="animation-delay: 0.5s">Craft.</span>
+                    <span class="block text-gold-500 animate-fade-in-up" style="animation-delay: 0.7s">Iconic.</span>
                 </h1>
                 
-                <!-- Subtitle (Slate-600 for contrast) -->
-                <p class="max-w-xl text-base sm:text-lg text-slate-600 leading-relaxed font-normal animate-fade-in-up" style="animation-delay: 1s">
-                    Instrumen musik kelas dunia dan gear rekaman kelas studio untuk menyempurnakan ekspresi seni Anda. Dapatkan kualitas suara premium tanpa kompromi.
+                <!-- Subtitle -->
+                <p class="mt-12 max-w-md text-sm md:text-base text-muted leading-relaxed font-medium animate-fade-in-up" style="animation-delay: 0.9s">
+                    Kurasi instrumen musik kelas dunia dan perlengkapan rekaman otentik. Temukan karya seni sejati untuk menyempurnakan harmoni Anda.
                 </p>
                 
                 <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 pt-2 animate-fade-in-up" style="animation-delay: 1.2s">
-                    <a href="{{ route('catalog') }}" class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-sm font-bold tracking-wider hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-600/20 transition-all duration-300">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i> 
+                <div class="flex flex-col sm:flex-row gap-6 mt-12 animate-fade-in-up" style="animation-delay: 1.1s">
+                    <a href="{{ route('catalog') }}" class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-walnut-900 text-cream-50 text-[0.75rem] font-bold tracking-[0.2em] uppercase hover:bg-gold-600 transition-all duration-500">
                         Jelajahi Toko
-                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                    <a href="#collections" class="inline-flex items-center justify-center px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl text-sm font-semibold tracking-wider hover:bg-slate-50 hover:border-slate-300 transition-all duration-300">
-                        Lihat Kategori
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300"></i>
                     </a>
                 </div>
             </div>
             
-            <!-- Right Column: Empty spacer in grid for large screens (as guitar is absolutely positioned) -->
-            <div class="lg:col-span-5 relative h-[400px] lg:h-full hidden lg:block"></div>
-        </div>
+            <!-- Right Column: Parallax Image -->
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-[55%] max-w-[800px] z-10 pointer-events-none hidden md:block">
+                <img src="{{ asset('images/hero_guitar.png') }}" 
+                     alt="Premium Guitar" 
+                     class="w-full h-auto object-contain mix-blend-multiply opacity-90 drop-shadow-2xl"
+                     :style="'transform: translateY(' + (scrollY * -0.15) + 'px) scale(1.05)'" />
+            </div>
 
-        <!-- Absolutely Positioned Guitar with Parallax Scroll Effect -->
-        <div class="absolute right-6 lg:right-16 top-1/2 -translate-y-1/2 w-[35%] max-w-[420px] hidden lg:block pointer-events-none z-20">
-            <img src="{{ asset('images/hero_guitar.png') }}" 
-                 alt="Premium Guitar" 
-                 class="w-full h-auto object-contain mix-blend-multiply drop-shadow-[0_25px_50px_rgba(0,0,0,0.15)]"
-                 :style="'transform: translateY(' + (scrollY * 0.14) + 'px) rotate(' + (-8 + scrollY * 0.015) + 'deg)'" />
+            <!-- Mobile Image Fallback -->
+            <div class="md:hidden w-full h-[300px] mt-8 relative">
+                <img src="{{ asset('images/hero_guitar.png') }}" 
+                     alt="Premium Guitar" 
+                     class="w-full h-full object-contain mix-blend-multiply opacity-90 drop-shadow-xl" />
+            </div>
         </div>
         
-        <!-- Glassmorphism Stats Cards (High contrast layout) -->
-        <div class="absolute bottom-10 right-6 lg:right-10 hidden lg:flex gap-4 animate-fade-in-up z-20" style="animation-delay: 1.6s">
-            <div class="bg-white/85 backdrop-blur-xl border border-slate-200/50 shadow-md rounded-2xl p-5 text-center min-w-[120px]">
-                <div class="text-2xl font-black text-slate-900">500+</div>
-                <div class="text-[0.6rem] uppercase tracking-widest text-slate-500 font-semibold mt-1">Produk</div>
-            </div>
-            <div class="bg-white/85 backdrop-blur-xl border border-slate-200/50 shadow-md rounded-2xl p-5 text-center min-w-[120px]">
-                <div class="text-2xl font-black text-slate-900">50+</div>
-                <div class="text-[0.6rem] uppercase tracking-widest text-slate-500 font-semibold mt-1">Brand</div>
-            </div>
-            <div class="bg-white/85 backdrop-blur-xl border border-slate-200/50 shadow-md rounded-2xl p-5 text-center min-w-[120px]">
-                <div class="text-2xl font-black text-slate-900">4.9</div>
-                <div class="text-[0.6rem] uppercase tracking-widest text-slate-500 font-semibold mt-1">Rating</div>
+        <!-- Rotating Badge -->
+        <div class="absolute bottom-12 right-12 hidden lg:flex items-center justify-center w-32 h-32 animate-fade-in-up z-30" style="animation-delay: 1.5s">
+            <div class="relative w-full h-full flex items-center justify-center">
+                <i data-lucide="award" class="w-8 h-8 text-gold-600 absolute"></i>
+                <svg viewBox="0 0 100 100" class="w-full h-full animate-spin-slow">
+                    <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
+                    <text>
+                        <textPath href="#circlePath" class="text-[0.6rem] font-bold uppercase tracking-[0.2em]" fill="#5c4033">
+                            • Premium Quality • Authentic Sound 
+                        </textPath>
+                    </text>
+                </svg>
             </div>
         </div>
         
         <!-- Scroll Down Indicator -->
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce-slow">
-            <span class="text-[0.55rem] uppercase tracking-[0.3em] text-slate-400 font-semibold">Scroll</span>
-            <div class="w-6 h-10 border-2 border-slate-300 rounded-full flex items-start justify-center p-1.5">
-                <div class="w-1.5 h-3 bg-indigo-600/60 rounded-full animate-scroll-dot"></div>
+        <div class="absolute bottom-8 left-6 lg:left-12 flex items-center gap-4 animate-fade-in-up" style="animation-delay: 1.5s">
+            <div class="w-[1px] h-12 bg-walnut-800/20 overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-full h-1/2 bg-walnut-800 animate-bounce-slow"></div>
             </div>
+            <span class="text-[0.6rem] uppercase tracking-[0.3em] text-walnut-800 font-bold origin-left -rotate-90 translate-y-8">Scroll</span>
         </div>
     </div>
 </section>
 
-<!-- Collections Section -->
-<section id="collections" class="py-16 mt-8">
-    <div class="space-y-10">
-        <div class="text-center md:text-left space-y-2">
-            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Curated Categories</span>
-            <h2 class="font-display text-3xl md:text-4xl font-black uppercase tracking-tight text-slate-950">Kategori Alat Musik</h2>
-            <p class="text-slate-500 text-sm max-w-xl">Dari piringan hitam vintage hingga gitar elektrik berkualitas premium.</p>
+<!-- Collections Section (Editorial Asymmetric) -->
+<section id="collections" class="py-24">
+    <div class="space-y-16">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-walnut-800/10 pb-8">
+            <h2 class="font-display text-4xl md:text-5xl font-black uppercase tracking-tighter text-walnut-950">
+                Kategori <br> <span class="text-gold-500">Koleksi.</span>
+            </h2>
+            <p class="text-muted text-sm max-w-sm leading-relaxed">
+                Eksplorasi instrumen pilihan dari piringan hitam klasik hingga alat musik modern dengan presisi tinggi.
+            </p>
         </div>
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        
+        <div class="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4">
             @foreach($categories as $cat)
                 @php
                     $icon = 'music';
                     $slug = strtolower($cat->slug);
-                    if (str_contains($slug, 'gitar')) $icon = 'guitar';
-                    elseif (str_contains($slug, 'bass')) $icon = 'guitar';
+                    if (str_contains($slug, 'gitar') || str_contains($slug, 'bass') || str_contains($slug, 'ukulele')) $icon = 'guitar';
                     elseif (str_contains($slug, 'drum')) $icon = 'drum';
-                    elseif (str_contains($slug, 'keyboard') || str_contains($slug, 'piano')) $icon = 'piano'; // Lucide piano/music
-                    elseif (str_contains($slug, 'tiup') || str_contains($slug, 'saxophone') || str_contains($slug, 'trumpet') || str_contains($slug, 'flute')) $icon = 'wind';
-                    elseif (str_contains($slug, 'biola')) $icon = 'music';
-                    elseif (str_contains($slug, 'audio') || str_contains($slug, 'recording') || str_contains($slug, 'microphone')) $icon = 'mic';
-                    elseif (str_contains($slug, 'effect') || str_contains($slug, 'pedal')) $icon = 'toggle-right';
-                    elseif (str_contains($slug, 'ukulele')) $icon = 'guitar';
-                    elseif (str_contains($slug, 'harmonica')) $icon = 'music';
-                    elseif (str_contains($slug, 'tradisional')) $icon = 'award';
-                    elseif (str_contains($slug, 'aksesoris') || str_contains($slug, 'senar') || str_contains($slug, 'capo')) $icon = 'sliders';
+                    elseif (str_contains($slug, 'keyboard') || str_contains($slug, 'piano')) $icon = 'piano';
+                    elseif (str_contains($slug, 'audio') || str_contains($slug, 'recording')) $icon = 'mic';
                 @endphp
-                <a href="{{ route('catalog', ['category' => $cat->slug]) }}" class="group overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm hover:shadow-xl hover:border-indigo-600/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-[230px]">
-                    <div class="flex items-center justify-between">
-                        <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
-                            <i data-lucide="{{ $icon }}" class="w-6 h-6"></i>
-                        </div>
-                        <span class="text-xs text-slate-400 font-semibold group-hover:text-indigo-600 transition">{{ $cat->products()->count() }} Produk</span>
+                <a href="{{ route('catalog', ['category' => $cat->slug]) }}" class="group block space-y-6">
+                    <div class="h-[2px] w-12 bg-gold-500 group-hover:w-full transition-all duration-500"></div>
+                    <div class="flex items-start justify-between">
+                        <i data-lucide="{{ $icon }}" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition duration-300"></i>
+                        <span class="text-[0.65rem] text-muted font-bold tracking-widest">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
-                    <div class="space-y-2">
-                        <h3 class="font-display text-xl font-bold uppercase tracking-tight text-slate-950 group-hover:text-indigo-600 transition">{{ $cat->name }}</h3>
-                        <p class="text-xs text-slate-500 line-clamp-2">{{ $cat->description }}</p>
+                    <div class="space-y-3">
+                        <h3 class="font-display text-xl font-black uppercase tracking-tight text-walnut-950 group-hover:text-gold-600 transition">{{ $cat->name }}</h3>
+                        <p class="text-[0.8rem] text-muted leading-relaxed line-clamp-2">{{ $cat->description }}</p>
                     </div>
                 </a>
             @endforeach
@@ -134,88 +121,83 @@
 </section>
 
 <!-- Featured Products Section -->
-<section id="products" class="py-16 bg-slate-50 rounded-[44px] border border-slate-200/50 p-8 lg:p-12 shadow-sm my-16">
-    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
-        <div class="space-y-2">
-            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Featured Products</span>
-            <h2 class="font-display text-3xl md:text-4xl font-black uppercase tracking-tight text-slate-950">Instrumen Pilihan Kami</h2>
+<section id="products" class="py-24 bg-cream-200 -mx-6 lg:-mx-10 px-6 lg:px-10 my-16 border-y border-walnut-800/5">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16">
+        <div>
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block mb-4">Featured Selection</span>
+            <h2 class="font-display text-3xl md:text-5xl font-black uppercase tracking-tighter text-walnut-950">Karya Terpilih.</h2>
         </div>
-        <p class="max-w-md text-sm text-slate-500">Pilihan instrumen terbaik teruji suara oleh kurator ahli kami, siap melahirkan melodi indah dalam kreasi seni Anda.</p>
+        <a href="{{ route('catalog') }}" class="inline-flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.2em] font-bold text-walnut-900 hover:text-gold-600 transition group">
+            Lihat Semua Koleksi 
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+        </a>
     </div>
     
-    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
         @forelse($products as $product)
-            <article class="group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1 duration-300 flex flex-col justify-between h-full">
-                <a href="{{ route('products.show', $product->slug) }}" class="block">
-                    <div class="h-64 overflow-hidden bg-slate-100 flex items-center justify-center relative">
-                        <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-                        
-                        <!-- Badges -->
-                        <div class="absolute top-4 left-4 flex flex-col gap-2">
-                            <span class="text-[0.65rem] uppercase tracking-wider font-bold bg-white text-slate-900 shadow-md px-3 py-1.5 rounded-xl">
-                                {{ $product->brand }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="p-6 space-y-3">
-                        <span class="text-[0.65rem] uppercase tracking-[0.25em] text-slate-400 font-bold block">{{ $product->category->name }}</span>
-                        <h3 class="font-display text-lg font-bold uppercase tracking-tight text-slate-950 leading-snug line-clamp-2 h-12 group-hover:text-indigo-600 transition">{{ $product->name }}</h3>
-                        
-                        <!-- Rating -->
-                        <div class="flex items-center gap-1 text-amber-500 text-xs">
-                            <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500"></i>
-                            <span class="font-bold text-slate-700">4.9</span>
-                            <span class="text-slate-400">(Verified Product)</span>
-                        </div>
-                        
-                        <p class="text-lg font-black text-indigo-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+            <article class="group flex flex-col h-full">
+                <a href="{{ route('products.show', $product->slug) }}" class="block mb-6 relative overflow-hidden bg-cream-50 border border-walnut-800/5 h-[320px]">
+                    <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80' }}" 
+                         alt="{{ $product->name }}" 
+                         class="h-full w-full object-cover mix-blend-multiply opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+                    
+                    <div class="absolute top-4 left-4">
+                        <span class="text-[0.6rem] uppercase tracking-[0.2em] font-bold bg-walnut-900 text-cream-50 px-3 py-1.5">
+                            {{ $product->brand }}
+                        </span>
                     </div>
                 </a>
-                <div class="px-6 pb-6">
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
-                        <a href="{{ route('products.show', $product->slug) }}" class="text-xs uppercase tracking-widest text-slate-900 font-bold hover:text-indigo-600 transition">Detail</a>
+                
+                <div class="space-y-3 flex-1 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[0.6rem] uppercase tracking-[0.2em] text-gold-600 font-bold">{{ $product->category->name }}</span>
+                        <h3 class="font-display text-lg font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-1 group-hover:text-gold-600 transition">{{ $product->name }}</h3>
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-4 border-t border-walnut-800/10 mt-auto">
+                        <p class="text-sm font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</p>
                         <form action="{{ route('cart.add') }}" method="POST">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition duration-300 font-semibold shadow-sm hover:shadow-indigo-600/10">
-                                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Beli
+                            <button type="submit" class="text-walnut-800 hover:text-gold-600 transition" title="Tambah ke Keranjang">
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                             </button>
                         </form>
                     </div>
                 </div>
             </article>
         @empty
-            <div class="col-span-3 text-center py-16 text-slate-500">Belum ada produk unggulan yang tersedia.</div>
+            <div class="col-span-3 text-center py-20 text-muted text-sm uppercase tracking-widest">Koleksi belum tersedia.</div>
         @endforelse
-    </div>
-    
-    <div class="text-center mt-12">
-        <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white border border-slate-900 text-slate-950 uppercase text-xs tracking-widest hover:bg-indigo-600 hover:text-white hover:border-indigo-600 rounded-2xl transition duration-300 font-black">
-            Lihat Semua Produk <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </a>
     </div>
 </section>
 
 <!-- Editorial Story Section -->
-<section class="py-16 grid gap-12 lg:grid-cols-2 lg:items-center">
-    <div class="space-y-6">
-        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Kualitas Suara Maksimal</span>
-        <h2 class="font-display text-4xl font-black uppercase tracking-tight text-slate-950">Desain Suara & Estetika Tanpa Kompromi.</h2>
-        <p class="text-slate-600 leading-relaxed text-sm">
-            DjudasMS bukan sekadar toko retail alat musik biasa. Kami adalah kurator seni musik. Kami percaya bahwa instrumen yang indah secara visual akan melahirkan melodi yang indah secara emosional.
+<section class="py-24 grid gap-16 lg:grid-cols-2 lg:items-center">
+    <div class="space-y-8 pr-0 lg:pr-12">
+        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block">Filosofi Kami</span>
+        <h2 class="font-display text-4xl md:text-5xl font-black uppercase tracking-tighter text-walnut-950 leading-[0.9]">
+            Keindahan <br>Dalam Presisi.
+        </h2>
+        <p class="text-muted leading-relaxed text-sm md:text-base">
+            DjudasMS bukan sekadar etalase instrumen. Kami adalah kurator yang percaya bahwa estetika visual dan akurasi sonik adalah dua hal yang tak terpisahkan. Setiap koleksi yang kami tampilkan telah melewati uji dengar dan raba yang ketat.
         </p>
+        <a href="#" class="inline-block border-b-2 border-walnut-900 pb-1 text-[0.7rem] uppercase tracking-[0.2em] font-bold text-walnut-900 hover:text-gold-600 hover:border-gold-600 transition">
+            Baca Kisah Kami
+        </a>
     </div>
-    <div class="grid gap-6 sm:grid-cols-2">
-        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1 transition duration-300">
-            <div class="text-4xl font-black text-indigo-600">01</div>
-            <div class="text-xs uppercase tracking-widest text-slate-900 font-bold">Produk Terkurasi</div>
-            <p class="text-xs text-slate-500 leading-relaxed">Setiap gitar dan piringan hitam diuji kualitas bunyinya oleh ahli audio kami sebelum masuk daftar display.</p>
+    
+    <div class="grid sm:grid-cols-2 gap-8">
+        <div class="space-y-4 pt-8 border-t border-walnut-800/10">
+            <div class="font-display text-4xl font-black text-gold-500">01</div>
+            <div class="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-walnut-950">Kurasi Ketat</div>
+            <p class="text-[0.8rem] text-muted leading-relaxed">Pilihan material dan resonansi diuji sebelum dimasukkan ke dalam katalog.</p>
         </div>
-        <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-4 hover:-translate-y-1 transition duration-300">
-            <div class="text-4xl font-black text-indigo-600">02</div>
-            <div class="text-xs uppercase tracking-widest text-slate-900 font-bold">Garansi Resmi</div>
-            <p class="text-xs text-slate-500 leading-relaxed">Kami menjamin orisinalitas semua produk premium dengan opsi pengembalian dana penuh jika cacat.</p>
+        <div class="space-y-4 pt-8 border-t border-walnut-800/10 sm:mt-12">
+            <div class="font-display text-4xl font-black text-gold-500">02</div>
+            <div class="text-[0.7rem] uppercase tracking-[0.2em] font-bold text-walnut-950">Garansi Orisinal</div>
+            <p class="text-[0.8rem] text-muted leading-relaxed">Jaminan keaslian seumur hidup untuk investasi musik berharga Anda.</p>
         </div>
     </div>
 </section>

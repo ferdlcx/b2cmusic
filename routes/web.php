@@ -145,6 +145,7 @@ $adminRoutes = function () {
     Route::put('/products/{id}', [AdminController::class, 'updateProduct'])->name('products.update');
     Route::delete('/products/{id}', [AdminController::class, 'destroyProduct'])->name('products.destroy');
     Route::post('/products/{id}/restore', [AdminController::class, 'restoreProduct'])->name('products.restore');
+    Route::delete('/products/{id}/force', [AdminController::class, 'forceDeleteProduct'])->name('products.forceDelete');
     Route::get('/products/trashed', [AdminController::class, 'trashedProducts'])->name('products.trashed');
 
     // Categories Management

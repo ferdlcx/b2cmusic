@@ -260,6 +260,19 @@ class AdminController extends Controller
         return redirect()->route('admin.products.trashed')->with('success', 'Produk berhasil dipulihkan.');
     }
 
+    public function forceDeleteProduct($id)
+    {
+        $product = Product::onlyTrashed()->findOrFail($id);
+        $productName = $product->name;
+        $productId = $product->id;
+        
+        $product->forceDelete();
+
+        $this->logActivity('force_delete_product', Product::class, $productId, "Menghapus produk permanen: {$productName}");
+
+        return redirect()->route('admin.products.trashed')->with('success', 'Produk berhasil dihapus secara permanen.');
+    }
+
     // --- CATEGORIES CRUD ---
     public function categories()
     {

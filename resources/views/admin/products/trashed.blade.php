@@ -3,31 +3,30 @@
 @section('title', 'Produk Terhapus - Admin DjudasMS')
 
 @section('admin_content')
-<div class="space-y-6">
+<div class="space-y-12">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-6 flex items-center justify-between">
-        <div>
-            <span class="text-xs uppercase tracking-[0.45em] text-slate-500 font-bold">Katalog Produk</span>
-            <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Tempat Sampah Produk</h1>
-            <p class="text-xs text-slate-500">Daftar produk yang telah dihapus sementara (soft delete).</p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-walnut-800/10">
+        <div class="space-y-2">
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-red-600 font-bold block">Sampah Produk</span>
+            <h1 class="font-display text-4xl font-black uppercase tracking-tighter text-walnut-950">Produk Terhapus.</h1>
         </div>
-        <a href="{{ route('admin.products') }}" class="inline-flex items-center justify-center px-4 py-2.5 border border-slate-200 bg-white rounded-xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 text-slate-400"></i> Katalog Aktif
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.products') }}" class="text-[0.65rem] uppercase tracking-widest font-bold text-walnut-500 hover:text-walnut-950 transition">← Katalog Aktif</a>
+        </div>
     </div>
 
     <!-- Trashed Products Table -->
     @if($products->isEmpty())
-        <div class="bg-white border border-slate-200/80 rounded-[32px] p-12 text-center text-slate-500">
-            <i data-lucide="trash-2" class="w-10 h-10 text-slate-350 mx-auto mb-3"></i>
-            <p class="text-xs font-semibold">Tempat sampah kosong.</p>
+        <div class="bg-cream-50 border border-walnut-800/10 p-16 text-center text-muted font-medium">
+            Tempat sampah kosong. Tidak ada produk yang dihapus.
         </div>
     @else
-        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-            <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-slate-50 border-b border-slate-100">
+        <div class="overflow-x-auto border border-walnut-800/10 bg-cream-50">
+            <table class="w-full text-left">
+                <thead class="text-[0.65rem] uppercase tracking-widest text-muted border-b border-walnut-800/10">
                     <tr>
-                        <th class="px-6 py-4">Produk</th>
+                        <th class="px-6 py-4">Gambar</th>
+                        <th class="px-6 py-4">Nama Produk</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Harga</th>
                         <th class="px-6 py-4">Dihapus Pada</th>
@@ -36,37 +35,62 @@
                 </thead>
                 <tbody>
                     @foreach($products as $product)
-                        <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
-                            <td class="px-6 py-4 flex items-center gap-4">
-                                <div class="w-10 h-10 bg-slate-50 rounded-lg overflow-hidden shrink-0 border border-slate-100">
+                        <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-100 transition">
+                            <!-- Image -->
+                            <td class="px-6 py-4">
+                                <div class="w-14 h-14 bg-cream-100 border border-walnut-800/10 flex items-center justify-center p-1">
                                     @if($product->primaryImage)
-                                        <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
+                                        <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover mix-blend-multiply" />
                                     @else
-                                        <div class="w-full h-full flex items-center justify-center text-slate-300">
-                                            <i data-lucide="image" class="w-5 h-5"></i>
-                                        </div>
+                                        <i data-lucide="image" class="w-5 h-5 text-walnut-800/20"></i>
                                     @endif
                                 </div>
-                                <div>
-                                    <span class="font-bold text-slate-900 block">{{ $product->name }}</span>
-                                    <span class="text-[0.65rem] text-slate-400 font-mono">SKU: {{ $product->sku }}</span>
-                                </div>
                             </td>
-                            <td class="px-6 py-4 text-slate-700 font-medium">{{ $product->category ? $product->category->name : '-' }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-900">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-slate-500">{{ $product->deleted_at->format('d M Y, H:i') }}</td>
-                            <td class="px-6 py-4 text-center">
-                                <form action="{{ route('admin.products.restore', $product->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="text-xs uppercase tracking-wider font-black text-indigo-600 hover:text-indigo-700 transition">Pulihkan</button>
-                                </form>
+
+                            <!-- Name -->
+                            <td class="px-6 py-5">
+                                <span class="font-display text-[0.8rem] font-black uppercase tracking-tight text-walnut-950 block">{{ $product->name }}</span>
+                                <span class="text-[0.65rem] text-walnut-600 font-mono">SKU: {{ $product->sku }}</span>
+                            </td>
+
+                            <!-- Category -->
+                            <td class="px-6 py-5 text-[0.65rem] text-muted font-bold uppercase tracking-widest">
+                                {{ $product->category ? $product->category->name : '-' }}
+                            </td>
+
+                            <!-- Price -->
+                            <td class="px-6 py-5 font-bold text-walnut-950 text-sm">
+                                Rp {{ number_format($product->price, 0, ',', '.') }}
+                            </td>
+
+                            <!-- Deleted At -->
+                            <td class="px-6 py-5 text-[0.7rem] font-medium text-walnut-600">
+                                {{ $product->deleted_at->format('d M Y, H:i') }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-5 text-center">
+                                <div class="inline-flex gap-4">
+                                    <form action="{{ route('admin.products.restore', $product->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-gold-600 hover:text-walnut-950 transition">Pulihkan</button>
+                                    </form>
+                                    
+                                    <form action="{{ route('admin.products.forceDelete', $product->id) }}" method="POST" onsubmit="return confirm('PENGHAPUSAN PERMANEN: Apakah Anda yakin ingin menghapus produk ini dari database secara total? Tindakan ini tidak dapat dibatalkan.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-red-600 hover:text-red-800 transition">Hapus Permanen</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <div class="pt-4">
+
+        <!-- Pagination -->
+        <div class="pt-6">
             {{ $products->links() }}
         </div>
     @endif

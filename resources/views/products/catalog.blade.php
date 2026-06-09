@@ -154,7 +154,7 @@
                                 @else
                                     <div class="absolute top-4 left-4">
                                         <span class="text-[0.6rem] uppercase tracking-[0.2em] font-bold bg-walnut-900 text-cream-50 px-3 py-1.5">
-                                            {{ $product->brand->name }}
+                                            {{ optional($product->brand)->name ?? 'Tanpa Merek' }}
                                         </span>
                                     </div>
                                 @endif

@@ -229,17 +229,19 @@
                                     Cek Status Pembayaran (Manual)
                                 </button>
                             </form>
-                        @elseif(in_array($order->status, ['processing', 'shipped', 'completed']))
-                            <a href="{{ route('orders.track', $order->id) }}" 
-                                class="block text-center w-full py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-500">
-                                Lacak Pengiriman Pesanan
-                            </a>
                         @else
                             <div class="p-4 bg-red-50 border border-red-200 text-red-700 text-[0.75rem] flex flex-col gap-2 font-medium">
                                 <span class="font-bold flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i> Gagal Memuat</span>
                                 <p>Terjadi kesalahan saat memuat link pembayaran Midtrans. Silakan hubungi kami.</p>
                             </div>
                         @endif
+                    </div>
+                @elseif(in_array($order->status, ['processing', 'shipped', 'completed']))
+                    <div class="pt-6 border-t border-walnut-800/10">
+                        <a href="{{ route('orders.track', $order->id) }}" 
+                            class="block text-center w-full py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-500">
+                            Lacak Pengiriman Pesanan
+                        </a>
                     </div>
                 @endif
             </div>
@@ -271,6 +273,18 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            @endif
+
+            @if($order->status === 'shipped')
+                <div class="pt-2">
+                    <form action="{{ route('orders.delivered', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin telah menerima pesanan ini dengan baik?');">
+                        @csrf
+                        <button type="submit" 
+                            class="w-full py-3.5 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300">
+                            Pesanan Diterima
+                        </button>
+                    </form>
                 </div>
             @endif
 

@@ -1,34 +1,33 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Produk - DjudasMS')
+@section('title', 'Katalog - DjudasMS')
 
 @section('content')
-<div class="space-y-10 py-4">
+<div class="space-y-12 py-8">
     <!-- Header -->
-    <div class="border-b border-slate-200/60 pb-8 space-y-3">
-        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-indigo-600 font-bold block">Katalog Belanja</span>
-        <h1 class="font-display text-4xl md:text-5xl font-black uppercase tracking-tight text-slate-950">Jelajahi Produk Kami</h1>
-        <p class="text-slate-500 text-sm max-w-2xl font-normal">Temukan berbagai instrumen musik kelas dunia, piringan hitam pilihan, dan perlengkapan studio murni di satu tempat.</p>
+    <div class="border-b border-walnut-800/10 pb-12 space-y-4 text-center md:text-left">
+        <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block">The Collection</span>
+        <h1 class="font-display text-4xl md:text-6xl font-black uppercase tracking-tighter text-walnut-950">Jelajahi <span class="text-gold-500">Katalog.</span></h1>
+        <p class="text-muted text-sm md:text-base max-w-2xl font-medium leading-relaxed">Pilihan instrumen musik kelas dunia, piringan hitam vintage, dan perangkat studio murni dengan spesifikasi editorial.</p>
     </div>
 
     <!-- Layout Grid -->
-    <div class="grid gap-10 lg:grid-cols-[260px_1fr]" x-data="{ showFilters: false }">
+    <div class="grid gap-12 lg:grid-cols-[240px_1fr]" x-data="{ showFilters: false }">
         <!-- Toggle Button for Filters on Mobile -->
-        <div class="lg:hidden flex items-center justify-between bg-white border border-slate-200/80 rounded-[20px] p-4 shadow-sm col-span-1">
-            <span class="text-xs font-bold text-slate-800 uppercase flex items-center gap-2">
-                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-indigo-600"></i>
-                Filter & Urutkan
+        <div class="lg:hidden flex items-center justify-between border-b border-walnut-800/10 pb-4">
+            <span class="text-[0.7rem] font-bold text-walnut-950 uppercase tracking-widest flex items-center gap-2">
+                <i data-lucide="sliders-horizontal" class="w-4 h-4 text-gold-500"></i> Filter
             </span>
-            <button type="button" @click="showFilters = !showFilters" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition">
-                <span x-text="showFilters ? 'Sembunyikan' : 'Tampilkan'"></span>
+            <button type="button" @click="showFilters = !showFilters" class="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-walnut-950 hover:text-gold-600 transition">
+                <span x-text="showFilters ? 'Tutup' : 'Buka'"></span>
             </button>
         </div>
 
         <!-- Sidebar Filters -->
-        <aside class="space-y-8 lg:block transition-all duration-500 ease-in-out" :class="showFilters ? 'block' : 'hidden'">
+        <aside class="space-y-10 lg:block transition-all duration-500" :class="showFilters ? 'block' : 'hidden'">
             <!-- Search -->
-            <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
-                <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Pencarian</span>
+            <div class="space-y-4">
+                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-walnut-950 font-bold block">Pencarian</span>
                 <form action="{{ route('catalog') }}" method="GET" class="relative">
                     @if(request('category'))
                         <input type="hidden" name="category" value="{{ request('category') }}">
@@ -37,35 +36,34 @@
                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                     @endif
                     <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                        placeholder="Cari produk..." 
-                        class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white text-xs transition duration-300 font-medium" />
-                    <button type="submit" class="absolute right-3 top-3 text-slate-400 hover:text-indigo-600 transition">
+                        placeholder="Cari karya..." 
+                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                    <button type="submit" class="absolute right-0 top-3 text-walnut-800 hover:text-gold-600 transition">
                         <i data-lucide="search" class="w-4 h-4"></i>
                     </button>
                 </form>
             </div>
 
             <!-- Categories -->
-            <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
-                <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Kategori</span>
-                <div class="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2">
+            <div class="space-y-4">
+                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-walnut-950 font-bold block">Kategori</span>
+                <div class="flex flex-col gap-3">
                     <a href="{{ route('catalog', array_merge(request()->except('category', 'page'))) }}" 
-                        class="text-xs py-2.5 px-3.5 rounded-xl transition font-semibold flex items-center justify-between {{ !request('category') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'text-slate-600 hover:bg-slate-50' }}">
-                        <span>Semua Kategori</span>
-                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        class="text-[0.7rem] uppercase tracking-wider font-bold transition flex items-center justify-between pb-2 border-b {{ !request('category') ? 'text-gold-600 border-gold-500' : 'text-walnut-800 hover:text-gold-500 border-transparent hover:border-walnut-800/20' }}">
+                        <span>Semua Koleksi</span>
                     </a>
                     @foreach($categories as $cat)
                         <a href="{{ route('catalog', array_merge(request()->except('page'), ['category' => $cat->slug])) }}" 
-                            class="text-xs py-2.5 px-3.5 rounded-xl transition font-semibold flex items-center justify-between {{ request('category') === $cat->slug ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'text-slate-600 hover:bg-slate-50' }}">
+                            class="text-[0.7rem] uppercase tracking-wider font-bold transition flex items-center justify-between pb-2 border-b {{ request('category') === $cat->slug ? 'text-gold-600 border-gold-500' : 'text-walnut-800 hover:text-gold-500 border-transparent hover:border-walnut-800/20' }}">
                             <span>{{ $cat->name }}</span>
-                            <span class="text-[0.65rem] {{ request('category') === $cat->slug ? 'text-white/80' : 'text-slate-400' }}">({{ $cat->products()->count() }})</span>
+                            <span class="text-[0.6rem] text-muted">{{ $cat->products()->count() }}</span>
                         </a>
                     @endforeach
                 </div>
             </div>
 
             <!-- Advanced Filters -->
-            <form action="{{ route('catalog') }}" method="GET" class="space-y-6">
+            <form action="{{ route('catalog') }}" method="GET" class="space-y-8">
                 @if(request('category'))
                     <input type="hidden" name="category" value="{{ request('category') }}">
                 @endif
@@ -76,69 +74,58 @@
                     <input type="hidden" name="sort" value="{{ request('sort') }}">
                 @endif
 
-                <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-5">
+                <div class="space-y-6">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Filter</span>
-                        <a href="{{ route('catalog') }}" class="text-[0.65rem] text-indigo-600 font-bold hover:underline">Reset</a>
+                        <span class="text-[0.65rem] uppercase tracking-[0.2em] text-walnut-950 font-bold block">Refine</span>
+                        <a href="{{ route('catalog') }}" class="text-[0.6rem] uppercase tracking-widest text-gold-600 font-bold hover:text-walnut-950 transition">Reset</a>
                     </div>
                     
                     <!-- Harga -->
                     <div class="space-y-3">
-                        <span class="text-xs font-bold text-slate-700">Rentang Harga (Rp)</span>
+                        <span class="text-[0.65rem] uppercase tracking-widest font-bold text-walnut-800">Harga (IDR)</span>
                         <div class="flex items-center gap-2">
-                            <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none">
-                            <span class="text-slate-400">-</span>
-                            <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Max" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+                            <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="Min" class="w-full bg-transparent border-b border-walnut-800/20 py-2 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.7rem] font-medium">
+                            <span class="text-walnut-400">-</span>
+                            <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Max" class="w-full bg-transparent border-b border-walnut-800/20 py-2 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.7rem] font-medium">
                         </div>
                     </div>
 
                     <!-- Merek -->
                     @if(isset($brands) && $brands->count() > 0)
-                    <div class="space-y-3 border-t border-slate-100 pt-4">
-                        <span class="text-xs font-bold text-slate-700">Merek</span>
-                        <div class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-2">
+                    <div class="space-y-3 border-t border-walnut-800/10 pt-6">
+                        <span class="text-[0.65rem] uppercase tracking-widest font-bold text-walnut-800">Merek</span>
+                        <div class="flex flex-col gap-3">
                             @foreach($brands as $brand)
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" name="brand[]" value="{{ $brand->id }}" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500" {{ in_array($brand->id, (array)request('brand', [])) ? 'checked' : '' }}>
-                                <span class="text-xs text-slate-600 group-hover:text-indigo-600 font-medium">{{ $brand->name }}</span>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" name="brand[]" value="{{ $brand->id }}" class="w-3.5 h-3.5 text-gold-600 bg-cream-50 border-walnut-800/30 rounded-none focus:ring-gold-500" {{ in_array($brand->id, (array)request('brand', [])) ? 'checked' : '' }}>
+                                <span class="text-[0.7rem] uppercase tracking-wider text-walnut-800 group-hover:text-gold-600 font-bold transition">{{ $brand->name }}</span>
                             </label>
                             @endforeach
                         </div>
                     </div>
                     @endif
 
-                    <!-- Rating -->
-                    <div class="space-y-3 border-t border-slate-100 pt-4">
-                        <span class="text-xs font-bold text-slate-700">Rating Minimum</span>
-                        <div class="flex flex-col gap-2">
-                            @foreach([4 => '4 Bintang & Ke atas', 3 => '3 Bintang & Ke atas'] as $val => $label)
-                            <label class="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="rating" value="{{ $val }}" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500" {{ request('rating') == $val ? 'checked' : '' }}>
-                                <span class="text-xs text-slate-600 group-hover:text-indigo-600 font-medium">{{ $label }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <button type="submit" class="w-full py-2.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl hover:bg-indigo-100 transition">Terapkan Filter</button>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full py-3 bg-walnut-900 text-gold-500 text-[0.65rem] uppercase tracking-[0.2em] font-bold hover:bg-gold-600 hover:text-white transition duration-300">Terapkan</button>
                     </div>
                 </div>
             </form>
 
             <!-- Sorting -->
-            <div class="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm space-y-4">
-                <span class="text-xs uppercase tracking-widest text-slate-900 font-black block">Urutkan</span>
-                <div class="flex flex-col gap-1.5">
+            <div class="space-y-4 pt-6 border-t border-walnut-800/10">
+                <span class="text-[0.65rem] uppercase tracking-[0.2em] text-walnut-950 font-bold block">Urutan</span>
+                <div class="flex flex-col gap-3">
                     @foreach([
                         'newest' => 'Terbaru',
                         'price_asc' => 'Harga Terendah',
                         'price_desc' => 'Harga Tertinggi'
                     ] as $key => $label)
                         <a href="{{ route('catalog', array_merge(request()->except('page'), ['sort' => $key])) }}" 
-                            class="text-xs py-2.5 px-3.5 rounded-xl transition font-semibold flex items-center justify-between {{ (request('sort', 'newest') === $key) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/10' : 'text-slate-600 hover:bg-slate-50' }}">
+                            class="text-[0.7rem] uppercase tracking-wider font-bold transition flex items-center justify-between {{ (request('sort', 'newest') === $key) ? 'text-gold-600' : 'text-walnut-800 hover:text-gold-500' }}">
                             <span>{{ $label }}</span>
-                            <i data-lucide="{{ request('sort', 'newest') === $key ? 'check' : 'chevron-right' }}" class="w-3.5 h-3.5"></i>
+                            @if(request('sort', 'newest') === $key)
+                                <span class="w-1.5 h-1.5 bg-gold-500 rounded-full"></span>
+                            @endif
                         </a>
                     @endforeach
                 </div>
@@ -146,67 +133,53 @@
         </aside>
 
         <!-- Product Grid -->
-        <div class="space-y-10">
+        <div class="space-y-12">
             @if($products->isEmpty())
-                <div class="bg-white border border-slate-200 rounded-[32px] p-16 text-center shadow-sm space-y-4">
-                    <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto">
-                        <i data-lucide="package-search" class="w-8 h-8"></i>
+                <div class="py-24 text-center space-y-6">
+                    <i data-lucide="inbox" class="w-12 h-12 text-walnut-800/20 mx-auto"></i>
+                    <div class="space-y-2">
+                        <p class="font-display text-2xl font-black text-walnut-950 uppercase tracking-tighter">Koleksi Tidak Ditemukan</p>
+                        <p class="text-sm text-muted max-w-sm mx-auto leading-relaxed">Kriteria yang Anda cari belum tersedia dalam kurasi kami.</p>
                     </div>
-                    <div class="space-y-1">
-                        <p class="font-display text-lg font-bold text-slate-900 uppercase">Produk Tidak Ditemukan</p>
-                        <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">Silakan coba kata kunci pencarian lain atau pilih kategori yang berbeda.</p>
-                    </div>
-                    <div class="pt-2">
-                        <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 text-white text-xs font-semibold tracking-wider rounded-xl hover:bg-indigo-700 transition duration-300">
-                            Reset Pencarian
-                        </a>
-                    </div>
+                    <a href="{{ route('catalog') }}" class="inline-block px-8 py-3 bg-walnut-900 text-gold-500 text-[0.65rem] uppercase tracking-[0.2em] font-bold hover:bg-gold-600 hover:text-white transition duration-300">
+                        Kembali ke Katalog
+                    </a>
                 </div>
             @else
-                <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div class="grid gap-12 sm:grid-cols-2 xl:grid-cols-3">
                     @foreach($products as $product)
-                        <article class="card-shine group overflow-hidden rounded-[32px] bg-white border border-slate-200/80 shadow-sm transition hover:shadow-xl hover:-translate-y-1.5 duration-300 flex flex-col justify-between h-full">
-                            <a href="{{ route('products.show', $product->slug) }}" class="block">
-                                <div class="h-60 overflow-hidden bg-slate-50 flex items-center justify-center relative">
-                                    <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-103" />
-                                    
-                                    @if($product->stock == 0)
-                                        <div class="absolute inset-0 bg-white/80 backdrop-blur-[2px] flex items-center justify-center">
-                                            <span class="text-[0.65rem] uppercase tracking-widest font-black bg-rose-600 text-white px-4 py-2.5 rounded-xl shadow-md">Stok Habis</span>
-                                        </div>
-                                    @else
-                                        <!-- Brand Badge -->
-                                        <div class="absolute top-4 left-4">
-                                            <span class="text-[0.65rem] uppercase tracking-wider font-bold bg-white text-slate-900 shadow-sm px-3 py-1.5 rounded-xl">
-                                                {{ $product->brand }}
-                                            </span>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div class="p-6 space-y-3">
-                                    <span class="text-[0.65rem] uppercase tracking-[0.25em] text-slate-400 font-bold block">{{ $product->category->name }}</span>
-                                    <h3 class="font-display text-base font-bold uppercase tracking-tight text-slate-950 leading-snug line-clamp-2 h-12 group-hover:text-indigo-600 transition">{{ $product->name }}</h3>
-                                    
-                                    <!-- Rating -->
-                                    <div class="flex items-center gap-1 text-amber-500 text-xs">
-                                        <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500"></i>
-                                        <span class="font-bold text-slate-700">4.9</span>
-                                        <span class="text-slate-400">(Ulasan)</span>
+                        <article class="group flex flex-col h-full">
+                            <a href="{{ route('products.show', $product->slug) }}" class="block mb-6 relative overflow-hidden bg-cream-50 border border-walnut-800/5 h-[340px]">
+                                <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $product->name }}" class="h-full w-full object-cover mix-blend-multiply opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+                                
+                                @if($product->stock == 0)
+                                    <div class="absolute inset-0 bg-cream-100/60 backdrop-blur-sm flex items-center justify-center">
+                                        <span class="text-[0.65rem] uppercase tracking-[0.3em] font-black text-walnut-900 border border-walnut-900 px-4 py-2">Terjual</span>
                                     </div>
-                                    
-                                    <p class="text-lg font-black text-indigo-600">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                                </div>
+                                @else
+                                    <div class="absolute top-4 left-4">
+                                        <span class="text-[0.6rem] uppercase tracking-[0.2em] font-bold bg-walnut-900 text-cream-50 px-3 py-1.5">
+                                            {{ $product->brand }}
+                                        </span>
+                                    </div>
+                                @endif
                             </a>
-                            <div class="px-6 pb-6">
-                                <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
-                                    <a href="{{ route('products.show', $product->slug) }}" class="text-xs uppercase tracking-widest text-slate-900 font-bold hover:text-indigo-600 transition">Detail</a>
-                                    <div class="flex items-center gap-2">
-                                        <!-- Wishlist Button -->
+                            
+                            <div class="space-y-3 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <span class="text-[0.6rem] uppercase tracking-[0.2em] text-gold-600 font-bold">{{ $product->category->name }}</span>
+                                    <h3 class="font-display text-lg font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-1 group-hover:text-gold-600 transition">{{ $product->name }}</h3>
+                                </div>
+                                
+                                <div class="flex items-center justify-between pt-4 border-t border-walnut-800/10 mt-auto">
+                                    <p class="text-sm font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</p>
+                                    
+                                    <div class="flex items-center gap-4">
                                         <form action="{{ route('wishlist.add') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <button type="submit" class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-slate-350 hover:bg-slate-100 transition" title="Tambah ke Wishlist">
-                                                <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500 fill-rose-500"></i>
+                                            <button type="submit" class="text-walnut-400 hover:text-gold-600 transition" title="Tambah ke Wishlist">
+                                                <i data-lucide="heart" class="w-4 h-4"></i>
                                             </button>
                                         </form>
 
@@ -215,8 +188,8 @@
                                                 @csrf
                                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                                                 <input type="hidden" name="quantity" value="1">
-                                                <button type="submit" class="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider bg-indigo-600 text-white px-3.5 py-2 rounded-xl hover:bg-indigo-700 transition duration-300 font-semibold shadow-sm hover:shadow-indigo-600/10">
-                                                    <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i> Beli
+                                                <button type="submit" class="text-walnut-800 hover:text-gold-600 transition" title="Beli">
+                                                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                                                 </button>
                                             </form>
                                         @endif
@@ -228,7 +201,7 @@
                 </div>
 
                 <!-- Pagination Links -->
-                <div class="pt-6 border-t border-slate-200/60">
+                <div class="pt-12 border-t border-walnut-800/10">
                     {{ $products->links() }}
                 </div>
             @endif

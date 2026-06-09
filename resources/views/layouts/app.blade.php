@@ -357,20 +357,20 @@
 <div x-data="chatWidget()" class="fixed bottom-6 right-6 z-[100]" x-cloak>
     <!-- Chat Window -->
     <div x-show="isOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-        class="absolute bottom-20 right-0 w-[360px] max-h-[520px] bg-white/95 backdrop-blur-xl border border-slate-200/80 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        class="absolute bottom-20 right-0 w-[360px] max-h-[520px] bg-cream-50 border border-walnut-800/10 shadow-2xl overflow-hidden flex flex-col">
         
         <!-- Header -->
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white">
+        <div class="bg-walnut-950 p-5 text-gold-500">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+                    <div class="w-10 h-10 border border-gold-500/30 rounded-none flex items-center justify-center">
                         <i data-lucide="headphones" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm">DjudasMS Support</h4>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                            <span class="text-[0.65rem] text-white/80 font-medium">Online sekarang</span>
+                        <h4 class="font-bold text-sm tracking-widest uppercase">DjudasMS Support</h4>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                            <span class="text-[0.65rem] text-cream-50/70 font-bold tracking-widest uppercase">Online sekarang</span>
                         </div>
                     </div>
                 </div>
@@ -381,39 +381,38 @@
         </div>
 
         <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[300px]" x-ref="chatMessages">
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[300px]" x-ref="chatMessages">
             <template x-for="(msg, idx) in messages" :key="idx">
                 <div :class="msg.from === 'bot' ? 'flex justify-start' : 'flex justify-end'">
-                    <div :class="msg.from === 'bot' ? 'bg-slate-100 text-slate-800 rounded-2xl rounded-tl-md' : 'bg-indigo-600 text-white rounded-2xl rounded-tr-md'" class="px-4 py-2.5 max-w-[85%] text-[0.8rem] leading-relaxed font-medium shadow-sm">
+                    <div :class="msg.from === 'bot' ? 'bg-cream-100 text-walnut-900 border border-walnut-800/10' : 'bg-walnut-900 text-cream-50'" class="px-4 py-3 max-w-[85%] text-[0.75rem] leading-relaxed font-medium">
                         <span x-html="msg.text"></span>
                     </div>
                 </div>
             </template>
             <div x-show="isTyping" class="flex justify-start">
-                <div class="bg-slate-100 text-slate-500 rounded-2xl rounded-tl-md px-4 py-3 text-xs font-semibold flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0s"></span>
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></span>
-                    <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+                <div class="bg-cream-100 text-walnut-500 px-4 py-3 flex items-center gap-1.5 border border-walnut-800/10">
+                    <span class="w-1.5 h-1.5 bg-walnut-400 animate-bounce" style="animation-delay: 0s"></span>
+                    <span class="w-1.5 h-1.5 bg-walnut-400 animate-bounce" style="animation-delay: 0.15s"></span>
+                    <span class="w-1.5 h-1.5 bg-walnut-400 animate-bounce" style="animation-delay: 0.3s"></span>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="px-4 pb-2" x-show="messages.length <= 1">
-            <div class="flex flex-wrap gap-1.5">
-                <button @click="sendQuickQuestion('Cara bayar?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Cara bayar?</button>
-                <button @click="sendQuickQuestion('Cara retur?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Cara retur?</button>
-                <button @click="sendQuickQuestion('Jam operasional?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Jam operasional?</button>
-                <button @click="sendQuickQuestion('Ongkir berapa?')" class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold hover:bg-indigo-100 transition">Ongkir?</button>
-                <button @click="sendQuickQuestion('Hubungi CS')" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold hover:bg-emerald-100 transition">💬 Hubungi CS</button>
+        <div class="px-4 pb-4" x-show="messages.length <= 1">
+            <div class="flex flex-wrap gap-2">
+                <button @click="sendQuickQuestion('Cara bayar?')" class="px-3 py-1.5 bg-cream-100 border border-walnut-800/10 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-wider hover:bg-gold-500 hover:text-white transition">Cara bayar?</button>
+                <button @click="sendQuickQuestion('Cara retur?')" class="px-3 py-1.5 bg-cream-100 border border-walnut-800/10 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-wider hover:bg-gold-500 hover:text-white transition">Cara retur?</button>
+                <button @click="sendQuickQuestion('Jam operasional?')" class="px-3 py-1.5 bg-cream-100 border border-walnut-800/10 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-wider hover:bg-gold-500 hover:text-white transition">Jam operasional?</button>
+                <button @click="sendQuickQuestion('Hubungi CS')" class="px-3 py-1.5 bg-walnut-900 text-gold-500 text-[0.65rem] font-bold uppercase tracking-wider hover:bg-gold-600 hover:text-white transition">Hubungi CS</button>
             </div>
         </div>
 
         <!-- Input -->
-        <div class="p-3 border-t border-slate-100">
+        <div class="p-3 border-t border-walnut-800/10">
             <form @submit.prevent="sendMessage()" class="flex gap-2">
-                <input x-model="userInput" type="text" placeholder="Ketik pertanyaan Anda..." class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" />
-                <button type="submit" class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center hover:bg-indigo-700 transition shrink-0">
+                <input x-model="userInput" type="text" placeholder="Ketik pesan..." class="flex-1 px-4 py-2.5 bg-cream-100 border border-walnut-800/10 text-[0.75rem] font-medium focus:outline-none focus:border-gold-500 transition" />
+                <button type="submit" class="w-10 h-10 bg-walnut-900 text-gold-500 flex items-center justify-center hover:bg-gold-600 hover:text-white transition shrink-0">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </form>
@@ -422,10 +421,10 @@
 
     <!-- Floating Button -->
     <button @click="toggleChat()" 
-        class="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl hover:shadow-indigo-600/30 hover:scale-110 transition-all duration-300 flex items-center justify-center relative">
-        <i data-lucide="message-circle" class="w-6 h-6" x-show="!isOpen"></i>
+        class="w-14 h-14 bg-walnut-950 text-gold-500 rounded-none shadow-xl hover:bg-gold-500 hover:text-white transition-colors duration-300 flex items-center justify-center relative">
+        <i data-lucide="message-square" class="w-5 h-5" x-show="!isOpen"></i>
         <i data-lucide="x" class="w-6 h-6" x-show="isOpen"></i>
-        <span x-show="!isOpen && unread > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[0.6rem] font-bold rounded-full flex items-center justify-center animate-bounce" x-text="unread"></span>
+        <span x-show="!isOpen && unread > 0" class="absolute -top-2 -right-2 w-5 h-5 bg-gold-600 text-white text-[0.6rem] font-bold rounded-full flex items-center justify-center animate-bounce" x-text="unread"></span>
     </button>
 </div>
 

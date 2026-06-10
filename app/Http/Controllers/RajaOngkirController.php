@@ -90,14 +90,13 @@ class RajaOngkirController extends Controller
 
                 if ($response->successful()) {
                     $results = $response->json()['data'] ?? [];
-                    if (!empty($results) && !empty($results[0]['costs'])) {
-                        $costs = $results[0]['costs'];
-                        foreach ($costs as $costDetail) {
+                    if (!empty($results)) {
+                        foreach ($results as $costDetail) {
                             $formattedCosts[] = [
-                                'service' => strtoupper($courier) . ' - ' . $costDetail['service'],
-                                'description' => $costDetail['description'],
-                                'cost' => $costDetail['cost'],
-                                'etd' => $costDetail['etd']
+                                'service' => strtoupper($courier) . ' - ' . ($costDetail['service'] ?? ''),
+                                'description' => $costDetail['description'] ?? '',
+                                'cost' => $costDetail['cost'] ?? 0,
+                                'etd' => $costDetail['etd'] ?? ''
                             ];
                         }
                     }

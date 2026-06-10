@@ -44,7 +44,10 @@ class BiteshipController extends Controller
                 $formatted = array_map(function($area) {
                     return [
                         'id' => $area['id'],
-                        'text' => $area['name'] . ', ' . $area['administrative_division_level_2_name'] . ', ' . $area['administrative_division_level_1_name'] . ' - ' . $area['postal_code']
+                        'text' => $area['name'] . ', ' . $area['administrative_division_level_2_name'] . ', ' . $area['administrative_division_level_1_name'] . ' - ' . $area['postal_code'],
+                        'postal_code' => $area['postal_code'],
+                        'city' => $area['administrative_division_level_2_name'],
+                        'province' => $area['administrative_division_level_1_name']
                     ];
                 }, $areas);
 

@@ -54,6 +54,9 @@
                   this.selectedNewAreaId = area.id;
                   this.selectedNewAreaName = area.text;
                   this.areaSearchQuery = area.text;
+                  this.postalCode = area.postal_code || '';
+                  this.city = area.city || '';
+                  this.province = area.province || '';
                   this.areaSearchResults = [];
                   this.selectedCityId = area.id; // use selectedCityId as area_id for consistency
                   this.fetchCourierOptions();
@@ -145,16 +148,16 @@
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <input type="text" name="new_address_label" value="Rumah" placeholder="Label (Rumah/Kantor)" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                 <input type="text" name="new_address_name" value="{{ auth()->user()->name }}" placeholder="Nama Penerima" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                <input type="text" name="new_address_phone" value="{{ auth()->user()->phone }}" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                             </div>
                             <textarea name="new_address_address" rows="2" placeholder="Detail Alamat" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium"></textarea>
                             <div class="relative w-full">
                                 <input type="hidden" name="new_address_area_id" x-model="selectedNewAreaId" />
                                 <input type="hidden" name="new_address_area_name" x-model="selectedNewAreaName" />
+                                <input type="hidden" name="new_address_city" x-model="city" />
+                                <input type="hidden" name="new_address_province" x-model="province" />
                                 
-                                <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik Kecamatan / Kodepos" 
-                                    class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                                <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Cari Kecamatan / Kota (Otomatis dari Biteship)" 
+                                    class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" autocomplete="off" />
                                 
                                 <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
 
@@ -163,6 +166,10 @@
                                         <div @click="selectArea(res)" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
                                     </template>
                                 </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" name="new_address_phone" value="{{ auth()->user()->phone }}" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                                <input type="text" name="new_address_postal_code" x-model="postalCode" placeholder="Kode Pos (Otomatis Terisi)" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
                             </div>
                         </div>
                     @else
@@ -207,25 +214,29 @@
                                         <div class="grid gap-4 sm:grid-cols-2">
                                             <input type="text" name="new_address_label" placeholder="Label (Rumah/Kantor)" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                             <input type="text" name="new_address_name" placeholder="Nama Penerima" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                            <input type="text" name="new_address_phone" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                            <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                         </div>
                                         <textarea name="new_address_address" rows="2" placeholder="Detail Alamat" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium"></textarea>
-                                            <div class="relative w-full sm:col-span-2">
-                                                <input type="hidden" name="new_address_area_id" x-model="selectedNewAreaId" />
-                                                <input type="hidden" name="new_address_area_name" x-model="selectedNewAreaName" />
-                                                
-                                                <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik Kecamatan / Kodepos" 
-                                                    class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                                
-                                                <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
+                                        <div class="relative w-full">
+                                            <input type="hidden" name="new_address_area_id" x-model="selectedNewAreaId" />
+                                            <input type="hidden" name="new_address_area_name" x-model="selectedNewAreaName" />
+                                            <input type="hidden" name="new_address_city" x-model="city" />
+                                            <input type="hidden" name="new_address_province" x-model="province" />
+                                            
+                                            <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Cari Kecamatan / Kota (Otomatis dari Biteship)" 
+                                                class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" autocomplete="off" />
+                                            
+                                            <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
 
-                                                <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
-                                                    <template x-for="res in areaSearchResults" :key="res.id">
-                                                        <div @click="selectArea(res)" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
-                                                    </template>
-                                                </div>
+                                            <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
+                                                <template x-for="res in areaSearchResults" :key="res.id">
+                                                    <div @click="selectArea(res)" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
+                                                </template>
                                             </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <input type="text" name="new_address_phone" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                                            <input type="text" name="new_address_postal_code" x-model="postalCode" placeholder="Kode Pos (Otomatis Terisi)" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

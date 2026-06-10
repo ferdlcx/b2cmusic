@@ -22,9 +22,10 @@
             border: 1px solid #e2e8f0;
         }
         .header {
-            background-color: #6366f1;
+            background-color: #1c1917;
             padding: 40px 20px;
             text-align: center;
+            border-bottom: 3px solid #eab308;
         }
         .header h1 {
             color: #ffffff;
@@ -61,7 +62,7 @@
             font-size: 42px;
             font-weight: 900;
             letter-spacing: 8px;
-            color: #6366f1;
+            color: #eab308;
             margin: 0;
         }
         .warning {
@@ -96,7 +97,7 @@
             </div>
             
             <div class="message" style="font-size: 14px;">
-                Kode ini akan kedaluwarsa dalam <strong>15 menit</strong>. Untuk keamanan, jangan pernah membagikan kode ini kepada siapa pun, termasuk pihak DjudasMS.
+                Kode ini akan kedaluwarsa dalam <strong>5 hari</strong>. Untuk keamanan, jangan pernah membagikan kode ini kepada siapa pun, termasuk pihak DjudasMS.
             </div>
             
             <div class="warning">

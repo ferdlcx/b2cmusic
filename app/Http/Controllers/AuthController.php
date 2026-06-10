@@ -52,7 +52,7 @@ class AuthController extends Controller
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->otp_code = $otpCode;
-        $user->otp_expires_at = now()->addMinutes(15);
+        $user->otp_expires_at = now()->addDays(5);
         $user->save();
 
         try {
@@ -210,7 +210,7 @@ class AuthController extends Controller
         // Generate 6-digit OTP code for password reset
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->reset_otp_code = $otpCode;
-        $user->reset_otp_expires_at = now()->addMinutes(15);
+        $user->reset_otp_expires_at = now()->addDays(5);
         $user->save();
 
         try {
@@ -314,7 +314,7 @@ class AuthController extends Controller
 
         $otpCode = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->otp_code = $otpCode;
-        $user->otp_expires_at = now()->addMinutes(15);
+        $user->otp_expires_at = now()->addDays(5);
         $user->save();
 
         try {

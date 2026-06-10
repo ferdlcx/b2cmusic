@@ -101,45 +101,43 @@ class CheckoutController extends Controller
             return ($item->product->weight ?: 1000) * $item->quantity;
         });
 
-        // Calculate shipping cost using Komship API if key is set
+        // Calculate shipping cost using RajaOngkir cost API if key is set
         $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default fallback
-        $apiKey = env('RAJAONGKIR_API_KEY', '1oKzkr5Qf967fe03de1d601bxUErSPD8');
-        $originCity = env('KOMSHIP_ORIGIN_ID', 31597);
+        $apiKey = env('RAJAONGKIR_API_KEY', config('services.rajaongkir.api_key'));
+        $originCity = env('RAJAONGKIR_ORIGIN_ID', 17464); // default Kebayoran Lama subdistrict
         
         $selectedCourier = explode('_', strtolower($request->courier))[0] ?? 'jne';
+        if (!in_array($selectedCourier, ['jne', 'pos', 'tiki'])) {
+            $selectedCourier = 'jne'; // fallback if invalid
+        }
 
         if ($apiKey && $address->area_id) {
             try {
-                $weightInKg = ceil($totalWeight) / 1000;
-                if ($weightInKg < 1) $weightInKg = 1;
-
                 $response = Http::withoutVerifying()->timeout(5)->withHeaders([
-                    'x-api-key' => $apiKey,
+                    'key' => $apiKey,
                     'Content-Type' => 'application/json'
-                ])->get('https://api-sandbox.collaborator.komerce.id/tariff/api/v1/calculate', [
-                    'shipper_destination_id' => (int) $originCity,
-                    'receiver_destination_id' => (int) $address->area_id,
-                    'weight' => (float) $weightInKg,
-                    'item_value' => 10000,
-                    'cod' => 'no'
+                ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+                    'origin' => (int) $originCity,
+                    'destination' => (int) $address->area_id,
+                    'weight' => (int) ceil($totalWeight),
+                    'courier' => $selectedCourier
                 ]);
                 
                 if ($response->successful()) {
-                    $data = $response->json()['data'] ?? [];
-                    $reguler = $data['calculate_reguler'] ?? [];
-                    $cargo = $data['calculate_cargo'] ?? [];
-                    $results = array_merge($reguler, $cargo);
-
-                    if (!empty($results)) {
+                    $results = $response->json()['data'] ?? [];
+                    if (!empty($results) && !empty($results[0]['costs'])) {
                         // Find the matching service cost, or use the first one
-                        $matchedCost = $results[0]['shipping_cost_net'] ?? $results[0]['shipping_cost'];
-                        foreach ($results as $c) {
-                            if (str_contains(strtolower($request->courier), strtolower($c['service_name']))) {
-                                $matchedCost = $c['shipping_cost_net'] ?? $c['shipping_cost'];
+                        $matchedCost = $results[0]['costs'][0]['cost'];
+                        foreach ($results[0]['costs'] as $c) {
+                            if (str_contains(strtolower($request->courier), strtolower($c['service']))) {
+                                $matchedCost = $c['cost'];
                                 break;
                             }
                         }
-                        $shippingCost = $matchedCost;
+                        if (is_null($costVal)) {
+                            $costVal = $results[0]['cost'][0]['value'];
+                        }
+                        $shippingCost = $costVal;
                     }
                 }
             } catch (\Exception $e) {

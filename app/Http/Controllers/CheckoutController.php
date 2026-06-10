@@ -24,14 +24,36 @@ class CheckoutController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->first();
-        if (!$cart) {
-            return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
-        }
+        $isBuyNow = false;
 
-        $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+        if (session()->has('buy_now')) {
+            $buyNowData = session('buy_now');
+            $product = \App\Models\Product::find($buyNowData['product_id']);
+            
+            if (!$product) {
+                session()->forget('buy_now');
+                return redirect()->route('catalog')->with('error', 'Produk tidak ditemukan.');
+            }
+
+            $cartItem = new CartItem([
+                'product_id' => $product->id,
+                'quantity' => $buyNowData['quantity'],
+                'price' => $buyNowData['price'],
+            ]);
+            $cartItem->setRelation('product', $product);
+            
+            $cartItems = collect([$cartItem]);
+            $isBuyNow = true;
+        } else {
+            $cart = Cart::where('user_id', $user->id)->first();
+            if (!$cart) {
+                return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+            }
+
+            $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
+            if ($cartItems->isEmpty()) {
+                return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+            }
         }
 
         $addresses = Address::where('user_id', $user->id)->get();
@@ -44,17 +66,45 @@ class CheckoutController extends Controller
         // Use flat rates or calculate shipping cost via frontend in the future
         $shippingCost = 25000; // default flat rate
 
-        return view('cart.checkout', compact('cartItems', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost'));
+        return view('cart.checkout', compact('cartItems', 'addresses', 'defaultAddress', 'subtotal', 'shippingCost', 'isBuyNow'));
+    }
+
+    public function cancelBuyNow()
+    {
+        session()->forget('buy_now');
+        return redirect()->route('cart.index')->with('success', 'Pembelian langsung dibatalkan. Menampilkan keranjang Anda.');
     }
 
     public function process(Request $request)
     {
         $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->firstOrFail();
-        $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
+        
+        $isBuyNow = $request->input('is_buy_now') == '1';
+        
+        if ($isBuyNow && session()->has('buy_now')) {
+            $buyNowData = session('buy_now');
+            $product = \App\Models\Product::find($buyNowData['product_id']);
+            
+            if (!$product) {
+                return redirect()->route('catalog')->with('error', 'Produk tidak ditemukan.');
+            }
 
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+            $cartItem = new CartItem([
+                'product_id' => $product->id,
+                'quantity' => $buyNowData['quantity'],
+                'price' => $buyNowData['price'],
+            ]);
+            $cartItem->setRelation('product', $product);
+            
+            $cartItems = collect([$cartItem]);
+            $cart = null; // No real cart
+        } else {
+            $cart = Cart::where('user_id', $user->id)->firstOrFail();
+            $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
+
+            if ($cartItems->isEmpty()) {
+                return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+            }
         }
 
         $request->validate([
@@ -113,9 +163,8 @@ class CheckoutController extends Controller
 
         if ($apiKey && $address->area_id) {
             try {
-                $response = Http::withoutVerifying()->timeout(5)->withHeaders([
+                $response = Http::asForm()->withoutVerifying()->timeout(5)->withHeaders([
                     'key' => $apiKey,
-                    'Content-Type' => 'application/json'
                 ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
                     'origin' => (int) $originCity,
                     'destination' => (int) $address->area_id,
@@ -125,19 +174,15 @@ class CheckoutController extends Controller
                 
                 if ($response->successful()) {
                     $results = $response->json()['data'] ?? [];
-                    if (!empty($results) && !empty($results[0]['costs'])) {
-                        // Find the matching service cost, or use the first one
-                        $matchedCost = $results[0]['costs'][0]['cost'];
-                        foreach ($results[0]['costs'] as $c) {
-                            if (str_contains(strtolower($request->courier), strtolower($c['service']))) {
+                    if (!empty($results)) {
+                        $matchedCost = $results[0]['cost'] ?? 0;
+                        foreach ($results as $c) {
+                            if (str_contains(strtolower($request->courier), strtolower($c['service'] ?? ''))) {
                                 $matchedCost = $c['cost'];
                                 break;
                             }
                         }
-                        if (is_null($costVal)) {
-                            $costVal = $results[0]['cost'][0]['value'];
-                        }
-                        $shippingCost = $costVal;
+                        $shippingCost = $matchedCost;
                     }
                 }
             } catch (\Exception $e) {
@@ -350,8 +395,14 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // 7. Clear user cart
-            CartItem::where('cart_id', $cart->id)->delete();
+            // 7. Clear user cart if not buy now
+            if (!$isBuyNow && $cart) {
+                CartItem::where('cart_id', $cart->id)->delete();
+            }
+            
+            if ($isBuyNow) {
+                session()->forget('buy_now');
+            }
 
             // Log activity
             try {

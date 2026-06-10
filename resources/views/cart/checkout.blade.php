@@ -123,6 +123,10 @@
           }">
         @csrf
         
+        @if(isset($isBuyNow) && $isBuyNow)
+            <input type="hidden" name="is_buy_now" value="1" />
+        @endif
+        
         <input type="hidden" name="address_id" :value="addressId" />
         <input type="hidden" name="courier" :value="selectedCourier" />
         <input type="hidden" name="courier_service" :value="selectedService" />
@@ -388,7 +392,15 @@
             <!-- Right Side: Order Summary & Coupon -->
             <div class="space-y-6 lg:sticky lg:top-32">
                 <div class="bg-cream-50 border border-walnut-800/10 p-8 space-y-8">
-                    <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950 pb-6 border-b border-walnut-800/10">Ringkasan</h3>
+                    <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950 pb-6 border-b border-walnut-800/10">
+                        Ringkasan
+                        @if(isset($isBuyNow) && $isBuyNow)
+                            <div class="mt-2 flex items-center justify-between bg-gold-500/10 border border-gold-500/30 p-2 text-[0.6rem] tracking-widest font-bold text-gold-600">
+                                <span>PEMBELIAN LANGSUNG</span>
+                                <a href="{{ route('checkout.cancelBuyNow') }}" class="hover:text-red-600 transition">BATAL</a>
+                            </div>
+                        @endif
+                    </h3>
                     
                     <div class="space-y-4">
                         @foreach($cartItems as $item)

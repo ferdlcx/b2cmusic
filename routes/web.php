@@ -97,6 +97,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Checkout Routes
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::get('/checkout/cancel-buy-now', [CheckoutController::class, 'cancelBuyNow'])->name('checkout.cancelBuyNow');
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::post('/checkout/shipping-cost', [CheckoutController::class, 'calculateShipping'])->name('checkout.shippingCost');
 

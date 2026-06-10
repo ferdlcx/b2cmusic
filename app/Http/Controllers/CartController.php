@@ -47,6 +47,15 @@ class CartController extends Controller
             return back()->with('error', 'Stok produk tidak mencukupi.');
         }
 
+        if ($request->input('action') === 'buy_now') {
+            session(['buy_now' => [
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+                'price' => $product->price
+            ]]);
+            return redirect()->route('checkout.index');
+        }
+
         $cart = $this->getUserCart();
 
         // Check if item already exists in cart
@@ -70,10 +79,6 @@ class CartController extends Controller
                 'price' => $product->price,
                 'quantity' => $request->quantity,
             ]);
-        }
-
-        if ($request->input('action') === 'buy_now') {
-            return redirect()->route('checkout.index');
         }
 
         return redirect()->route('cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang belanja.');

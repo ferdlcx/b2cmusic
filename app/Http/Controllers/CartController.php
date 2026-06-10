@@ -103,8 +103,12 @@ class CartController extends Controller
 
     public function destroy($id)
     {
-        $cartItem = CartItem::findOrFail($id);
+        $cartItem = CartItem::find($id);
         
+        if (!$cartItem) {
+            return back();
+        }
+
         $cart = $this->getUserCart();
         if ($cartItem->cart_id !== $cart->id) {
             abort(403);

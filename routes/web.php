@@ -86,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/cart/add', [CartController::class, 'store'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
+    Route::get('/cart/remove/{id}', function() { return redirect()->route('cart.index'); }); // Fallback for GET request
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
     // Wishlist Routes

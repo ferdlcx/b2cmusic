@@ -20,8 +20,32 @@ class TrackingController extends Controller
 
         $checkpoints = [];
 
-        if ($order->shipment) {
-            $checkpoints = $this->generateMockCheckpoints($order);
+        if ($order->biteship_order_id) {
+            $apiKey = env('BITESHIP_API_KEY');
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                    'Authorization' => $apiKey
+                ])->get("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+
+                if ($response->successful()) {
+                    $biteshipData = $response->json();
+                    if (!empty($biteshipData['courier']['history'])) {
+                        foreach ($biteshipData['courier']['history'] as $history) {
+                            $checkpoints[] = [
+                                'status' => ucfirst(str_replace('_', ' ', $history['status'])),
+                                'description' => $history['note'],
+                                'location' => 'Biteship Update',
+                                'lat' => null,
+                                'lng' => null,
+                                'datetime' => \Carbon\Carbon::parse($history['updated_at'])->format('d M Y, H:i') . ' WIB',
+                                'completed' => true,
+                            ];
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // fallback to dummy data if API fails
+            }
         }
 
         // Fallback to dummy data if no history from Biteship or no biteship_order_id

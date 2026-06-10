@@ -75,6 +75,9 @@ class OrderController extends Controller
                     $user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
                     DB::commit();
                     
+                    // Trigger Biteship API
+                    $this->processBiteshipOrder($order);
+                    
                     try {
                         \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\InvoiceMail($order));
                     } catch (\Exception $e) {
@@ -207,6 +210,10 @@ class OrderController extends Controller
             DB::commit();
             Log::info("Order {$order->order_code} updated successfully via Webhook to: {$orderStatus}");
             
+            if ($orderStatus === 'paid') {
+                $this->processBiteshipOrder($order);
+            }
+            
             try {
                 \App\Models\ActivityLog::create([
                     'user_id' => $order->user_id,
@@ -274,6 +281,101 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    protected function processBiteshipOrder($order)
+    {
+        if ($order->biteship_order_id) return; // already processed
+
+        $apiKey = env('BITESHIP_API_KEY');
+        if (!$apiKey) return;
+
+        $address = \App\Models\Address::find($order->shipping_address_id);
+        if (!$address) return;
+
+        $items = [];
+        $totalWeight = 0;
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            $weight = $product ? ($product->weight ?: 1000) : 1000;
+            $totalWeight += $weight * $item->quantity;
+            $items[] = [
+                'name' => mb_substr($product ? $product->name : 'Item', 0, 40),
+                'value' => (int) $item->price,
+                'quantity' => (int) $item->quantity,
+                'weight' => (int) $weight
+            ];
+        }
+
+        $courierCompany = strtolower($order->courier_company ?: 'jne');
+        $courierType = strtolower($order->courier_type ?: 'reg');
+
+        $payload = [
+            'shipper_contact_name' => env('MAIL_FROM_NAME', 'DjudasMS Official'),
+            'shipper_contact_phone' => '08123456789',
+            'shipper_organization' => 'DjudasMS',
+            'origin_contact_name' => 'Admin DjudasMS',
+            'origin_contact_phone' => '08123456789',
+            'origin_address' => 'Toko DjudasMS',
+            'origin_postal_code' => (int) env('BITESHIP_ORIGIN_POSTAL_CODE', 17464),
+            'destination_contact_name' => mb_substr($address->name, 0, 50),
+            'destination_contact_phone' => mb_substr($address->phone, 0, 20),
+            'destination_address' => mb_substr($address->address, 0, 200),
+            'destination_postal_code' => (int) $address->postal_code,
+            'courier_company' => $courierCompany,
+            'courier_type' => $courierType,
+            'delivery_type' => 'now',
+            'items' => $items
+        ];
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(10)->withHeaders([
+                'Authorization' => $apiKey,
+                'Content-Type' => 'application/json'
+            ])->post('https://api.biteship.com/v1/orders', $payload);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $order->update([
+                    'biteship_order_id' => $data['id'] ?? null,
+                    'waybill_id' => $data['courier']['waybill_id'] ?? null,
+                    'tracking_id' => $data['courier']['tracking_id'] ?? null,
+                ]);
+
+                if ($order->shipment) {
+                    $order->shipment->update([
+                        'tracking_number' => $data['courier']['waybill_id'] ?? null,
+                        'status' => 'processing'
+                    ]);
+                }
+            } else {
+                Log::error('Biteship create order failed', ['res' => $response->json(), 'payload' => $payload]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Biteship exception: ' . $e->getMessage());
+        }
+    }
+
+    public function getBiteshipTracking($id)
+    {
+        $order = Order::findOrFail($id);
+        if (!$order->biteship_order_id) {
+            return response()->json(['success' => false, 'message' => 'No tracking available']);
+        }
+
+        $apiKey = env('BITESHIP_API_KEY');
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                'Authorization' => $apiKey
+            ])->get("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'data' => $response->json()]);
+            }
+            return response()->json(['success' => false, 'message' => 'Failed to fetch tracking']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 }

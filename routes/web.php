@@ -107,6 +107,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/order/{id}/check-status', [OrderController::class, 'checkStatus'])->name('orders.checkStatus');
     Route::get('/order/{order_code}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
     Route::get('/order/{id}/track', [TrackingController::class, 'track'])->name('orders.track');
+    Route::get('/order/{id}/biteship-track', [OrderController::class, 'getBiteshipTracking'])->name('orders.biteshipTrack');
     Route::post('/order/{id}/delivered', [TrackingController::class, 'simulateDelivery'])->name('orders.delivered');
     Route::post('/order/{id}/sandbox-arrive', [TrackingController::class, 'sandboxArrive'])->name('orders.sandboxArrive');
     Route::post('/order/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

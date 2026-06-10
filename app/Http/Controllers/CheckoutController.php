@@ -117,6 +117,7 @@ class CheckoutController extends Controller
             'new_address_area_id' => ['required_without:address_id', 'nullable', 'string'],
             'new_address_postal_code' => ['required_without:address_id', 'nullable', 'string'],
             'courier' => ['required', 'string'],
+            'courier_service' => ['nullable', 'string'],
             'payment_method' => ['required', 'in:va,ewallet,credit_card,qris'],
             'coupon_code' => ['nullable', 'string', 'exists:coupons,code'],
         ]);
@@ -243,6 +244,8 @@ class CheckoutController extends Controller
                 'discount' => $discount,
                 'total' => $total,
                 'status' => 'pending',
+                'courier_company' => $selectedCourier,
+                'courier_type' => strtolower($request->courier_service ?: 'reg'),
             ]);
 
             // 2. Create Order Items & Deduct Stock

@@ -139,25 +139,52 @@ class BiteshipController extends Controller
             // Fallback for Demo/Testing if API limit or balance runs out
             $errorJson = $response->json();
             if (isset($errorJson['error']) && str_contains(strtolower($errorJson['error']), 'balance')) {
+                // Skenario Mock Pintar untuk Ujian:
+                // Mengekstrak ID Provinsi dari 'IDNP{X}IDNC...'
+                $destAreaId = $request->destination_area_id;
+                $provId = 3; // Default Jakarta
+                if (preg_match('/IDNP(\d+)/', $destAreaId, $matches)) {
+                    $provId = (int)$matches[1];
+                }
+                
+                // Tarif dasar per KG (Origin: Jakarta Selatan)
+                $basePricePerKg = 15000; // Default area Jawa
+                
+                if (in_array($provId, [1, 2, 5, 6, 7, 8, 31, 32])) {
+                    $basePricePerKg = 35000; // Sumatera
+                } elseif (in_array($provId, [13, 14, 15, 16, 17])) {
+                    $basePricePerKg = 45000; // Kalimantan
+                } elseif (in_array($provId, [20, 21, 22, 23, 24, 25])) {
+                    $basePricePerKg = 55000; // Sulawesi
+                } elseif (in_array($provId, [33, 34, 35, 36, 37, 38])) {
+                    $basePricePerKg = 90000; // Papua & Maluku
+                }
+                
+                // Hitung berat aktual (pembulatan ke atas per 1000 gram)
+                $weightKg = ceil($request->weight / 1000);
+                if ($weightKg < 1) $weightKg = 1;
+                
+                $totalBasePrice = $basePricePerKg * $weightKg;
+
                 // Mock rates for demonstration
                 $formattedCosts = [
                     [
                         'service' => 'JNE - REG',
                         'description' => 'Layanan Reguler (Mock Test Mode)',
-                        'cost' => 15000 + ($request->weight > 1000 ? 5000 : 0),
-                        'etd' => '2-3 days'
+                        'cost' => $totalBasePrice,
+                        'etd' => ($provId == 3 ? '1-2' : '3-5') . ' days'
                     ],
                     [
                         'service' => 'JNT - EZ',
                         'description' => 'Regular Service (Mock Test Mode)',
-                        'cost' => 17000 + ($request->weight > 1000 ? 4000 : 0),
-                        'etd' => '2-4 days'
+                        'cost' => $totalBasePrice + 2000, // Sedikit lebih mahal untuk variasi
+                        'etd' => ($provId == 3 ? '1-2' : '2-4') . ' days'
                     ],
                     [
                         'service' => 'SICEPAT - REG',
                         'description' => 'Sicepat Reguler (Mock Test Mode)',
-                        'cost' => 16500 + ($request->weight > 1000 ? 4500 : 0),
-                        'etd' => '1-3 days'
+                        'cost' => $totalBasePrice + 1000,
+                        'etd' => ($provId == 3 ? '1' : '2-3') . ' days'
                     ]
                 ];
                 return response()->json(['costs' => $formattedCosts]);

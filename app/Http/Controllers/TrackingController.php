@@ -138,6 +138,12 @@ class TrackingController extends Controller
                 'status' => 'delivered',
             ]);
         }
+        
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OrderCompletedMail($order));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim OrderCompletedMail: ' . $e->getMessage());
+        }
 
         try {
             ActivityLog::create([
@@ -168,6 +174,12 @@ class TrackingController extends Controller
                 'status' => 'delivered',
                 'delivered_at' => now(),
             ]);
+        }
+        
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OrderArrivedMail($order));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengirim OrderArrivedMail: ' . $e->getMessage());
         }
 
         try {

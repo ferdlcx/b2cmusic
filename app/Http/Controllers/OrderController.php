@@ -74,6 +74,12 @@ class OrderController extends Controller
                     ]);
                     $user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
                     DB::commit();
+                    
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\InvoiceMail($order));
+                    } catch (\Exception $e) {
+                        Log::error('Gagal mengirim InvoiceMail: ' . $e->getMessage());
+                    }
 
                     return back()->with('success', 'Pembayaran berhasil dikonfirmasi dari Midtrans! Pesanan Anda kini sedang diproses.');
                 } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
@@ -181,6 +187,12 @@ class OrderController extends Controller
 
             if ($orderStatus === 'paid') {
                 $order->user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
+                
+                try {
+                    \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\InvoiceMail($order));
+                } catch (\Exception $e) {
+                    Log::error('Gagal mengirim InvoiceMail webhook: ' . $e->getMessage());
+                }
             }
 
             // Update Payment

@@ -79,9 +79,8 @@ class RajaOngkirController extends Controller
 
         try {
             foreach ($couriers as $courier) {
-                $response = Http::withHeaders([
+                $response = Http::asForm()->withHeaders([
                     'key' => $this->apiKey,
-                    'Content-Type' => 'application/json'
                 ])->post("{$this->baseUrl}/calculate/domestic-cost", [
                     'origin' => (int)$originSubdistrictId,
                     'destination' => (int)$request->destination_area_id,

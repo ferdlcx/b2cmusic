@@ -1,9 +1,18 @@
 <?php
 $key = '1oKzkr5Qf967fe03de1d601bxUErSPD8';
-$url = 'https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search=mengwi';
+$url = 'https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost';
+$data = json_encode([
+    'origin' => 17464,
+    'destination' => 26693, // Mengwi
+    'weight' => 1000,
+    'courier' => 'jne'
+]);
+
 $options = [
     'http' => [
-        'header' => "key: $key\r\n"
+        'method' => 'POST',
+        'header' => "key: $key\r\nContent-Type: application/json\r\n",
+        'content' => $data
     ]
 ];
 $context = stream_context_create($options);

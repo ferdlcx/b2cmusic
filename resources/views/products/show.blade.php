@@ -36,8 +36,8 @@
         <!-- Left: Images Gallery & Video -->
         <div class="lg:col-span-7 space-y-6">
             <!-- Main Image Frame with zoom-on-hover -->
-            <div class="bg-cream-50 flex items-center justify-center min-h-[450px] md:min-h-[600px] border border-walnut-800/5">
-                <img :src="activeImage" alt="{{ $product->name }}" class="w-full max-h-[700px] object-contain mix-blend-multiply transition-transform duration-700 hover:scale-105" />
+            <div class="bg-cream-50 flex items-center justify-center h-[450px] md:h-[600px] border border-walnut-800/5 overflow-hidden">
+                <img :src="activeImage" alt="{{ $product->name }}" class="w-full h-full object-contain p-8 mix-blend-multiply transition-transform duration-700 hover:scale-105" />
             </div>
 
             <!-- Gallery Images (Alpine switcher) -->

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['order_id', 'courier', 'service', 'tracking_number', 'shipping_cost', 'status', 'shipped_at', 'delivered_at'])]
+#[Fillable(['order_id', 'courier', 'service', 'tracking_number', 'biteship_order_id', 'shipping_cost', 'status', 'shipped_at', 'delivered_at'])]
 class Shipment extends Model
 {
     protected $casts = [

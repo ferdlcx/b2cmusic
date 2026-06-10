@@ -10,6 +10,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RajaOngkirController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\ReviewController;
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/order/{order_code}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
     Route::get('/order/{id}/track', [TrackingController::class, 'track'])->name('orders.track');
     Route::post('/order/{id}/delivered', [TrackingController::class, 'simulateDelivery'])->name('orders.delivered');
+    Route::post('/order/{id}/sandbox-arrive', [TrackingController::class, 'sandboxArrive'])->name('orders.sandboxArrive');
     Route::post('/order/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     // Review Routes
@@ -124,8 +126,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profile/address/{address}', [ProfileController::class, 'updateAddress'])->name('profile.address.update');
     Route::delete('/profile/address/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
     Route::post('/profile/address/{address}/default', [ProfileController::class, 'setDefaultAddress'])->name('profile.address.default');
-    Route::get('/api/provinces', [ProfileController::class, 'getProvinces'])->name('api.provinces');
-    Route::get('/api/cities', [ProfileController::class, 'getCities'])->name('api.cities');
+    
+    // Biteship API
+    Route::get('/api/biteship/search-area', [App\Http\Controllers\BiteshipController::class, 'searchArea'])->name('api.biteship.search');
+    Route::post('/api/biteship/rates', [App\Http\Controllers\BiteshipController::class, 'getRates'])->name('api.biteship.rates');
 
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

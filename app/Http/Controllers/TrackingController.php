@@ -18,21 +18,108 @@ class TrackingController extends Controller
             return back()->with('error', 'Pesanan ini belum bisa dilacak.');
         }
 
-        // Store Origin (Jakarta Barat)
-        $originLat = -6.1683;
-        $originLng = 106.7588;
+        $checkpoints = [];
 
-        // Customer Destination
-        $destLat = $order->address->latitude ?? null;
-        $destLng = $order->address->longitude ?? null;
+        if ($order->shipment && $order->shipment->biteship_order_id) {
+            $biteshipController = new BiteshipController();
+            $trackingData = $biteshipController->getTracking($order->shipment->biteship_order_id);
 
-        // If no precise coords, use center of Indonesia as fallback
-        if (!$destLat || !$destLng) {
-            $destLat = -0.7893;
-            $destLng = 113.9213;
+            if ($trackingData && isset($trackingData['courier']['history'])) {
+                $historyCount = count($trackingData['courier']['history']);
+                $originLat = -6.1684;
+                $originLng = 106.7588;
+                $destLat = $order->address->latitude ?? -6.9175;
+                $destLng = $order->address->longitude ?? 107.6191;
+
+                foreach ($trackingData['courier']['history'] as $index => $history) {
+                    $datetime = \Carbon\Carbon::parse($history['updated_at'])->format('d M Y, H:i');
+                    
+                    // Generate dummy coordinates along the path from origin to destination
+                    $fraction = $historyCount > 1 ? ($index / ($historyCount - 1)) : 0.5;
+                    $currentLat = $originLat + (($destLat - $originLat) * $fraction);
+                    $currentLng = $originLng + (($destLng - $originLng) * $fraction);
+
+                    $checkpoints[] = [
+                        'status' => strtoupper($history['status']),
+                        'description' => $history['note'],
+                        'location' => 'Biteship Tracking',
+                        'lat' => $currentLat,
+                        'lng' => $currentLng,
+                        'datetime' => $datetime . ' WIB',
+                        'completed' => true,
+                    ];
+                }
+            }
         }
 
-        return view('orders.tracking', compact('order', 'originLat', 'originLng', 'destLat', 'destLng'));
+        // Fallback to dummy data if no history from Biteship or no biteship_order_id
+        if (empty($checkpoints)) {
+            // Determine destination city from order address
+            $destinationCity = $order->address ? $order->address->city : 'Kota Tujuan';
+
+            // Base checkpoints for all orders that have been shipped
+            if (in_array($order->status, ['processing', 'shipped', 'completed'])) {
+            $baseDate = $order->shipment->shipped_at ?? $order->created_at;
+
+            $checkpoints[] = [
+                'status' => 'Pesanan Diproses',
+                'description' => 'Pesanan Anda sedang dikemas di gudang DjudasMS Jakarta',
+                'location' => 'Gudang DjudasMS, Jakarta Barat',
+                'lat' => -6.1684,
+                'lng' => 106.7588,
+                'datetime' => $baseDate->format('d M Y, H:i') . ' WIB',
+                'completed' => true,
+            ];
+
+            $checkpoints[] = [
+                'status' => 'Diserahkan ke Kurir',
+                'description' => 'Paket telah diserahkan ke ' . ($order->shipment->courier ?? 'Kurir'),
+                'location' => 'Drop Point ' . ($order->shipment->courier ?? 'Kurir') . ', Jakarta Barat',
+                'lat' => -6.1751,
+                'lng' => 106.7890,
+                'datetime' => $baseDate->copy()->addHours(3)->format('d M Y, H:i') . ' WIB',
+                'completed' => true,
+            ];
+        }
+
+        if (in_array($order->status, ['shipped', 'completed'])) {
+            $baseDate = $order->shipment->shipped_at ?? $order->created_at;
+
+            $checkpoints[] = [
+                'status' => 'Dalam Perjalanan',
+                'description' => 'Paket sedang dalam proses sortir di hub Jakarta',
+                'location' => 'Sorting Center Jakarta',
+                'lat' => -6.2088,
+                'lng' => 106.8456,
+                'datetime' => $baseDate->copy()->addHours(8)->format('d M Y, H:i') . ' WIB',
+                'completed' => true,
+            ];
+
+            $checkpoints[] = [
+                'status' => 'Transit Hub',
+                'description' => 'Paket sedang dalam transit menuju kota tujuan',
+                'location' => 'Hub Distribusi Regional',
+                'lat' => -6.3000,
+                'lng' => 106.9000,
+                'datetime' => $baseDate->copy()->addHours(18)->format('d M Y, H:i') . ' WIB',
+                'completed' => true,
+            ];
+        }
+
+            if ($order->shipment && $order->shipment->status === 'delivered') {
+                $checkpoints[] = [
+                    'status' => 'Terkirim',
+                    'description' => 'Paket telah diterima di alamat tujuan',
+                    'location' => $order->address->address ?? $destinationCity,
+                    'lat' => $order->address->latitude ?? -6.9210,
+                    'lng' => $order->address->longitude ?? 107.6210,
+                    'datetime' => ($order->shipment->delivered_at ?? now())->format('d M Y, H:i') . ' WIB',
+                    'completed' => true,
+                ];
+            }
+        }
+
+        return view('orders.tracking', compact('order', 'checkpoints'));
     }
 
     public function simulateDelivery($id)
@@ -65,5 +152,36 @@ class TrackingController extends Controller
         } catch (\Exception $e) {}
 
         return redirect()->route('orders.show', $order->order_code)->with('success', 'Pesanan berhasil disimulasikan sebagai Diterima. Sekarang Anda dapat memberikan ulasan produk!');
+    }
+
+    public function sandboxArrive($id)
+    {
+        $user = Auth::user();
+        $order = Order::where('user_id', $user->id)->findOrFail($id);
+
+        if ($order->status !== 'shipped') {
+            return back()->with('error', 'Hanya pesanan berstatus "Dikirim" yang dapat disimulasikan.');
+        }
+
+        if ($order->shipment) {
+            $order->shipment->update([
+                'status' => 'delivered',
+                'delivered_at' => now(),
+            ]);
+        }
+
+        try {
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'courier_arrived_simulated',
+                'model_type' => Order::class,
+                'model_id' => $order->id,
+                'description' => "Simulasi kurir sampai di tujuan untuk {$order->order_code}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        } catch (\Exception $e) {}
+
+        return redirect()->route('orders.show', $order->order_code)->with('success', 'Simulasi: Paket telah tiba di tujuan! Anda kini bisa mengonfirmasi penerimaan atau mengajukan retur.');
     }
 }

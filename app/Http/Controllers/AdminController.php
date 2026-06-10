@@ -825,6 +825,17 @@ class AdminController extends Controller
                 if ($request->status === 'shipped') {
                     $shipmentData['status'] = 'shipped';
                     $shipmentData['shipped_at'] = now();
+
+                    // Integritas dengan Biteship: Booking Kurir Sandbox
+                    if (!$shipment->biteship_order_id) {
+                        $biteshipController = new \App\Http\Controllers\BiteshipController();
+                        $biteshipResult = $biteshipController->createOrder($order);
+                        
+                        if ($biteshipResult['success']) {
+                            $shipmentData['biteship_order_id'] = $biteshipResult['biteship_order_id'];
+                            $shipmentData['tracking_number'] = $biteshipResult['waybill_id'] ?? $biteshipResult['tracking_id'] ?? 'WAITING_RESI';
+                        }
+                    }
                 } elseif ($request->status === 'completed') {
                     $shipmentData['status'] = 'delivered';
                     $shipmentData['delivered_at'] = now();

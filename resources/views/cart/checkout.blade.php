@@ -13,60 +13,93 @@
     <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form"
           x-data="{ 
               addressId: '{{ $defaultAddress ? $defaultAddress->id : '' }}',
-              courier: 'JNE_REG',
+              selectedCourier: '',
+              selectedService: '',
               paymentMethod: 'va',
               packingOption: 'standard',
               packingCost: 0,
-              shippingCost: {{ $shippingCost }},
+              shippingCost: 0,
               shippingLoading: false,
+              courierOptions: [],
               totalWeight: {{ $cartItems->sum(function($item) { return ($item->product->weight ?: 1000) * $item->quantity; }) }},
-              selectedCityId: {{ $defaultAddress ? ($defaultAddress->city_id ?: 'null') : 'null' }},
+              selectedCityId: '{{ $defaultAddress ? ($defaultAddress->area_id ?: ($defaultAddress->city_id ?: "")) : "" }}',
               couponCode: '',
               discount: 0,
               subtotal: {{ $subtotal }},
-              async calculateShipping() {
-                  if (!this.selectedCityId) return;
-                  
-                  this.shippingLoading = true;
+              areaSearchQuery: '',
+              areaSearchResults: [],
+              selectedNewAreaId: '',
+              selectedNewAreaName: '',
+              isSearchingArea: false,
+              init() {
+                  if (this.selectedCityId) {
+                      this.fetchCourierOptions();
+                  }
+              },
+              async searchArea() {
+                  if (this.areaSearchQuery.length < 3) {
+                      this.areaSearchResults = [];
+                      return;
+                  }
+                  this.isSearchingArea = true;
                   try {
-                      let res = await fetch('{{ route('checkout.shippingCost') }}', {
+                      let res = await fetch('{{ route("api.biteship.search") }}?q=' + encodeURIComponent(this.areaSearchQuery));
+                      if (res.ok) {
+                          this.areaSearchResults = await res.json();
+                      }
+                  } catch(e) {}
+                  this.isSearchingArea = false;
+              },
+              selectArea(area) {
+                  this.selectedNewAreaId = area.id;
+                  this.selectedNewAreaName = area.text;
+                  this.areaSearchQuery = area.text;
+                  this.areaSearchResults = [];
+                  this.selectedCityId = area.id; // use selectedCityId as area_id for consistency
+                  this.fetchCourierOptions();
+              },
+              async fetchCourierOptions() {
+                  if (!this.selectedCityId) return;
+                  this.shippingLoading = true;
+                  this.courierOptions = [];
+                  this.selectedCourier = '';
+                  this.selectedService = '';
+                  this.shippingCost = 0;
+                  
+                  try {
+                      let res = await fetch('{{ route("api.biteship.rates") }}', {
                           method: 'POST',
                           headers: {
                               'Content-Type': 'application/json',
                               'X-CSRF-TOKEN': '{{ csrf_token() }}'
                           },
                           body: JSON.stringify({
-                              city_id: this.selectedCityId,
-                              weight: this.totalWeight,
-                              courier: this.courier
+                              destination_area_id: this.selectedCityId,
+                              weight: this.totalWeight
                           })
                       });
-
                       if (res.ok) {
-                          let results = await res.json();
-                          if (results && results.length > 0) {
-                              let costVal = null;
-                              let isYes = this.courier.includes('YES');
-                              for (let c of results) {
-                                  if (isYes && c.service.toUpperCase().includes('YES')) {
-                                      costVal = c.cost[0].value;
-                                      break;
-                                  } else if (!isYes && c.service.toUpperCase().includes('REG')) {
-                                      costVal = c.cost[0].value;
-                                      break;
-                                  }
-                              }
-                              if (costVal === null) {
-                                  costVal = results[0].cost[0].value;
-                              }
-                              this.shippingCost = costVal;
+                          let data = await res.json();
+                          if (data.costs) {
+                              data.costs.forEach(c => {
+                                  this.courierOptions.push({
+                                      courier: c.service.split(' - ')[0] || 'COURIER',
+                                      courier_name: c.service.split(' - ')[0] || 'COURIER',
+                                      service: c.description,
+                                      description: c.description,
+                                      cost: c.cost,
+                                      etd: c.etd
+                                  });
+                              });
                           }
                       }
-                  } catch (e) {
-                      console.error('Shipping calculate error:', e);
-                  } finally {
-                      this.shippingLoading = false;
-                  }
+                  } catch(e) { console.error(e); }
+                  this.shippingLoading = false;
+              },
+              selectCourier(option) {
+                  this.selectedCourier = option.courier;
+                  this.selectedService = option.service;
+                  this.shippingCost = option.cost;
               },
               applyCoupon() {
                   let code = this.couponCode.toUpperCase().trim();
@@ -88,7 +121,8 @@
         @csrf
         
         <input type="hidden" name="address_id" :value="addressId" />
-        <input type="hidden" name="courier" :value="courier" />
+        <input type="hidden" name="courier" :value="selectedCourier" />
+        <input type="hidden" name="courier_service" :value="selectedService" />
         <input type="hidden" name="payment_method" :value="paymentMethod" />
         <input type="hidden" name="coupon_code" :value="couponCode" />
         <input type="hidden" name="packing" :value="packingOption" />
@@ -115,15 +149,26 @@
                                 <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                             </div>
                             <textarea name="new_address_address" rows="2" placeholder="Detail Alamat" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium"></textarea>
-                            <div class="grid gap-4 sm:grid-cols-2">
-                                <input type="text" name="new_address_city" placeholder="Kota" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                <input type="text" name="new_address_province" placeholder="Provinsi" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                            <div class="relative w-full">
+                                <input type="hidden" name="new_address_area_id" x-model="selectedNewAreaId" />
+                                <input type="hidden" name="new_address_area_name" x-model="selectedNewAreaName" />
+                                
+                                <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik Kecamatan / Kodepos" 
+                                    class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                                
+                                <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
+
+                                <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
+                                    <template x-for="res in areaSearchResults" :key="res.id">
+                                        <div @click="selectArea(res)" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     @else
                         <div class="space-y-4">
                             @foreach($addresses as $addr)
-                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->city_id }}'; calculateShipping()" 
+                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->city_id }}'; fetchCourierOptions()" 
                                      :class="addressId == '{{ $addr->id }}' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'"
                                      class="flex gap-4 p-6 border cursor-pointer hover:bg-cream-50 transition duration-300">
                                     <div class="pt-0.5">
@@ -166,10 +211,21 @@
                                             <input type="text" name="new_address_postal_code" placeholder="Kode Pos" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                         </div>
                                         <textarea name="new_address_address" rows="2" placeholder="Detail Alamat" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium"></textarea>
-                                        <div class="grid gap-4 sm:grid-cols-2">
-                                            <input type="text" name="new_address_city" placeholder="Kota" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                            <input type="text" name="new_address_province" placeholder="Provinsi" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                                        </div>
+                                            <div class="relative w-full sm:col-span-2">
+                                                <input type="hidden" name="new_address_area_id" x-model="selectedNewAreaId" />
+                                                <input type="hidden" name="new_address_area_name" x-model="selectedNewAreaName" />
+                                                
+                                                <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik Kecamatan / Kodepos" 
+                                                    class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                                                
+                                                <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
+
+                                                <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
+                                                    <template x-for="res in areaSearchResults" :key="res.id">
+                                                        <div @click="selectArea(res)" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
+                                                    </template>
+                                                </div>
+                                            </div>
                                     </div>
                                 </div>
                             </div>
@@ -179,38 +235,65 @@
 
                 <!-- Courier Section -->
                 <div class="space-y-6 pt-6 border-t border-walnut-800/10">
-                    <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950 pb-4 border-b border-walnut-800/10">Layanan Logistik</h3>
-                    <div class="grid gap-4 sm:grid-cols-3">
-                        <label class="block p-5 border cursor-pointer hover:border-gold-500 transition flex items-center justify-between"
-                                :class="courier === 'JNE_REG' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" name="courier" value="JNE_REG" x-model="courier" class="text-gold-600 focus:ring-gold-500 bg-cream-50 border-walnut-800/30" @change="calculateShipping()">
-                                <div>
-                                    <span class="block text-[0.75rem] font-bold uppercase tracking-widest text-walnut-950">Reguler</span>
-                                    <span class="block text-[0.65rem] text-muted">2-3 Hari</span>
+                    <div class="flex items-center justify-between pb-4 border-b border-walnut-800/10">
+                        <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Layanan Logistik</h3>
+                        <span class="text-[0.65rem] text-muted font-bold uppercase tracking-widest" x-show="totalWeight > 0">
+                            Berat: <span x-text="totalWeight >= 1000 ? (totalWeight/1000).toFixed(1) + ' kg' : totalWeight + ' g'"></span>
+                        </span>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div x-show="shippingLoading" class="space-y-3">
+                        <template x-for="i in 3">
+                            <div class="p-5 border border-walnut-800/10 animate-pulse">
+                                <div class="flex justify-between items-center">
+                                    <div class="space-y-2">
+                                        <div class="h-3 w-24 bg-walnut-800/10"></div>
+                                        <div class="h-2 w-32 bg-walnut-800/5"></div>
+                                    </div>
+                                    <div class="h-4 w-20 bg-walnut-800/10"></div>
                                 </div>
                             </div>
-                        </label>
-                        <label class="block p-5 border cursor-pointer hover:border-gold-500 transition flex items-center justify-between"
-                                :class="courier === 'JNE_YES' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" name="courier" value="JNE_YES" x-model="courier" class="text-gold-600 focus:ring-gold-500 bg-cream-50 border-walnut-800/30" @change="calculateShipping()">
-                                <div>
-                                    <span class="block text-[0.75rem] font-bold uppercase tracking-widest text-walnut-950">Express</span>
-                                    <span class="block text-[0.65rem] text-muted">Esok Sampai</span>
+                        </template>
+                    </div>
+
+                    <!-- No Address Selected -->
+                    <div x-show="!selectedCityId && !shippingLoading" class="p-6 border border-dashed border-walnut-800/20 text-center">
+                        <p class="text-[0.75rem] text-muted font-medium">Pilih alamat pengiriman terlebih dahulu untuk melihat opsi kurir.</p>
+                    </div>
+
+                    <!-- Courier Options -->
+                    <div x-show="courierOptions.length > 0 && !shippingLoading" class="space-y-3">
+                        <template x-for="(option, idx) in courierOptions" :key="idx">
+                            <div @click="selectCourier(option)"
+                                 :class="selectedCourier === option.courier && selectedService === option.service ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20 hover:border-walnut-800/40'"
+                                 class="p-5 border cursor-pointer transition duration-300">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div :class="selectedCourier === option.courier && selectedService === option.service ? 'border-gold-500 bg-gold-500' : 'border-walnut-800/30 bg-transparent'"
+                                             class="w-4 h-4 rounded-full border flex items-center justify-center transition flex-shrink-0">
+                                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-950" x-text="option.courier"></span>
+                                                <span class="text-[0.6rem] bg-walnut-900 text-gold-500 px-2 py-0.5 font-bold uppercase tracking-wider" x-text="option.service"></span>
+                                            </div>
+                                            <span class="text-[0.65rem] text-muted font-medium block mt-1" x-text="option.description"></span>
+                                            <span class="text-[0.6rem] text-gold-600 font-bold mt-0.5 block">
+                                                Estimasi: <span x-text="option.etd"></span> hari
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="text-[0.8rem] font-black text-walnut-950 tracking-wide flex-shrink-0" x-text="'IDR ' + option.cost.toLocaleString('id-ID')"></span>
                                 </div>
                             </div>
-                        </label>
-                        <label class="block p-5 border cursor-pointer hover:border-gold-500 transition flex items-center justify-between"
-                                :class="courier === 'JNT' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'">
-                            <div class="flex items-center gap-3">
-                                <input type="radio" name="courier" value="JNT" x-model="courier" class="text-gold-600 focus:ring-gold-500 bg-cream-50 border-walnut-800/30" @change="calculateShipping()">
-                                <div>
-                                    <span class="block text-[0.75rem] font-bold uppercase tracking-widest text-walnut-950">Cargo</span>
-                                    <span class="block text-[0.65rem] text-muted">Heavy Duty</span>
-                                </div>
-                            </div>
-                        </label>
+                        </template>
+                    </div>
+
+                    <!-- No Results -->
+                    <div x-show="selectedCityId && courierOptions.length === 0 && !shippingLoading" class="p-6 border border-dashed border-red-600/30 text-center">
+                        <p class="text-[0.75rem] text-red-600 font-bold">Tidak ada layanan kurir tersedia untuk tujuan ini.</p>
                     </div>
                 </div>
 
@@ -327,7 +410,7 @@
                             <span class="text-walnut-950">IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span>Logistik</span>
+                            <span>Logistik <span x-show="selectedCourier" class="text-gold-600" x-text="'(' + selectedCourier + ' ' + selectedService + ')'"></span></span>
                             <span class="text-walnut-950" x-show="!shippingLoading">
                                 IDR <span x-text="new Intl.NumberFormat('id-ID').format(shippingCost)"></span>
                             </span>

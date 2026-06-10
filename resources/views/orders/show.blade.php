@@ -150,6 +150,63 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Sandbox Simulate Button -->
+                    @if($order->shipment->status === 'shipped')
+                    <div class="mt-8 pt-6 border-t border-walnut-800/10">
+                        <form action="{{ route('orders.sandboxArrive', $order->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" onclick="return confirm('Simulasi: Ubah status menjadi Terkirim (Barang Sampai)?');" class="w-full py-3 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300 flex justify-center items-center gap-2">
+                                <i data-lucide="package-check" class="w-4 h-4"></i> Simulasikan Barang Sampai (Sandbox)
+                            </button>
+                        </form>
+                    </div>
+                    @endif
+                    
+                    <!-- Tracking Timeline -->
+                    <div class="mt-8 pt-6 border-t border-walnut-800/10 space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-walnut-800/20 before:to-transparent">
+                        
+                        <!-- Dikemas -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full border-4 border-cream-50 bg-gold-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10"></div>
+                            <div class="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-4 rounded bg-cream-50 border border-walnut-800/10 shadow-sm">
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+                                    <div class="font-bold text-walnut-950 text-[0.75rem] uppercase tracking-widest">Pesanan Dikemas</div>
+                                    <time class="text-[0.65rem] font-bold text-gold-600">{{ $order->created_at->format('d M, H:i') }}</time>
+                                </div>
+                                <div class="text-muted text-[0.7rem] font-medium">Penjual sedang menyiapkan pesanan Anda.</div>
+                            </div>
+                        </div>
+
+                        <!-- Dikirim -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group {{ in_array($order->shipment->status, ['shipped', 'delivered']) ? 'is-active' : 'opacity-50' }}">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full border-4 border-cream-50 {{ in_array($order->shipment->status, ['shipped', 'delivered']) ? 'bg-gold-500 text-white' : 'bg-walnut-800/30' }} shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10"></div>
+                            <div class="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-4 rounded bg-cream-50 border border-walnut-800/10 shadow-sm">
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+                                    <div class="font-bold text-walnut-950 text-[0.75rem] uppercase tracking-widest">Pesanan Dikirim</div>
+                                    @if($order->shipment->shipped_at)
+                                        <time class="text-[0.65rem] font-bold text-gold-600">{{ $order->shipment->shipped_at->format('d M, H:i') }}</time>
+                                    @endif
+                                </div>
+                                <div class="text-muted text-[0.7rem] font-medium">Pesanan telah diserahkan ke pihak logistik ({{ $order->shipment->courier }}).</div>
+                            </div>
+                        </div>
+
+                        <!-- Tiba di Tujuan -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group {{ $order->shipment->status === 'delivered' ? 'is-active' : 'opacity-50' }}">
+                            <div class="flex items-center justify-center w-6 h-6 rounded-full border-4 border-cream-50 {{ $order->shipment->status === 'delivered' ? 'bg-gold-500 text-white' : 'bg-walnut-800/30' }} shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10"></div>
+                            <div class="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-4 rounded bg-cream-50 border border-walnut-800/10 shadow-sm">
+                                <div class="flex items-center justify-between space-x-2 mb-1">
+                                    <div class="font-bold text-walnut-950 text-[0.75rem] uppercase tracking-widest">Pesanan Tiba</div>
+                                    @if($order->shipment->delivered_at)
+                                        <time class="text-[0.65rem] font-bold text-gold-600">{{ $order->shipment->delivered_at->format('d M, H:i') }}</time>
+                                    @endif
+                                </div>
+                                <div class="text-muted text-[0.7rem] font-medium">Pesanan telah diterima oleh yang bersangkutan.</div>
+                            </div>
+                        </div>
+
+                    </div>
                 @else
                     <p class="text-[0.75rem] text-muted italic font-medium">Informasi pengiriman tidak tersedia.</p>
                 @endif
@@ -277,24 +334,43 @@
             @endif
 
             @if($order->status === 'shipped')
-                <div class="pt-2 border border-walnut-800/10 p-6 bg-cream-50 mt-6">
+                <div class="pt-2 border border-walnut-800/10 p-6 bg-cream-50 mt-6 space-y-4">
+                    <p class="text-[0.65rem] text-red-600 font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i> Perhatian PENTING
+                    </p>
+                    <p class="text-[0.7rem] text-muted font-medium leading-relaxed">
+                        Pastikan paket telah Anda terima dalam kondisi baik. <strong>Tanpa melampirkan video unboxing, semua bentuk komplain atau pengajuan retur akan ditolak otomatis oleh sistem.</strong>
+                    </p>
+
                     @if($order->shipment && $order->shipment->status === 'delivered')
-                        <p class="text-[0.65rem] text-red-600 font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <i data-lucide="alert-triangle" class="w-4 h-4"></i> Perhatian PENTING
-                        </p>
-                        <p class="text-[0.7rem] text-muted font-medium mb-4 leading-relaxed">
-                            Pastikan paket telah Anda terima dalam kondisi baik. <strong>Tanpa melampirkan video unboxing, semua bentuk komplain atau pengajuan retur akan ditolak otomatis oleh sistem.</strong>
-                        </p>
-                        <form action="{{ route('orders.delivered', $order->id) }}" method="POST" onsubmit="return confirm('PENTING: Apakah Anda sudah merekam video unboxing dan yakin ingin menyelesaikan pesanan ini?');">
-                            @csrf
-                            <button type="submit" 
-                                class="w-full py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.7rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300 shadow-lg hover:shadow-xl">
-                                Pesanan Telah Diterima
-                            </button>
-                        </form>
+                        {{-- Both buttons ACTIVE --}}
+                        <div class="flex gap-4">
+                            <form action="{{ route('orders.delivered', $order->id) }}" method="POST" class="flex-1" onsubmit="return confirm('PENTING: Apakah Anda sudah merekam video unboxing dan yakin ingin menyelesaikan pesanan ini?');">
+                                @csrf
+                                <button type="submit" 
+                                    class="w-full py-4 bg-walnut-900 text-gold-500 hover:bg-gold-600 hover:text-white font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                                    Konfirmasi Pesanan Diterima
+                                </button>
+                            </form>
+                            <a href="{{ route('returns.create', $order->id) }}" 
+                                class="flex-1 flex items-center justify-center py-4 border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold uppercase text-[0.7rem] tracking-widest transition duration-300">
+                                Ajukan Pengembalian
+                            </a>
+                        </div>
                     @else
+                        {{-- Both buttons DISABLED --}}
+                        <div class="flex gap-4">
+                            <button type="button" disabled
+                                class="flex-1 py-4 bg-walnut-900/50 text-gold-500/50 font-bold uppercase text-[0.7rem] tracking-widest cursor-not-allowed pointer-events-none">
+                                Konfirmasi Pesanan Diterima
+                            </button>
+                            <button type="button" disabled
+                                class="flex-1 py-4 bg-walnut-800/10 border border-walnut-800/20 text-muted font-bold uppercase text-[0.7rem] tracking-widest cursor-not-allowed pointer-events-none">
+                                Ajukan Pengembalian
+                            </button>
+                        </div>
                         <p class="text-[0.7rem] text-muted font-medium text-center italic">
-                            Tombol konfirmasi penerimaan akan aktif setelah status pengiriman berubah menjadi "Tiba di Tujuan".
+                            Tombol akan aktif setelah status pengiriman berubah menjadi "Tiba di Tujuan".
                         </p>
                     @endif
                 </div>

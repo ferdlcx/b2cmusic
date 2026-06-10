@@ -36,7 +36,7 @@
         <!-- Left: Images Gallery & Video -->
         <div class="lg:col-span-7 space-y-6">
             <!-- Main Image Frame with zoom-on-hover -->
-            <div class="bg-cream-50 flex items-center justify-center h-[450px] md:h-[600px] border border-walnut-800/5 overflow-hidden">
+            <div class="bg-cream-50 flex items-center justify-center aspect-square w-full border border-walnut-800/5 overflow-hidden">
                 <img :src="activeImage" alt="{{ $product->name }}" class="w-full h-full object-contain p-8 mix-blend-multiply transition-transform duration-700 hover:scale-105" />
             </div>
 
@@ -255,8 +255,8 @@
             <div class="grid gap-8 md:grid-cols-3">
                 @foreach($relatedProducts as $rel)
                     <article class="group flex flex-col h-full">
-                        <a href="{{ route('products.show', $rel->slug) }}" class="block mb-4 relative overflow-hidden bg-cream-50 border border-walnut-800/5 h-[280px]">
-                            <img src="{{ $rel->primaryImage ? $rel->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $rel->name }}" class="h-full w-full object-cover mix-blend-multiply opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+                        <a href="{{ route('products.show', $rel->slug) }}" class="block mb-4 relative overflow-hidden bg-cream-50 border border-walnut-800/5 aspect-square">
+                            <img src="{{ $rel->primaryImage ? $rel->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80' }}" alt="{{ $rel->name }}" class="h-full w-full object-cover mix-blend-multiply opacity-90 transition duration-700 group-hover:opacity-100" />
                         </a>
                         <div class="space-y-2">
                             <span class="text-[0.55rem] uppercase tracking-[0.2em] text-gold-600 font-bold">{{ $rel->category->name }}</span>

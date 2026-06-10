@@ -63,8 +63,8 @@ class CheckoutController extends Controller
             'new_address_name' => ['required_without:address_id', 'nullable', 'string'],
             'new_address_phone' => ['required_without:address_id', 'nullable', 'string'],
             'new_address_address' => ['required_without:address_id', 'nullable', 'string'],
-            'new_address_city' => ['required_without:address_id', 'nullable', 'string'],
-            'new_address_province' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_area_name' => ['required_without:address_id', 'nullable', 'string'],
+            'new_address_area_id' => ['required_without:address_id', 'nullable', 'string'],
             'new_address_postal_code' => ['required_without:address_id', 'nullable', 'string'],
             'courier' => ['required', 'string'],
             'payment_method' => ['required', 'in:va,ewallet,credit_card,qris'],
@@ -81,8 +81,9 @@ class CheckoutController extends Controller
                 'name' => $request->new_address_name,
                 'phone' => $request->new_address_phone,
                 'address' => $request->new_address_address,
-                'city' => $request->new_address_city,
-                'province' => $request->new_address_province,
+                'city' => explode(',', $request->new_address_area_name)[0] ?? 'Unknown',
+                'province' => explode(',', $request->new_address_area_name)[2] ?? 'Unknown',
+                'area_id' => $request->new_address_area_id,
                 'postal_code' => $request->new_address_postal_code,
                 'is_default' => Address::where('user_id', $user->id)->count() === 0,
             ]);
@@ -385,44 +386,5 @@ class CheckoutController extends Controller
         }
     }
 
-    public function calculateShipping(Request $request)
-    {
-        $request->validate([
-            'city_id' => 'required|integer',
-            'weight' => 'required|integer',
-            'courier' => 'required|string'
-        ]);
 
-        $apiKey = config('services.rajaongkir.api_key');
-        $originCity = config('services.rajaongkir.origin_city_id', 152);
-
-        if (!$apiKey) {
-            return response()->json(['error' => 'API Key not configured'], 500);
-        }
-
-        try {
-            $selectedCourier = 'jne';
-            if (str_contains(strtolower($request->courier), 'pos')) {
-                $selectedCourier = 'pos';
-            } elseif (str_contains(strtolower($request->courier), 'jnt')) {
-                $selectedCourier = 'tiki';
-            }
-
-            $response = Http::withoutVerifying()->timeout(5)->withHeaders([
-                'key' => $apiKey
-            ])->post('https://api.rajaongkir.com/starter/cost', [
-                'origin' => (int) $originCity,
-                'destination' => (int) $request->city_id,
-                'weight' => (int) $request->weight,
-                'courier' => $selectedCourier
-            ]);
-            
-            if ($response->successful()) {
-                return response()->json($response->json('rajaongkir.results.0.costs'));
-            }
-            return response()->json(['error' => 'RajaOngkir API Error: ' . $response->body()], 500);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
 }

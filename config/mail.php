@@ -61,6 +61,10 @@ return [
             // ],
         ],
 
+        'sendgrid' => [
+            'transport' => 'sendgrid',
+        ],
+
         'resend' => [
             'transport' => 'resend',
         ],

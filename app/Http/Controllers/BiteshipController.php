@@ -54,6 +54,27 @@ class BiteshipController extends Controller
                 return response()->json($formatted);
             }
 
+            // Fallback for Demo if Biteship limits/balance is reached
+            $errorJson = $response->json();
+            if (isset($errorJson['error']) && str_contains(strtolower($errorJson['error']), 'balance')) {
+                return response()->json([
+                    [
+                        'id' => 'IDNP3IDNC131IDND1489IDZ12440',
+                        'text' => strtoupper($search) . ' (Mock Area), Jakarta Selatan, DKI Jakarta - 12920',
+                        'postal_code' => '12920',
+                        'city' => 'Jakarta Selatan',
+                        'province' => 'DKI Jakarta'
+                    ],
+                    [
+                        'id' => 'IDNP10IDNC201IDND1234IDZ55281',
+                        'text' => strtoupper($search) . ' (Mock Area 2), Sleman, DI Yogyakarta - 55281',
+                        'postal_code' => '55281',
+                        'city' => 'Sleman',
+                        'province' => 'DI Yogyakarta'
+                    ]
+                ]);
+            }
+
             return response()->json([]);
         } catch (\Exception $e) {
             return response()->json([]);

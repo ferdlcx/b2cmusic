@@ -20,36 +20,8 @@ class TrackingController extends Controller
 
         $checkpoints = [];
 
-        if ($order->shipment && $order->shipment->biteship_order_id) {
-            $biteshipController = new BiteshipController();
-            $trackingData = $biteshipController->getTracking($order->shipment->biteship_order_id);
-
-            if ($trackingData && isset($trackingData['courier']['history'])) {
-                $historyCount = count($trackingData['courier']['history']);
-                $originLat = -6.1684;
-                $originLng = 106.7588;
-                $destLat = $order->address->latitude ?? -6.9175;
-                $destLng = $order->address->longitude ?? 107.6191;
-
-                foreach ($trackingData['courier']['history'] as $index => $history) {
-                    $datetime = \Carbon\Carbon::parse($history['updated_at'])->format('d M Y, H:i');
-                    
-                    // Generate dummy coordinates along the path from origin to destination
-                    $fraction = $historyCount > 1 ? ($index / ($historyCount - 1)) : 0.5;
-                    $currentLat = $originLat + (($destLat - $originLat) * $fraction);
-                    $currentLng = $originLng + (($destLng - $originLng) * $fraction);
-
-                    $checkpoints[] = [
-                        'status' => strtoupper($history['status']),
-                        'description' => $history['note'],
-                        'location' => 'Biteship Tracking',
-                        'lat' => $currentLat,
-                        'lng' => $currentLng,
-                        'datetime' => $datetime . ' WIB',
-                        'completed' => true,
-                    ];
-                }
-            }
+        if ($order->shipment) {
+            $checkpoints = $this->generateMockCheckpoints($order);
         }
 
         // Fallback to dummy data if no history from Biteship or no biteship_order_id

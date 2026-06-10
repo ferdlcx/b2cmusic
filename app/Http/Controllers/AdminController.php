@@ -826,15 +826,9 @@ class AdminController extends Controller
                     $shipmentData['status'] = 'shipped';
                     $shipmentData['shipped_at'] = now();
 
-                    // Integritas dengan Biteship: Booking Kurir Sandbox
-                    if (!$shipment->biteship_order_id) {
-                        $biteshipController = new \App\Http\Controllers\BiteshipController();
-                        $biteshipResult = $biteshipController->createOrder($order);
-                        
-                        if ($biteshipResult['success']) {
-                            $shipmentData['biteship_order_id'] = $biteshipResult['biteship_order_id'];
-                            $shipmentData['tracking_number'] = $biteshipResult['waybill_id'] ?? $biteshipResult['tracking_id'] ?? 'WAITING_RESI';
-                        }
+                    // Mock tracking number for RajaOngkir V2 since booking API is not available
+                    if (!$shipment->tracking_number || $shipment->tracking_number == 'WAITING_RESI') {
+                        $shipmentData['tracking_number'] = 'RAJA' . rand(1000000000, 9999999999);
                     }
                 } elseif ($request->status === 'completed') {
                     $shipmentData['status'] = 'delivered';

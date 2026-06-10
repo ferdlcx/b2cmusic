@@ -127,9 +127,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile/address/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.address.destroy');
     Route::post('/profile/address/{address}/default', [ProfileController::class, 'setDefaultAddress'])->name('profile.address.default');
     
-    // Biteship API
-    Route::get('/api/biteship/search-area', [App\Http\Controllers\BiteshipController::class, 'searchArea'])->name('api.biteship.search');
-    Route::post('/api/biteship/rates', [App\Http\Controllers\BiteshipController::class, 'getRates'])->name('api.biteship.rates');
+    // RajaOngkir API (V2 Komerce)
+    Route::get('/api/rajaongkir/search-area', [App\Http\Controllers\RajaOngkirController::class, 'searchArea'])->name('api.rajaongkir.search');
+    Route::post('/api/rajaongkir/rates', [App\Http\Controllers\RajaOngkirController::class, 'getRates'])->name('api.rajaongkir.rates');
 
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -183,6 +183,9 @@ $adminRoutes = function () {
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::post('/orders/{id}/arrive', [AdminController::class, 'simulateCourierArrived'])->name('orders.arrive');
+    Route::get('/admin/orders/{id}/shipping', [App\Http\Controllers\AdminController::class, 'manageShipping'])->name('admin.orders.shipping');
+    Route::post('/admin/orders/{id}/ship', [App\Http\Controllers\AdminController::class, 'shipOrder'])->name('admin.orders.ship');
+    Route::post('/admin/orders/{id}/force-delivered', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('admin.orders.force_delivered');
 
     // --- SUPER ADMIN ONLY FEATURES ---
     Route::middleware('super_admin')->group(function () {

@@ -103,38 +103,34 @@ class CheckoutController extends Controller
 
         // Calculate shipping cost using RajaOngkir cost API if key is set
         $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default fallback
-        $apiKey = config('services.rajaongkir.api_key');
-        $originCity = config('services.rajaongkir.origin_city_id', 152); // default Jakarta Barat
+        $apiKey = env('RAJAONGKIR_API_KEY', config('services.rajaongkir.api_key'));
+        $originCity = env('RAJAONGKIR_ORIGIN_ID', 17464); // default Kebayoran Lama subdistrict
         
-        $selectedCourier = 'jne';
-        if (str_contains(strtolower($request->courier), 'pos')) {
-            $selectedCourier = 'pos';
-        } elseif (str_contains(strtolower($request->courier), 'jnt')) {
-            $selectedCourier = 'tiki'; // Starter API only supports jne, pos, tiki
+        $selectedCourier = explode('_', strtolower($request->courier))[0] ?? 'jne';
+        if (!in_array($selectedCourier, ['jne', 'pos', 'tiki'])) {
+            $selectedCourier = 'jne'; // fallback if invalid
         }
 
-        if ($apiKey && $address->city_id) {
+        if ($apiKey && $address->area_id) {
             try {
                 $response = Http::withoutVerifying()->timeout(5)->withHeaders([
-                    'key' => $apiKey
-                ])->post('https://api.rajaongkir.com/starter/cost', [
+                    'key' => $apiKey,
+                    'Content-Type' => 'application/json'
+                ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
                     'origin' => (int) $originCity,
-                    'destination' => (int) $address->city_id,
-                    'weight' => (int) $totalWeight,
+                    'destination' => (int) $address->area_id,
+                    'weight' => (int) ceil($totalWeight),
                     'courier' => $selectedCourier
                 ]);
                 
                 if ($response->successful()) {
-                    $results = $response->json('rajaongkir.results.0.costs');
-                    if ($results && count($results) > 0) {
-                        $costVal = null;
-                        $isYes = str_contains(strtoupper($request->courier), 'YES');
-                        foreach ($results as $c) {
-                            if ($isYes && str_contains(strtoupper($c['service']), 'YES')) {
-                                $costVal = $c['cost'][0]['value'];
-                                break;
-                            } elseif (!$isYes && str_contains(strtoupper($c['service']), 'REG')) {
-                                $costVal = $c['cost'][0]['value'];
+                    $results = $response->json()['data'] ?? [];
+                    if (!empty($results) && !empty($results[0]['costs'])) {
+                        // Find the matching service cost, or use the first one
+                        $matchedCost = $results[0]['costs'][0]['cost'];
+                        foreach ($results[0]['costs'] as $c) {
+                            if (str_contains(strtolower($request->courier), strtolower($c['service']))) {
+                                $matchedCost = $c['cost'];
                                 break;
                             }
                         }

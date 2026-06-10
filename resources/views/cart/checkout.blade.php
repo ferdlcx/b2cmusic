@@ -43,7 +43,7 @@
                   }
                   this.isSearchingArea = true;
                   try {
-                      let res = await fetch('{{ route("api.biteship.search") }}?q=' + encodeURIComponent(this.areaSearchQuery));
+                      let res = await fetch('{{ route("api.rajaongkir.search") }}?q=' + encodeURIComponent(this.areaSearchQuery));
                       if (res.ok) {
                           this.areaSearchResults = await res.json();
                       }
@@ -70,7 +70,7 @@
                   this.shippingCost = 0;
                   
                   try {
-                      let res = await fetch('{{ route("api.biteship.rates") }}', {
+                      let res = await fetch('{{ route("api.rajaongkir.rates") }}', {
                           method: 'POST',
                           headers: {
                               'Content-Type': 'application/json',

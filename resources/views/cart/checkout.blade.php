@@ -175,7 +175,7 @@
                     @else
                         <div class="space-y-4">
                             @foreach($addresses as $addr)
-                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->city_id }}'; fetchCourierOptions()" 
+                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->area_id ?: $addr->city_id }}'; fetchCourierOptions()" 
                                      :class="addressId == '{{ $addr->id }}' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'"
                                      class="flex gap-4 p-6 border cursor-pointer hover:bg-cream-50 transition duration-300">
                                     <div class="pt-0.5">

@@ -12,9 +12,9 @@
         activeTab: 'profile',
         showAddAddressModal: false,
         showEditAddressModal: false,
-        provinces: [],
-        cities: [],
-        rajaongkirFailed: false,
+        areaSearchQuery: '',
+        areaSearchResults: [],
+        isSearchingArea: false,
         addMap: null,
         addMarker: null,
         editMap: null,
@@ -25,9 +25,8 @@
             name: '',
             phone: '',
             address: '',
-            province_id: '',
             province: '',
-            city_id: '',
+            area_id: '',
             city: '',
             district: '',
             village: '',
@@ -36,52 +35,37 @@
             longitude: '',
             is_default: false
         },
-        async init() {
+        async searchArea() {
+            if (this.areaSearchQuery.length < 3) {
+                this.areaSearchResults = [];
+                return;
+            }
+            this.isSearchingArea = true;
             try {
-                let res = await fetch('{{ route('api.provinces') }}');
+                let res = await fetch('/api/rajaongkir/search-area?q=' + encodeURIComponent(this.areaSearchQuery));
                 if (res.ok) {
-                    let data = await res.json();
-                    if (data && data.length > 0) {
-                        this.provinces = data;
-                        this.rajaongkirFailed = false;
-                    } else {
-                        this.rajaongkirFailed = true;
-                    }
-                } else {
-                    this.rajaongkirFailed = true;
+                    this.areaSearchResults = await res.json();
                 }
-            } catch (err) {
-                this.rajaongkirFailed = true;
-            }
+            } catch(e) {}
+            this.isSearchingArea = false;
         },
-        async handleProvinceChange(e, type) {
-            let pId = e.target.value;
-            let provinceObj = this.provinces.find(p => p.province_id == pId);
-            let pName = provinceObj ? provinceObj.province : '';
-            
-            if (type !== 'add') {
-                this.editAddressData.province = pName;
-                this.editAddressData.city_id = '';
-                this.editAddressData.city = '';
+        selectArea(area, type) {
+            if (type === 'add') {
+                this.areaSearchQuery = area.text;
+                document.getElementById('add-city-id').value = area.id;
+                document.getElementById('add-city').value = area.city;
+                document.getElementById('add-province').value = area.province;
+                document.getElementById('add-postal').value = area.postal_code;
+                document.getElementById('add-district').value = '';
+            } else {
+                this.areaSearchQuery = area.text;
+                this.editAddressData.area_id = area.id;
+                this.editAddressData.city = area.city;
+                this.editAddressData.province = area.province;
+                this.editAddressData.postal_code = area.postal_code;
+                this.editAddressData.district = '';
             }
-            
-            this.cities = [];
-            if (pId) {
-                try {
-                    let res = await fetch(`{{ route('api.cities') }}?province_id=${pId}`);
-                    if (res.ok) {
-                        this.cities = await res.json();
-                    }
-                } catch (err) {}
-            }
-        },
-        handleCityChange(e, type) {
-            let cId = e.target.value;
-            let cityObj = this.cities.find(c => c.city_id == cId);
-            let cityName = cityObj ? `${cityObj.type} ${cityObj.city_name}` : '';
-            if (type === 'edit') {
-                this.editAddressData.city = cityName;
-            }
+            this.areaSearchResults = [];
         },
         initMap(type) {
             this.$nextTick(() => {
@@ -145,9 +129,8 @@
                 name: addr.name,
                 phone: addr.phone,
                 address: addr.address,
-                province_id: addr.province_id || '',
                 province: addr.province || '',
-                city_id: addr.city_id || '',
+                area_id: addr.area_id || addr.city_id || '',
                 city: addr.city || '',
                 district: addr.district || '',
                 village: addr.village || '',
@@ -157,17 +140,9 @@
                 is_default: addr.is_default
             };
             
+            this.areaSearchQuery = addr.city || ''; // Init search field with current city
             this.showEditAddressModal = true;
             this.initMap('edit');
-            
-            if (addr.province_id) {
-                try {
-                    let res = await fetch(`{{ route('api.cities') }}?province_id=${addr.province_id}`);
-                    if (res.ok) {
-                        this.cities = await res.json();
-                    }
-                } catch (err) {}
-            }
         }
      }">
      
@@ -296,7 +271,7 @@
                     <div>
                         <h3 class="font-display text-2xl font-black uppercase tracking-tighter text-walnut-950">Daftar Alamat Pengiriman</h3>
                     </div>
-                    <button @click="showAddAddressModal = true; initMap('add')" 
+                    <button @click="showAddAddressModal = true; areaSearchQuery = ''; initMap('add')" 
                             class="inline-flex items-center px-4 py-2 bg-transparent border border-walnut-800/20 text-walnut-900 text-[0.65rem] font-bold uppercase tracking-widest hover:border-gold-500 hover:text-gold-600 transition">
                         + Tambah
                     </button>
@@ -394,61 +369,34 @@
                         <input type="text" name="phone" required placeholder="Contoh: 0812345678" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                     <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan / Kota (Pilih Otomatis)</label>
+                        <div class="relative w-full">
+                            <input type="hidden" name="area_id" id="add-city-id" />
+                            <input type="hidden" name="city" id="add-city" />
+                            <input type="hidden" name="province" id="add-province" />
+                            
+                            <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik nama kota/kecamatan..." 
+                                class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" autocomplete="off" required />
+                            
+                            <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
+
+                            <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
+                                <template x-for="res in areaSearchResults" :key="res.id">
+                                    <div @click="selectArea(res, 'add')" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
                         <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" required placeholder="12345" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                    </div>
-                </div>
-
-                <div class="grid gap-6 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Provinsi</label>
-                        <template x-if="!rajaongkirFailed">
-                            <div x-data="{ pNameInput: '' }">
-                                <input type="hidden" name="province" :value="pNameInput" />
-                                <select name="province_id" required 
-                                        @change="handleProvinceChange($event, 'add'); pNameInput = $event.target.options[$event.target.selectedIndex].text" 
-                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
-                                    <option value="">Pilih Provinsi</option>
-                                    <template x-for="p in provinces" :key="p.province_id">
-                                        <option :value="p.province_id" x-text="p.province"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </template>
-                        <template x-if="rajaongkirFailed">
-                            <input type="text" name="province" required placeholder="Provinsi" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                        </template>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kota / Kabupaten</label>
-                        <template x-if="!rajaongkirFailed">
-                            <div x-data="{ cNameInput: '' }">
-                                <input type="hidden" name="city" :value="cNameInput" />
-                                <select name="city_id" required 
-                                        @change="cNameInput = $event.target.options[$event.target.selectedIndex].text" 
-                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
-                                    <option value="">Pilih Kota</option>
-                                    <template x-for="c in cities" :key="c.city_id">
-                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </template>
-                        <template x-if="rajaongkirFailed">
-                            <input type="text" name="city" required placeholder="Kota" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                        </template>
-                    </div>
-                </div>
-
-                <div class="grid gap-6 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan</label>
-                        <input type="text" name="district" placeholder="Kecamatan" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                        <input type="text" name="postal_code" id="add-postal" required placeholder="Otomatis terisi" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kelurahan / Desa</label>
-                        <input type="text" name="village" placeholder="Kelurahan" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kelurahan / Desa (Opsional)</label>
+                        <input type="text" name="village" placeholder="Nama Kelurahan" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                 </div>
 
@@ -510,57 +458,30 @@
                         <input type="text" name="phone" x-model="editAddressData.phone" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                     </div>
                     <div class="space-y-2">
+                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan / Kota (Ubah)</label>
+                        <div class="relative w-full">
+                            <input type="hidden" name="area_id" x-model="editAddressData.area_id" />
+                            <input type="hidden" name="city" x-model="editAddressData.city" />
+                            <input type="hidden" name="province" x-model="editAddressData.province" />
+                            
+                            <input type="text" x-model="areaSearchQuery" @input.debounce.500ms="searchArea()" placeholder="Ketik nama kota/kecamatan..." 
+                                class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" autocomplete="off" required />
+                            
+                            <div x-show="isSearchingArea" class="absolute right-0 top-3 text-[0.65rem] text-muted">Mencari...</div>
+
+                            <div x-show="areaSearchResults.length > 0" @click.away="areaSearchResults = []" class="absolute z-10 w-full mt-1 bg-white border border-walnut-800/10 shadow-lg max-h-60 overflow-y-auto">
+                                <template x-for="res in areaSearchResults" :key="res.id">
+                                    <div @click="selectArea(res, 'edit')" x-text="res.text" class="p-3 hover:bg-cream-50 cursor-pointer text-[0.75rem] border-b border-walnut-800/5 transition"></div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div class="space-y-2">
                         <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kode Pos</label>
-                        <input type="text" name="postal_code" x-model="editAddressData.postal_code" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                    </div>
-                </div>
-
-                <div class="grid gap-6 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Provinsi</label>
-                        <template x-if="!rajaongkirFailed">
-                            <div>
-                                <input type="hidden" name="province" x-model="editAddressData.province" />
-                                <select name="province_id" x-model="editAddressData.province_id" required 
-                                        @change="handleProvinceChange($event, 'edit')" 
-                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
-                                    <option value="">Pilih Provinsi</option>
-                                    <template x-for="p in provinces" :key="p.province_id">
-                                        <option :value="p.province_id" x-text="p.province"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </template>
-                        <template x-if="rajaongkirFailed">
-                            <input type="text" name="province" x-model="editAddressData.province" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                        </template>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kota / Kabupaten</label>
-                        <template x-if="!rajaongkirFailed">
-                            <div>
-                                <input type="hidden" name="city" x-model="editAddressData.city" />
-                                <select name="city_id" x-model="editAddressData.city_id" required 
-                                        @change="handleCityChange($event, 'edit')" 
-                                        class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium appearance-none rounded-none">
-                                    <option value="">Pilih Kota</option>
-                                    <template x-for="c in cities" :key="c.city_id">
-                                        <option :value="c.city_id" x-text="c.type + ' ' + c.city_name"></option>
-                                    </template>
-                                </select>
-                            </div>
-                        </template>
-                        <template x-if="rajaongkirFailed">
-                            <input type="text" name="city" x-model="editAddressData.city" required class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
-                        </template>
-                    </div>
-                </div>
-
-                <div class="grid gap-6 sm:grid-cols-2">
-                    <div class="space-y-2">
-                        <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kecamatan</label>
-                        <input type="text" name="district" x-model="editAddressData.district" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
+                        <input type="text" name="postal_code" x-model="editAddressData.postal_code" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
                     </div>
                     <div class="space-y-2">
                         <label class="text-[0.65rem] uppercase tracking-widest text-muted font-bold block">Kelurahan / Desa</label>

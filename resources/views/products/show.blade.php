@@ -120,10 +120,16 @@
                                 <button type="button" @click="if (qty < maxQty) qty++" class="w-10 py-3 text-walnut-500 hover:text-gold-600 font-bold transition">+</button>
                             </div>
                             
-                            <button type="submit" 
-                                class="w-full py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-gold-600 hover:text-white transition duration-500 flex items-center justify-center gap-3">
-                                <i data-lucide="shopping-bag" class="w-4 h-4"></i> Tambah ke Keranjang
-                            </button>
+                            <div class="grid grid-cols-5 gap-3">
+                                <button type="submit" name="action" value="add_to_cart" title="Tambah ke Keranjang"
+                                    class="col-span-1 py-4 bg-transparent border border-walnut-900 text-walnut-900 font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-walnut-900 hover:text-gold-500 transition duration-500 flex items-center justify-center">
+                                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                                </button>
+                                <button type="submit" name="action" value="buy_now"
+                                    class="col-span-4 py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-gold-600 hover:text-white transition duration-500 flex items-center justify-center gap-3">
+                                    Beli Langsung
+                                </button>
+                            </div>
                         </div>
                     </form>
                 @else

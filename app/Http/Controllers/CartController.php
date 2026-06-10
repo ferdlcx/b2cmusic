@@ -72,6 +72,10 @@ class CartController extends Controller
             ]);
         }
 
+        if ($request->input('action') === 'buy_now') {
+            return redirect()->route('checkout.index');
+        }
+
         return redirect()->route('cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang belanja.');
     }
 

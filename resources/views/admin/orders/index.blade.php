@@ -5,12 +5,12 @@
 @section('content')
 <div class="space-y-10 py-4">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-8 flex items-center justify-between">
+    <div class="border-b border-walnut-800/10 pb-8 flex items-center justify-between">
         <div>
             <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Menu Admin</span>
-            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-[-0.04em] text-slate-950 mt-3">Daftar Pesanan</h1>
+            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-[-0.04em] text-walnut-950 mt-3">Daftar Pesanan</h1>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-slate-950 transition">← Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-walnut-950 transition">← Dashboard</a>
     </div>
 
     <!-- Orders Table -->
@@ -21,7 +21,7 @@
     @else
         <div class="overflow-hidden rounded-[32px] border border-walnut-800/10 bg-cream-50 shadow-sm">
             <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
+                <thead class="text-xs uppercase tracking-widest text-walnut-400 bg-cream-100 border-b border-walnut-800/10">
                     <tr>
                         <th class="px-6 py-4">Kode Invoice</th>
                         <th class="px-6 py-4">Nama Pelanggan</th>
@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
-                        <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
+                        <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-100/50">
                             <!-- Invoice Code -->
                             <td class="px-6 py-6 font-bold text-walnut-900 uppercase">
                                 #{{ $order->order_code }}
@@ -60,7 +60,7 @@
                                 @if($order->status === 'pending')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                 @elseif($order->status === 'paid')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">Paid</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Paid</span>
                                 @elseif($order->status === 'shipped')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Shipped</span>
                                 @elseif($order->status === 'completed')
@@ -79,7 +79,7 @@
 
                             <!-- Manage Link -->
                             <td class="px-6 py-6 text-center">
-                                <a href="{{ route('admin.orders.show', $order->id) }}" class="text-xs uppercase tracking-wider font-bold bg-slate-950 text-white px-3.5 py-1.5 rounded-xl hover:bg-slate-800 transition shadow-sm">Kelola</a>
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="text-xs uppercase tracking-wider font-bold bg-walnut-950 text-white px-3.5 py-1.5 rounded-xl hover:bg-walnut-800 transition shadow-sm">Kelola</a>
                             </td>
                         </tr>
                     @endforeach

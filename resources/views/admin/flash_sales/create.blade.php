@@ -5,13 +5,13 @@
 @section('admin_content')
 <div class="space-y-6" x-data="flashSaleForm()">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-6 flex items-center justify-between">
+    <div class="border-b border-walnut-800/10 pb-6 flex items-center justify-between">
         <div>
             <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Pemasaran</span>
-            <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Tambah Flash Sale</h1>
+            <h1 class="text-3xl font-black uppercase tracking-tight text-walnut-950 mt-2">Tambah Flash Sale</h1>
         </div>
         <a href="{{ route('admin.flashSales') }}" class="inline-flex items-center justify-center px-4 py-2.5 border border-walnut-800/10 bg-cream-50 rounded-xl text-xs font-semibold uppercase tracking-wider text-walnut-800 hover:bg-cream-100 transition">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 text-slate-400"></i> Batal
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 text-walnut-400"></i> Batal
         </a>
     </div>
 
@@ -22,7 +22,7 @@
 
             <!-- Name -->
             <div class="space-y-1.5">
-                <label for="name" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Nama Campaign</label>
+                <label for="name" class="text-[0.65rem] uppercase tracking-widest text-walnut-400 font-bold block">Nama Campaign</label>
                 <input type="text" name="name" id="name" value="{{ old('name') }}" required
                     class="w-full px-5 py-4 bg-cream-100 border border-walnut-800/10 rounded-2xl text-walnut-900 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:bg-cream-50 transition text-xs font-semibold @error('name') border-rose-500 @enderror" 
                     placeholder="Contoh: Flash Sale Akhir Bulan Juni" />
@@ -34,7 +34,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Start Time -->
                 <div class="space-y-1.5">
-                    <label for="start_time" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Waktu Mulai</label>
+                    <label for="start_time" class="text-[0.65rem] uppercase tracking-widest text-walnut-400 font-bold block">Waktu Mulai</label>
                     <input type="datetime-local" name="start_time" id="start_time" value="{{ old('start_time') }}" required
                         class="w-full px-5 py-3.5 bg-cream-100 border border-walnut-800/10 rounded-2xl text-walnut-900 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:bg-cream-50 transition text-xs font-semibold @error('start_time') border-rose-500 @enderror" />
                     @error('start_time')
@@ -44,7 +44,7 @@
 
                 <!-- End Time -->
                 <div class="space-y-1.5">
-                    <label for="end_time" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Waktu Selesai</label>
+                    <label for="end_time" class="text-[0.65rem] uppercase tracking-widest text-walnut-400 font-bold block">Waktu Selesai</label>
                     <input type="datetime-local" name="end_time" id="end_time" value="{{ old('end_time') }}" required
                         class="w-full px-5 py-3.5 bg-cream-100 border border-walnut-800/10 rounded-2xl text-walnut-900 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:bg-cream-50 transition text-xs font-semibold @error('end_time') border-rose-500 @enderror" />
                     @error('end_time')
@@ -54,7 +54,7 @@
 
                 <!-- Status -->
                 <div class="space-y-1.5">
-                    <label for="status" class="text-[0.65rem] uppercase tracking-widest text-slate-400 font-bold block">Status</label>
+                    <label for="status" class="text-[0.65rem] uppercase tracking-widest text-walnut-400 font-bold block">Status</label>
                     <select name="status" id="status" required
                         class="w-full px-5 py-4 bg-cream-100 border border-walnut-800/10 rounded-2xl text-walnut-900 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:bg-cream-50 transition text-xs font-semibold">
                         <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Aktif</option>
@@ -64,9 +64,9 @@
             </div>
 
             <!-- Product Selection Section -->
-            <div class="border-t border-slate-100 pt-6 space-y-4">
+            <div class="border-t border-walnut-800/10 pt-6 space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Daftar Produk Promo</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-walnut-800">Daftar Produk Promo</h3>
                     
                     <!-- Dropdown Add Product -->
                     <div class="w-64">
@@ -89,7 +89,7 @@
                 <!-- Items Table -->
                 <div class="overflow-hidden rounded-2xl border border-walnut-800/10 bg-cream-50">
                     <table class="w-full text-sm text-left">
-                        <thead class="text-xs uppercase tracking-wider text-slate-400 bg-cream-100 border-b border-slate-150">
+                        <thead class="text-xs uppercase tracking-wider text-walnut-400 bg-cream-100 border-b border-walnut-800/15">
                             <tr>
                                 <th class="px-5 py-3">Produk</th>
                                 <th class="px-5 py-3">Harga Normal</th>
@@ -100,18 +100,18 @@
                         </thead>
                         <tbody>
                             <template x-for="(item, index) in items" :key="item.id">
-                                <tr class="border-b border-slate-100 last:border-0">
+                                <tr class="border-b border-walnut-800/10 last:border-0">
                                     <td class="px-5 py-3.5">
                                         <input type="hidden" name="products[]" :value="item.id" />
-                                        <span class="font-bold text-slate-800 text-xs block" x-text="item.name"></span>
-                                        <span class="text-[0.6rem] text-slate-400 font-semibold">Total stok gudang: <span x-text="item.maxStock"></span></span>
+                                        <span class="font-bold text-walnut-800 text-xs block" x-text="item.name"></span>
+                                        <span class="text-[0.6rem] text-walnut-400 font-semibold">Total stok gudang: <span x-text="item.maxStock"></span></span>
                                     </td>
-                                    <td class="px-5 py-3.5 text-xs text-slate-650 font-semibold">
+                                    <td class="px-5 py-3.5 text-xs text-walnut-600 font-semibold">
                                         Rp <span x-text="formatNumber(item.price)"></span>
                                     </td>
                                     <td class="px-5 py-3.5">
                                         <div class="relative">
-                                            <span class="absolute left-3 top-3 text-[0.7rem] text-slate-400 font-bold">Rp</span>
+                                            <span class="absolute left-3 top-3 text-[0.7rem] text-walnut-400 font-bold">Rp</span>
                                             <input type="number" name="discount_prices[]" required :max="item.price" min="0"
                                                 class="w-full pl-8 pr-3 py-2 bg-cream-100 border border-walnut-800/10 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-gold-500 focus:bg-cream-50" />
                                         </div>
@@ -126,7 +126,7 @@
                                 </tr>
                             </template>
                             <tr x-show="items.length === 0">
-                                <td colspan="5" class="px-5 py-8 text-center text-xs text-slate-400 font-semibold">Belum ada produk ditambahkan ke flash sale ini.</td>
+                                <td colspan="5" class="px-5 py-8 text-center text-xs text-walnut-400 font-semibold">Belum ada produk ditambahkan ke flash sale ini.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -135,7 +135,7 @@
 
             <!-- Submit -->
             <button type="submit" 
-                class="w-full py-4.5 bg-indigo-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
+                class="w-full py-4.5 bg-gold-600 text-white rounded-2xl font-semibold uppercase text-xs tracking-widest hover:bg-gold-700 hover:shadow-lg hover:shadow-indigo-600/20 transition duration-300 flex items-center justify-center gap-2">
                 <i data-lucide="save" class="w-4 h-4"></i> Simpan Flash Sale
             </button>
         </form>

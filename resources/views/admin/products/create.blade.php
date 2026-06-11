@@ -5,12 +5,12 @@
 @section('content')
 <div class="max-w-4xl mx-auto space-y-10 py-4">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-8 flex items-center justify-between">
+    <div class="border-b border-walnut-800/10 pb-8 flex items-center justify-between">
         <div>
             <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Produk Baru</span>
-            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-[-0.04em] text-slate-950 mt-3">Tambah Produk</h1>
+            <h1 class="text-4xl md:text-5xl font-black uppercase tracking-[-0.04em] text-walnut-950 mt-3">Tambah Produk</h1>
         </div>
-        <a href="{{ route('admin.products') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-slate-950 transition">← Kembali</a>
+        <a href="{{ route('admin.products') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-walnut-950 transition">← Kembali</a>
     </div>
 
     <!-- Form -->
@@ -113,11 +113,11 @@
         </div>
 
         <!-- Dynamic Specifications Panel -->
-        <div class="space-y-4 border-t border-slate-100 pt-6">
+        <div class="space-y-4 border-t border-walnut-800/10 pt-6">
             <div class="flex items-center justify-between">
                 <span class="text-xs uppercase tracking-widest text-muted font-bold">Spesifikasi Tambahan (ERD-aligned)</span>
                 <button type="button" id="add-spec-btn" 
-                    class="text-xs font-bold text-slate-950 border border-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-900 hover:text-white transition">
+                    class="text-xs font-bold text-walnut-950 border border-walnut-900 px-3 py-1.5 rounded-lg hover:bg-walnut-900 hover:text-white transition">
                     + Tambah Baris
                 </button>
             </div>
@@ -136,7 +136,7 @@
 
         <!-- Submit Button -->
         <button type="submit" 
-            class="w-full py-4 bg-slate-950 text-white rounded-2xl font-black uppercase text-xs tracking-[0.25em] hover:bg-slate-800 transition pt-4">
+            class="w-full py-4 bg-walnut-950 text-white rounded-2xl font-black uppercase text-xs tracking-[0.25em] hover:bg-walnut-800 transition pt-4">
             Simpan Produk
         </button>
     </form>

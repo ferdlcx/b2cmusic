@@ -5,13 +5,13 @@
 @section('content')
 <div class="space-y-10 py-4">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-8 flex items-center justify-between">
+    <div class="border-b border-walnut-800/10 pb-8 flex items-center justify-between">
         <div>
             <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Detail Pesanan</span>
-            <h1 class="text-3xl font-black uppercase tracking-[-0.04em] text-slate-950 mt-3">Kelola Pesanan #{{ $order->order_code }}</h1>
-            <p class="text-slate-400 text-xs mt-1">Oleh pelanggan: <strong class="text-walnut-800">{{ $order->user->name }}</strong> ({{ $order->user->email }})</p>
+            <h1 class="text-3xl font-black uppercase tracking-[-0.04em] text-walnut-950 mt-3">Kelola Pesanan #{{ $order->order_code }}</h1>
+            <p class="text-walnut-400 text-xs mt-1">Oleh pelanggan: <strong class="text-walnut-800">{{ $order->user->name }}</strong> ({{ $order->user->email }})</p>
         </div>
-        <a href="{{ route('admin.orders') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-slate-950 transition">← Kembali</a>
+        <a href="{{ route('admin.orders') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-walnut-950 transition">← Kembali</a>
     </div>
 
     <!-- Layout Grid -->
@@ -21,7 +21,7 @@
             <!-- Items Table -->
             <div class="overflow-hidden rounded-[32px] border border-walnut-800/10 bg-cream-50 shadow-sm">
                 <table class="w-full text-sm text-left">
-                    <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
+                    <thead class="text-xs uppercase tracking-widest text-walnut-400 bg-cream-100 border-b border-walnut-800/10">
                         <tr>
                             <th class="px-6 py-4">Item Produk</th>
                             <th class="px-6 py-4 text-center">Harga</th>
@@ -31,17 +31,17 @@
                     </thead>
                     <tbody>
                         @foreach($order->items as $item)
-                            <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
+                            <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-100/50">
                                 <td class="px-6 py-4 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 border border-walnut-800/10 flex-shrink-0 flex items-center justify-center">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-cream-100 border border-walnut-800/10 flex-shrink-0 flex items-center justify-center">
                                         <img src="{{ $item->product && $item->product->primaryImage ? $item->product->primaryImage->image : 'https://placehold.co/100' }}" alt="{{ $item->product_name }}" class="w-full h-full object-cover" />
                                     </div>
                                     <div>
                                         <span class="font-bold text-walnut-900 block text-xs uppercase">{{ $item->product_name }}</span>
-                                        <span class="text-[0.65rem] text-slate-400 block mt-0.5">SKU: {{ $item->product_sku }}</span>
+                                        <span class="text-[0.65rem] text-walnut-400 block mt-0.5">SKU: {{ $item->product_sku }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-center text-slate-600">
+                                <td class="px-6 py-4 text-center text-walnut-600">
                                     Rp {{ number_format($item->price, 0, ',', '.') }}
                                 </td>
                                 <td class="px-6 py-4 text-center font-bold text-walnut-900">
@@ -58,7 +58,7 @@
 
             <!-- Shipping address details -->
             <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-8 shadow-sm space-y-4">
-                <h3 class="text-lg font-black uppercase tracking-tight text-walnut-900 pb-2 border-b border-slate-100">Alamat Pengiriman</h3>
+                <h3 class="text-lg font-black uppercase tracking-tight text-walnut-900 pb-2 border-b border-walnut-800/10">Alamat Pengiriman</h3>
                 @if($order->address)
                     <div class="space-y-1.5 text-walnut-800">
                         <span class="font-bold text-walnut-900 text-sm block">{{ $order->address->label }}</span>
@@ -67,15 +67,15 @@
                         <p class="text-sm text-muted">{{ $order->address->city }}, {{ $order->address->province }}, {{ $order->address->postal_code }}</p>
                     </div>
                 @else
-                    <p class="text-sm text-slate-400 italic">Alamat pengiriman tidak tersedia.</p>
+                    <p class="text-sm text-walnut-400 italic">Alamat pengiriman tidak tersedia.</p>
                 @endif
             </div>
 
             <!-- Shipment Details -->
             <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-8 shadow-sm space-y-4">
-                <h3 class="text-lg font-black uppercase tracking-tight text-walnut-900 pb-2 border-b border-slate-100">Rincian Pengiriman</h3>
+                <h3 class="text-lg font-black uppercase tracking-tight text-walnut-900 pb-2 border-b border-walnut-800/10">Rincian Pengiriman</h3>
                 @if($order->shipment)
-                    <div class="grid gap-6 sm:grid-cols-2 text-sm text-slate-600">
+                    <div class="grid gap-6 sm:grid-cols-2 text-sm text-walnut-600">
                         <div class="space-y-2">
                             <div>Kurir: <strong class="text-walnut-900 uppercase">{{ $order->shipment->courier }} ({{ $order->shipment->service }})</strong></div>
                             <div>Biaya Ongkir: <strong class="text-walnut-900">Rp {{ number_format($order->shipment->shipping_cost, 0, ',', '.') }}</strong></div>
@@ -93,13 +93,13 @@
         <div class="space-y-6">
             <!-- Status Information (Interactive) -->
             <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-8 shadow-sm space-y-6">
-                <h3 class="text-xl font-black uppercase tracking-tight text-slate-950 pb-4 border-b border-slate-100">Kelola Status Pesanan</h3>
+                <h3 class="text-xl font-black uppercase tracking-tight text-walnut-950 pb-4 border-b border-walnut-800/10">Kelola Status Pesanan</h3>
                 
                 <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="space-y-4">
                     @csrf
                     <div class="space-y-1.5">
                         <label class="text-xs text-muted font-bold uppercase tracking-widest">Ubah Status</label>
-                        <select name="status" class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-400 font-medium">
+                        <select name="status" class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-walnut-800 focus:outline-none focus:border-walnut-400 font-medium">
                             <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="paid" {{ $order->status === 'paid' ? 'selected' : '' }}>Paid (Lunas)</option>
                             <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped (Dikirim)</option>
@@ -111,16 +111,16 @@
                     <div class="space-y-1.5">
                         <label class="text-xs text-muted font-bold uppercase tracking-widest">Nomor Resi / AWB</label>
                         <input type="text" name="tracking_number" value="{{ $order->shipment ? $order->shipment->tracking_number : '' }}" placeholder="Masukkan Nomor Resi" 
-                            class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-400 font-mono font-bold text-xs" />
+                            class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-walnut-800 focus:outline-none focus:border-walnut-400 font-mono font-bold text-xs" />
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-slate-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-slate-800 transition duration-300">
+                    <button type="submit" class="w-full py-3 bg-walnut-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-walnut-800 transition duration-300">
                         Perbarui Status & Resi
                     </button>
                 </form>
 
                 @if($order->status === 'shipped' && $order->shipment && $order->shipment->status !== 'delivered')
-                    <div class="pt-4 border-t border-slate-100">
+                    <div class="pt-4 border-t border-walnut-800/10">
                         <form action="{{ route('admin.orders.arrive', $order->id) }}" method="POST">
                             @csrf
                             <button type="submit" class="w-full py-3 bg-gold-600 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-gold-700 transition duration-300">
@@ -133,8 +133,8 @@
 
             <!-- Totals Card -->
             <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-8 shadow-sm space-y-4">
-                <h3 class="text-lg font-black uppercase tracking-tight text-slate-950 pb-2 border-b border-slate-100">Kalkulasi Tagihan</h3>
-                <div class="space-y-3 text-sm text-slate-600">
+                <h3 class="text-lg font-black uppercase tracking-tight text-walnut-950 pb-2 border-b border-walnut-800/10">Kalkulasi Tagihan</h3>
+                <div class="space-y-3 text-sm text-walnut-600">
                     <div class="flex justify-between">
                         <span>Subtotal</span>
                         <span class="font-bold text-walnut-900">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
@@ -149,7 +149,7 @@
                             <span class="font-bold">-Rp {{ number_format($order->discount, 0, ',', '.') }}</span>
                         </div>
                     @endif
-                    <div class="pt-3 border-t border-slate-100 flex justify-between items-end">
+                    <div class="pt-3 border-t border-walnut-800/10 flex justify-between items-end">
                         <span class="font-bold text-walnut-900">Total Tagihan</span>
                         <span class="text-xl font-black text-walnut-900">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
                     </div>

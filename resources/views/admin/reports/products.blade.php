@@ -5,9 +5,9 @@
 @section('admin_content')
 <div class="space-y-8">
     <!-- Header -->
-    <div class="border-b border-slate-100 pb-6">
+    <div class="border-b border-walnut-800/10 pb-6">
         <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Laporan & Audit</span>
-        <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Laporan Produk</h1>
+        <h1 class="text-3xl font-black uppercase tracking-tight text-walnut-950 mt-2">Laporan Produk</h1>
         <p class="text-xs text-muted font-normal">Analisis produk terlaris Anda dan periksa daftar inventaris stok rendah.</p>
     </div>
 
@@ -16,16 +16,16 @@
         
         <!-- Top Selling Products -->
         <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <i data-lucide="award" class="w-4 h-4 text-indigo-600"></i> 10 Produk Terlaris (Lunas)
+            <h3 class="text-sm font-bold uppercase tracking-wider text-walnut-800 flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-gold-600"></i> 10 Produk Terlaris (Lunas)
             </h3>
 
             @if($topProducts->isEmpty())
-                <p class="text-xs text-slate-400 font-semibold text-center py-10">Belum ada transaksi tuntas.</p>
+                <p class="text-xs text-walnut-400 font-semibold text-center py-10">Belum ada transaksi tuntas.</p>
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
+                        <thead class="text-xs uppercase tracking-widest text-walnut-400 bg-cream-100 border-b border-walnut-800/10">
                             <tr>
                                 <th class="px-4 py-3">Produk</th>
                                 <th class="px-4 py-3 text-center">Unit Terjual</th>
@@ -34,23 +34,23 @@
                         </thead>
                         <tbody>
                             @foreach($topProducts as $product)
-                                <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
+                                <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-100/50">
                                     <td class="px-4 py-4 flex items-center gap-3">
-                                        <div class="w-8 h-8 bg-cream-100 border border-slate-100 rounded-lg overflow-hidden shrink-0">
+                                        <div class="w-8 h-8 bg-cream-100 border border-walnut-800/10 rounded-lg overflow-hidden shrink-0">
                                             @if($product->primaryImage)
                                                 <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
                                             @else
-                                                <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                                <div class="w-full h-full flex items-center justify-center text-walnut-300">
                                                     <i data-lucide="image" class="w-4 h-4"></i>
                                                 </div>
                                             @endif
                                         </div>
                                         <div>
-                                            <span class="font-bold text-slate-800 text-xs block truncate max-w-[150px]">{{ $product->name }}</span>
-                                            <span class="text-[0.6rem] text-slate-400 font-mono">SKU: {{ $product->sku }}</span>
+                                            <span class="font-bold text-walnut-800 text-xs block truncate max-w-[150px]">{{ $product->name }}</span>
+                                            <span class="text-[0.6rem] text-walnut-400 font-mono">SKU: {{ $product->sku }}</span>
                                         </div>
                                     </td>
-                                    <td class="px-4 py-4 text-center font-bold text-indigo-650 text-xs">{{ $product->total_sold }} unit</td>
+                                    <td class="px-4 py-4 text-center font-bold text-gold-600 text-xs">{{ $product->total_sold }} unit</td>
                                     <td class="px-4 py-4 text-right font-bold text-walnut-900 text-xs">Rp {{ number_format($product->total_revenue, 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
@@ -62,7 +62,7 @@
 
         <!-- Low Stock Products -->
         <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-walnut-800 flex items-center gap-2">
                 <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i> Peringatan Stok Rendah (Stok &le; 5)
             </h3>
 
@@ -73,7 +73,7 @@
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
+                        <thead class="text-xs uppercase tracking-widest text-walnut-400 bg-cream-100 border-b border-walnut-800/10">
                             <tr>
                                 <th class="px-4 py-3">Produk</th>
                                 <th class="px-4 py-3 text-center">Stok</th>
@@ -82,20 +82,20 @@
                         </thead>
                         <tbody>
                             @foreach($lowStockProducts as $product)
-                                <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
+                                <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-100/50">
                                     <td class="px-4 py-4 flex items-center gap-3">
-                                        <div class="w-8 h-8 bg-cream-100 border border-slate-100 rounded-lg overflow-hidden shrink-0">
+                                        <div class="w-8 h-8 bg-cream-100 border border-walnut-800/10 rounded-lg overflow-hidden shrink-0">
                                             @if($product->primaryImage)
                                                 <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover" />
                                             @else
-                                                <div class="w-full h-full flex items-center justify-center text-slate-300">
+                                                <div class="w-full h-full flex items-center justify-center text-walnut-300">
                                                     <i data-lucide="image" class="w-4 h-4"></i>
                                                 </div>
                                             @endif
                                         </div>
                                         <div>
-                                            <span class="font-bold text-slate-800 text-xs block truncate max-w-[150px]">{{ $product->name }}</span>
-                                            <span class="text-[0.6rem] text-slate-400 font-mono">SKU: {{ $product->sku }}</span>
+                                            <span class="font-bold text-walnut-800 text-xs block truncate max-w-[150px]">{{ $product->name }}</span>
+                                            <span class="text-[0.6rem] text-walnut-400 font-mono">SKU: {{ $product->sku }}</span>
                                         </div>
                                     </td>
                                     <td class="px-4 py-4 text-center">

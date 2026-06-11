@@ -213,7 +213,7 @@ class TrackingController extends Controller
             return response('ok', 200);
         }
 
-        if ($event === 'order.status') {
+        if (in_array($event, ['order.status', 'waybill.status'])) {
             $biteshipOrderId = $request->input('order_id');
             $status = $request->input('status'); // e.g. 'delivered', 'picking_up', 'in_transit'
 

@@ -22,6 +22,10 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'mailersend' => [
+        'api_key' => env('MAILERSEND_API_KEY'),
+    ],
+
     'sendgrid' => [
         'key' => env('SENDGRID_API_KEY'),
     ],

@@ -80,7 +80,7 @@
                                     @if($order->status === 'pending')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                     @elseif($order->status === 'paid')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">Paid</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Paid</span>
                                     @elseif($order->status === 'shipped')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Shipped</span>
                                     @elseif($order->status === 'completed')

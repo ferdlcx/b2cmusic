@@ -32,12 +32,13 @@ class ImportDummyProducts extends Command
      */
     public function handle()
     {
-        $jsonPath = 'c:\laragon\www\sweelee-scraper\products.json';
-        $imagesSourceDir = 'c:\laragon\www\sweelee-scraper\images';
+        // Try reading from seeders directory (for Render deployment) or fallback to scraper path
+        $jsonPath = base_path('database/seeders/products.json');
+        
         $imagesDestDir = storage_path('app/public/products');
 
         if (!File::exists($jsonPath)) {
-            $this->error("File $jsonPath tidak ditemukan. Harap jalankan scraper terlebih dahulu.");
+            $this->error("File $jsonPath tidak ditemukan. Harap pastikan file ada.");
             return;
         }
 
@@ -97,19 +98,16 @@ class ImportDummyProducts extends Command
                 'status' => true
             ]);
 
-            // 3. Copy image and insert ProductImage
+            // 3. Find image and insert ProductImage
             $imageFilename = $item['primary_image'];
             if ($imageFilename && $imageFilename !== 'default.webp') {
-                $sourceFile = $imagesSourceDir . '\\' . $imageFilename;
-                $destFilename = time() . '_' . $imageFilename;
-                $destFile = $imagesDestDir . '/' . $destFilename;
-
-                if (File::exists($sourceFile)) {
-                    File::copy($sourceFile, $destFile);
-                    
+                // Find existing file matching the name in storage/app/public/products
+                $existingFiles = glob($imagesDestDir . '/*' . $imageFilename);
+                if (count($existingFiles) > 0) {
+                    $foundFile = basename($existingFiles[0]);
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image' => 'products/' . $destFilename,
+                        'image' => 'products/' . $foundFile,
                         'is_primary' => true
                     ]);
                 }

@@ -95,19 +95,21 @@
             <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-8 shadow-sm space-y-6">
                 <h3 class="text-xl font-black uppercase tracking-tight text-walnut-950 pb-4 border-b border-walnut-800/10">Kelola Status Pesanan</h3>
                 
-                <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="space-y-4">
-                    @csrf
-                    <div class="space-y-1.5">
-                        <label class="text-xs text-muted font-bold uppercase tracking-widest">Nomor Resi / AWB</label>
-                        <input type="text" name="tracking_number" value="{{ $order->shipment ? $order->shipment->tracking_number : '' }}" placeholder="Masukkan Nomor Resi" 
-                            class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-walnut-800 focus:outline-none focus:border-walnut-400 font-mono font-bold text-xs" />
-                        <p class="text-[0.65rem] text-muted mt-1">Status pesanan akan otomatis berubah menjadi "Shipped" jika nomor resi diisi.</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-cream-100 border border-walnut-800/10 rounded-xl text-center">
+                        <p class="text-[0.65rem] text-muted font-bold uppercase tracking-widest mb-1">Nomor Resi / AWB Otomatis</p>
+                        <p class="font-mono font-black text-lg text-walnut-950">{{ $order->shipment && $order->shipment->tracking_number ? $order->shipment->tracking_number : 'Menunggu Resi...' }}</p>
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-walnut-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-walnut-800 transition duration-300">
-                        Simpan Nomor Resi
-                    </button>
-                </form>
+                    <div class="text-[0.65rem] text-muted leading-relaxed font-medium bg-walnut-50 border border-walnut-800/10 p-3 rounded-lg">
+                        <i data-lucide="info" class="w-3 h-3 inline mr-1 text-gold-600"></i>
+                        Status pesanan akan <strong>otomatis berubah menjadi "Shipped"</strong> saat kurir Biteship memindai paket (Pick-up). Tidak perlu diubah manual.
+                    </div>
+
+                    <a href="{{ route('admin.orders.print_label', $order->id) }}" target="_blank" class="w-full py-3 bg-walnut-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-walnut-800 transition duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Cetak Label Pengiriman
+                    </a>
+                </div>
 
 
             </div>

@@ -185,12 +185,13 @@ $adminRoutes = function () {
     Route::post('/returns/{id}/reject', [AdminController::class, 'rejectReturn'])->name('returns.reject');
 
     // Orders Management
-    Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+    Route::get('/orders', [AdminController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::post('/orders/{id}/arrive', [AdminController::class, 'simulateCourierArrived'])->name('orders.arrive');
     Route::get('/admin/orders/{id}/shipping', [App\Http\Controllers\AdminController::class, 'manageShipping'])->name('admin.orders.shipping');
     Route::post('/admin/orders/{id}/ship', [App\Http\Controllers\AdminController::class, 'shipOrder'])->name('admin.orders.ship');
+    Route::get('/admin/orders/{id}/print-label', [App\Http\Controllers\AdminController::class, 'printLabel'])->name('admin.orders.print_label');
     Route::post('/admin/orders/{id}/force-delivered', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('admin.orders.force_delivered');
 
     // --- SUPER ADMIN ONLY FEATURES ---

@@ -820,6 +820,14 @@ class AdminController extends Controller
         return view('admin.orders.show', compact('order'));
     }
 
+    public function printLabel($id)
+    {
+        $order = Order::with(['user', 'address', 'items.product.primaryImage', 'payment', 'shipment'])->findOrFail($id);
+        
+        // This view will just be a simple printable layout
+        return view('admin.orders.print_label', compact('order'));
+    }
+
     public function updateOrderStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);

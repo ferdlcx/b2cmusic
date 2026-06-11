@@ -102,10 +102,12 @@ class TrackingController extends Controller
         foreach ($orders as $order) {
             if ($apiKey) {
                 try {
-                    // Coba delete hard secara API (Meskipun deprecated, kadang di Sandbox jalan)
+                    // Mengubah status di Biteship menjadi Cancelled karena tidak bisa di-delete hard
                     \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
                         'Authorization' => $apiKey
-                    ])->delete("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+                    ])->post("https://api.biteship.com/v1/orders/{$order->biteship_order_id}/cancel", [
+                        'reason' => 'Test reset'
+                    ]);
                 } catch (\Exception $e) {}
             }
         }

@@ -98,37 +98,18 @@
                 <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="space-y-4">
                     @csrf
                     <div class="space-y-1.5">
-                        <label class="text-xs text-muted font-bold uppercase tracking-widest">Ubah Status</label>
-                        <select name="status" class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-walnut-800 focus:outline-none focus:border-walnut-400 font-medium">
-                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="paid" {{ $order->status === 'paid' ? 'selected' : '' }}>Paid (Lunas)</option>
-                            <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped (Dikirim)</option>
-                            <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
-                            <option value="canceled" {{ $order->status === 'canceled' ? 'selected' : '' }}>Canceled (Dibatalkan)</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-1.5">
                         <label class="text-xs text-muted font-bold uppercase tracking-widest">Nomor Resi / AWB</label>
                         <input type="text" name="tracking_number" value="{{ $order->shipment ? $order->shipment->tracking_number : '' }}" placeholder="Masukkan Nomor Resi" 
                             class="w-full bg-cream-100 border border-walnut-800/10 rounded-xl p-3 text-walnut-800 focus:outline-none focus:border-walnut-400 font-mono font-bold text-xs" />
+                        <p class="text-[0.65rem] text-muted mt-1">Status pesanan akan otomatis berubah menjadi "Shipped" jika nomor resi diisi.</p>
                     </div>
 
                     <button type="submit" class="w-full py-3 bg-walnut-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-walnut-800 transition duration-300">
-                        Perbarui Status & Resi
+                        Simpan Nomor Resi
                     </button>
                 </form>
 
-                @if($order->status === 'shipped' && $order->shipment && $order->shipment->status !== 'delivered')
-                    <div class="pt-4 border-t border-walnut-800/10">
-                        <form action="{{ route('admin.orders.arrive', $order->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full py-3 bg-gold-600 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-gold-700 transition duration-300">
-                                Simulasikan Kurir Tiba (Delivered)
-                            </button>
-                        </form>
-                    </div>
-                @endif
+
             </div>
 
             <!-- Totals Card -->

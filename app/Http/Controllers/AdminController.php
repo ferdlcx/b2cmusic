@@ -824,59 +824,29 @@ class AdminController extends Controller
     {
         $order = Order::findOrFail($id);
         $request->validate([
-            'status' => ['required', 'in:pending,paid,shipped,completed,canceled'],
-            'tracking_number' => ['nullable', 'string'],
+            'tracking_number' => ['required', 'string'],
         ]);
 
         DB::beginTransaction();
         try {
-            $order->update(['status' => $request->status]);
+            $order->update(['status' => 'shipped']);
 
             // Update Shipment or Payment status accordingly
             $shipment = Shipment::where('order_id', $order->id)->first();
             if ($shipment) {
-                $shipmentData = [];
-                if ($request->tracking_number) {
-                    $shipmentData['tracking_number'] = $request->tracking_number;
-                }
-
-                if ($request->status === 'shipped') {
-                    $shipmentData['status'] = 'shipped';
-                    $shipmentData['shipped_at'] = now();
-
-                    // Mock tracking number for RajaOngkir V2 since booking API is not available
-                    if (!$shipment->tracking_number || $shipment->tracking_number == 'WAITING_RESI') {
-                        $shipmentData['tracking_number'] = 'RAJA' . rand(1000000000, 9999999999);
-                    }
-                } elseif ($request->status === 'completed') {
-                    $shipmentData['status'] = 'delivered';
-                    $shipmentData['delivered_at'] = now();
-                } elseif ($request->status === 'canceled') {
-                    $shipmentData['status'] = 'canceled';
-                }
+                $shipmentData = [
+                    'tracking_number' => $request->tracking_number,
+                    'status' => 'shipped',
+                    'shipped_at' => now(),
+                ];
 
                 $shipment->update($shipmentData);
             }
 
-            // Update payment status if marked as paid
-            $payment = $order->payment;
-            if ($payment && $request->status === 'paid' && $payment->status !== 'paid') {
-                $payment->update([
-                    'status' => 'paid',
-                    'paid_at' => now(),
-                ]);
-            }
-
             // Trigger database notifications for user
-            if ($request->status === 'paid') {
-                $order->user->notify(new PaymentSuccess($order));
-            } elseif ($request->status === 'shipped') {
-                $order->user->notify(new OrderShipped($order));
-            } elseif ($request->status === 'completed') {
-                $order->user->notify(new OrderCompleted($order));
-            }
+            $order->user->notify(new OrderShipped($order));
 
-            $this->logActivity('update_order_status', Order::class, $order->id, "Mengubah status pesanan {$order->order_code} menjadi {$request->status}");
+            $this->logActivity('update_order_resi', Order::class, $order->id, "Menginput resi pesanan {$order->order_code}: {$request->tracking_number}");
 
             DB::commit();
             return back()->with('success', 'Status pesanan berhasil diperbarui!');

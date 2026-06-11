@@ -27,9 +27,6 @@
             <!-- Left Column: Typography -->
             <div class="lg:col-span-8 z-20 flex flex-col justify-center">
                 <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.1s">
-                    <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold">
-                        B2C E-Commerce Model
-                    </span>
                 </div>
                 
                 <!-- Main Heading (Editorial Style) -->

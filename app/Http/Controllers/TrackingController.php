@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
  
 class TrackingController extends Controller
 {
-    public function track($id)
+    public function track(Request $request, $id)
     {
         $user = Auth::user();
         $order = Order::with(['address', 'shipment'])->where('user_id', $user->id)->findOrFail($id);
@@ -121,6 +121,14 @@ class TrackingController extends Controller
                 'datetime' => ($order->shipment->delivered_at ?? now())->format('d M Y, H:i') . ' WIB',
                 'completed' => true,
             ];
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => $order->status,
+                'shipment_status' => $order->shipment->status ?? 'pending',
+                'checkpoints' => $checkpoints
+            ]);
         }
 
         return view('orders.tracking', compact('order', 'checkpoints'));

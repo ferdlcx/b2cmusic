@@ -308,8 +308,8 @@ class OrderController extends Controller
             ];
         }
 
-        $courierCompany = strtolower($order->courier_company ?: 'jne');
-        $courierType = strtolower($order->courier_type ?: 'reg');
+        $courierCompany = strtolower($order->shipment->courier ?? 'jne');
+        $courierType = strtolower($order->shipment->service ?? 'reg');
 
         $payload = [
             'shipper_contact_name' => env('MAIL_FROM_NAME', 'DjudasMS Official'),

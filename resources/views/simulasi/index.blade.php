@@ -97,11 +97,11 @@
                         @endphp
                         <tr class="hover:bg-walnut-50/30 transition-colors group">
                             <td class="px-4 py-3">
-                                <span class="font-bold text-purple-700 underline decoration-dashed underline-offset-2 cursor-pointer">{{ substr($biteshipId, 0, 15) }}...</span><br>
+                                <span class="font-bold text-purple-700 underline decoration-dashed underline-offset-2 cursor-pointer">{{ $biteshipId }}</span><br>
                                 <span class="text-walnut-500 text-[0.65rem]">-</span>
                             </td>
                             <td class="px-4 py-3">
-                                <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">{{ $order->shipment->tracking_number ?? 'WYB-'.rand(10000000, 99999999) }}</span><br>
+                                <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">{{ $order->waybill_id ?? $order->shipment->tracking_number ?? 'Menunggu Resi' }}</span><br>
                                 <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white">{{ strtoupper($order->shipment->courier ?? 'JNE') }} - {{ strtoupper($order->shipment->service ?? 'REG') }}</span>
                             </td>
                             <td class="px-4 py-3">

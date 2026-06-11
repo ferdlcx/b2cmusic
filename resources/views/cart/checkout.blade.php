@@ -61,6 +61,38 @@
                   this.selectedCityId = area.id; // use selectedCityId as area_id for consistency
                   this.fetchCourierOptions();
               },
+              async saveNewAddress() {
+                  try {
+                      let res = await fetch('{{ route("profile.address.store") }}', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                              'Accept': 'application/json'
+                          },
+                          body: JSON.stringify({
+                              label: document.querySelector('input[name=new_address_label]').value,
+                              name: document.querySelector('input[name=new_address_name]').value,
+                              phone: document.querySelector('input[name=new_address_phone]').value,
+                              address: document.querySelector('textarea[name=new_address_address]').value,
+                              area_id: this.selectedNewAreaId,
+                              city: this.city,
+                              province: this.province,
+                              postal_code: this.postalCode,
+                              is_default: 0
+                          })
+                      });
+                      if (res.ok) {
+                          alert('Alamat berhasil disimpan!');
+                          window.location.reload();
+                      } else {
+                          let err = await res.json();
+                          alert('Gagal menyimpan alamat: ' + (err.message || 'Periksa kembali kelengkapan data'));
+                      }
+                  } catch (e) {
+                      alert('Terjadi kesalahan koneksi.');
+                  }
+              },
               async fetchCourierOptions() {
                   if (!this.selectedCityId) return;
                   this.shippingLoading = true;
@@ -78,6 +110,7 @@
                           },
                           body: JSON.stringify({
                               destination_area_id: this.selectedCityId,
+                              postal_code: this.postalCode,
                               weight: this.totalWeight
                           })
                       });
@@ -175,6 +208,11 @@
                                 <input type="text" name="new_address_phone" value="{{ auth()->user()->phone }}" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                 <input type="text" name="new_address_postal_code" x-model="postalCode" placeholder="Kode Pos (Otomatis Terisi)" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
                             </div>
+                            <div class="pt-4">
+                                <button type="button" @click="saveNewAddress()" class="px-6 py-3 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300">
+                                    Simpan Alamat
+                                </button>
+                            </div>
                         </div>
                     @else
                         <div class="space-y-4">
@@ -240,6 +278,11 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <input type="text" name="new_address_phone" placeholder="No. Telepon" class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium" />
                                             <input type="text" name="new_address_postal_code" x-model="postalCode" placeholder="Kode Pos (Otomatis Terisi)" readonly class="w-full bg-transparent border-b border-walnut-800/20 py-2.5 text-walnut-950 focus:outline-none focus:border-gold-500 transition text-[0.75rem] font-medium opacity-70 cursor-not-allowed" />
+                                        </div>
+                                        <div class="pt-4">
+                                            <button type="button" @click="saveNewAddress()" class="px-6 py-3 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300">
+                                                Simpan Alamat
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

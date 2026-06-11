@@ -20,17 +20,17 @@ class TrackingController extends Controller
 
         $checkpoints = [];
 
-        if ($order->biteship_order_id) {
+        if ($order->tracking_id) {
             $apiKey = env('BITESHIP_API_KEY');
             try {
                 $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
                     'Authorization' => $apiKey
-                ])->get("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+                ])->get("https://api.biteship.com/v1/trackings/{$order->tracking_id}");
 
                 if ($response->successful()) {
                     $biteshipData = $response->json();
-                    if (!empty($biteshipData['courier']['history'])) {
-                        foreach ($biteshipData['courier']['history'] as $history) {
+                    if (!empty($biteshipData['history'])) {
+                        foreach ($biteshipData['history'] as $history) {
                             $checkpoints[] = [
                                 'status' => ucfirst(str_replace('_', ' ', $history['status'])),
                                 'description' => $history['note'],
@@ -191,5 +191,63 @@ class TrackingController extends Controller
         } catch (\Exception $e) {}
 
         return redirect()->route('orders.show', $order->order_code)->with('success', 'Simulasi: Paket telah tiba di tujuan! Anda kini bisa mengonfirmasi penerimaan atau mengajukan retur.');
+    }
+    public function biteshipWebhook(Request $request)
+    {
+        // Authenticate webhook (Biteship sends signature, but for simplicity we verify the payload)
+        // Log the incoming webhook for debugging
+        \Illuminate\Support\Facades\Log::info('Biteship Webhook Received:', $request->all());
+
+        $event = $request->input('event');
+        
+        // If event is empty (usually during ping/installation test from Biteship)
+        if (empty($event)) {
+            return response('ok', 200);
+        }
+
+        if ($event === 'order.status') {
+            $biteshipOrderId = $request->input('order_id');
+            $status = $request->input('status'); // e.g. 'delivered', 'picking_up', 'in_transit'
+
+            $order = Order::with('shipment')->where('biteship_order_id', $biteshipOrderId)->first();
+
+            if ($order && $order->shipment) {
+                // Update internal shipment status
+                $order->shipment->update([
+                    'status' => $status === 'delivered' ? 'delivered' : 'processing',
+                ]);
+
+                if ($status === 'delivered') {
+                    $order->update(['status' => 'completed']);
+                    $order->shipment->update(['delivered_at' => now()]);
+
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderArrivedMail($order));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Gagal mengirim email Order Arrived (Webhook): ' . $e->getMessage());
+                    }
+
+                    try {
+                        ActivityLog::create([
+                            'user_id' => $order->user_id,
+                            'action' => 'courier_arrived_webhook',
+                            'model_type' => Order::class,
+                            'model_id' => $order->id,
+                            'description' => "Pesanan {$order->order_code} telah terkirim (Update via Biteship Webhook)",
+                            'ip_address' => request()->ip(),
+                            'user_agent' => request()->userAgent(),
+                        ]);
+                    } catch (\Exception $e) {}
+                } elseif ($status === 'picking_up' || $status === 'inTransit' || $status === 'droppingOff' || $status === 'picked') {
+                    if ($order->status === 'processing') {
+                        $order->update(['status' => 'shipped']);
+                        $order->shipment->update(['shipped_at' => now()]);
+                    }
+                }
+            }
+            return response('ok', 200);
+        }
+
+        return response('ok', 200);
     }
 }

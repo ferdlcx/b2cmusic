@@ -318,11 +318,11 @@ class OrderController extends Controller
             'origin_contact_name' => 'Admin DjudasMS',
             'origin_contact_phone' => '08123456789',
             'origin_address' => 'Toko DjudasMS',
-            'origin_postal_code' => (int) env('BITESHIP_ORIGIN_POSTAL_CODE', 17464),
+            'origin_postal_code' => 12440, // Hardcoded sandbox valid postal code
             'destination_contact_name' => mb_substr($address->name, 0, 50),
             'destination_contact_phone' => mb_substr($address->phone, 0, 20),
             'destination_address' => mb_substr($address->address, 0, 200),
-            'destination_postal_code' => (int) $address->postal_code,
+            'destination_postal_code' => 12950, // Hardcoded sandbox valid postal code
             'courier_company' => $courierCompany,
             'courier_type' => $courierType,
             'delivery_type' => 'now',

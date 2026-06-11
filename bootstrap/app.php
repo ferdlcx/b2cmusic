@@ -20,6 +20,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'midtrans/webhook',
+            'api/biteship/webhook',
         ]);
 
         $middleware->trustProxies(at: '*');

@@ -27,6 +27,7 @@ Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/midtrans/webhook', [OrderController::class, 'handleWebhook'])->name('midtrans.webhook');
+Route::any('/api/biteship/webhook', [App\Http\Controllers\TrackingController::class, 'biteshipWebhook'])->name('biteship.webhook');
 
 // Test SMTP Route
 Route::get('/dmail', function () {

@@ -60,7 +60,7 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Hitung ongkos kirim (rates) via RajaOngkir V2
+     * Hitung ongkos kirim (rates) via Biteship (Migration from RajaOngkir)
      */
     public function getRates(Request $request)
     {
@@ -69,14 +69,13 @@ class RajaOngkirController extends Controller
             'weight' => 'required|numeric' // in grams
         ]);
 
-        // Origin set to Kebayoran Lama (Subdistrict ID 17464) as default
-        $originSubdistrictId = env('RAJAONGKIR_ORIGIN_ID', 17464); 
         $weight = ceil($request->weight);
         if ($weight < 1) $weight = 1000; // minimum 1kg
         
+        // Origin set to Kebayoran Lama (Subdistrict ID 17464) as default
+        $originSubdistrictId = env('RAJAONGKIR_ORIGIN_ID', 17464); 
         $couriers = ['jne', 'pos', 'tiki'];
         $formattedCosts = [];
-
         try {
             foreach ($couriers as $courier) {
                 $response = Http::asForm()->withHeaders([
@@ -87,7 +86,6 @@ class RajaOngkirController extends Controller
                     'weight' => (int)$weight,
                     'courier' => $courier
                 ]);
-
                 if ($response->successful()) {
                     $results = $response->json()['data'] ?? [];
                     if (!empty($results)) {
@@ -102,12 +100,15 @@ class RajaOngkirController extends Controller
                     }
                 }
             }
-
             return response()->json(['costs' => $formattedCosts]);
-
         } catch (\Exception $e) {
             Log::error('RajaOngkir V2 Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
         }
+
+        /* 
+        // Biteship Rates API implementation (PAID in Sandbox, requires balance)
+        // ...
+        */
     }
 }

@@ -150,18 +150,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Sandbox Simulate Button -->
-                    @if($order->shipment->status === 'shipped')
-                    <div class="mt-8 pt-6 border-t border-walnut-800/10">
-                        <form action="{{ route('orders.sandboxArrive', $order->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" onclick="return confirm('Simulasi: Ubah status menjadi Terkirim (Barang Sampai)?');" class="w-full py-3 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.65rem] tracking-widest hover:bg-gold-600 hover:text-white transition duration-300 flex justify-center items-center gap-2">
-                                <i data-lucide="package-check" class="w-4 h-4"></i> Simulasikan Barang Sampai (Sandbox)
-                            </button>
-                        </form>
-                    </div>
-                    @endif
                     
                     <!-- Tracking Timeline -->
                     <div class="mt-8 pt-6 border-t border-walnut-800/10 space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-walnut-800/20 before:to-transparent">

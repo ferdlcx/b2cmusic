@@ -85,8 +85,9 @@
                       return;
                   }
                   
+                  let res;
                   try {
-                      let res = await fetch('{{ route("profile.address.store") }}', {
+                      res = await fetch('{{ route("profile.address.store") }}', {
                           method: 'POST',
                           headers: {
                               'Content-Type': 'application/json',
@@ -110,7 +111,7 @@
                       let data = await res.json();
                       
                       if (res.ok && data.success) {
-                          alert('Alamat berhasil disimpan!');
+                          alert(data.message || 'Alamat berhasil ditambahkan!');
                           window.location.reload();
                       } else {
                           // Show validation errors or server errors
@@ -122,7 +123,13 @@
                       }
                   } catch (e) {
                       console.error('Save address error:', e);
-                      alert('Terjadi kesalahan koneksi. Coba refresh halaman dan ulangi.');
+                      // Try to get text response if possible
+                      try {
+                          let text = res ? await res.text() : 'No response from server';
+                          alert('Error Server:\n' + text.substring(0, 150));
+                      } catch (err) {
+                          alert('Terjadi kesalahan koneksi. (JS Error: ' + e.message + ')');
+                      }
                   }
               },
               async fetchCourierOptions() {

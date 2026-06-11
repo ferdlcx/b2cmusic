@@ -145,6 +145,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)
 $adminRoutes = function () {
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
     // Products Management

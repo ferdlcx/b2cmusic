@@ -7,9 +7,9 @@
     <!-- Header -->
     <div class="border-b border-slate-100 pb-6 flex items-center justify-between">
         <div>
-            <span class="text-xs uppercase tracking-[0.45em] text-slate-500 font-bold">Pemasaran</span>
+            <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Pemasaran</span>
             <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Kelola Flash Sale</h1>
-            <p class="text-xs text-slate-500">Kelola promosi flash sale berbatas waktu untuk instrumen musik.</p>
+            <p class="text-xs text-muted">Kelola promosi flash sale berbatas waktu untuk instrumen musik.</p>
         </div>
         <a href="{{ route('admin.flashSales.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 rounded-xl text-xs font-semibold uppercase tracking-wider text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-600/10 transition duration-300">
             <i data-lucide="plus" class="w-4 h-4 mr-1.5"></i> Tambah Flash Sale
@@ -18,14 +18,14 @@
 
     <!-- Table -->
     @if($flashSales->isEmpty())
-        <div class="bg-white border border-slate-200/80 rounded-[32px] p-12 text-center text-slate-500">
+        <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-12 text-center text-muted">
             <i data-lucide="zap" class="w-10 h-10 text-slate-350 mx-auto mb-3"></i>
             <p class="text-xs font-semibold">Belum ada promo flash sale ditambahkan.</p>
         </div>
     @else
-        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[32px] border border-walnut-800/10 bg-cream-50 shadow-sm">
             <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-slate-50 border-b border-slate-100">
+                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
                     <tr>
                         <th class="px-6 py-4">Nama Promo</th>
                         <th class="px-6 py-4">Waktu Mulai</th>
@@ -37,15 +37,15 @@
                 </thead>
                 <tbody>
                     @foreach($flashSales as $sale)
-                        <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
-                            <td class="px-6 py-4 font-bold text-slate-900">{{ $sale->name }}</td>
+                        <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
+                            <td class="px-6 py-4 font-bold text-walnut-900">{{ $sale->name }}</td>
                             <td class="px-6 py-4 text-slate-650 font-semibold text-xs">
                                 {{ $sale->start_time->format('d M Y, H:i') }} WIB
                             </td>
                             <td class="px-6 py-4 text-slate-650 font-semibold text-xs">
                                 {{ $sale->end_time->format('d M Y, H:i') }} WIB
                             </td>
-                            <td class="px-6 py-4 font-bold text-slate-700">
+                            <td class="px-6 py-4 font-bold text-walnut-800">
                                 {{ $sale->items_count }} Produk
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -54,11 +54,11 @@
                                     $isActive = $sale->status && $sale->start_time <= $now && $sale->end_time >= $now;
                                 @endphp
                                 @if($isActive)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-amber-50 text-amber-700 border border-amber-255 uppercase animate-pulse">Berlangsung</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-gold-50 text-gold-700 border border-amber-255 uppercase animate-pulse">Berlangsung</span>
                                 @elseif($sale->status && $sale->start_time > $now)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Mendatang</span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-slate-50 text-slate-500 border border-slate-200 uppercase">Berakhir / Non-Aktif</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Berakhir / Non-Aktif</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center space-x-3">

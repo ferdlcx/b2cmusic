@@ -62,7 +62,7 @@
                                         @csrf
                                         <div class="space-y-2">
                                             <label class="text-[0.6rem] uppercase tracking-widest text-walnut-600 font-bold block">Catatan Persetujuan (Opsional)</label>
-                                            <input type="text" name="admin_notes" class="w-full px-4 py-2.5 bg-white border border-walnut-800/20 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-gold-500 transition" placeholder="Instruksi pengiriman ke gudang..." />
+                                            <input type="text" name="admin_notes" class="w-full px-4 py-2.5 bg-cream-50 border border-walnut-800/20 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-gold-500 transition" placeholder="Instruksi pengiriman ke gudang..." />
                                         </div>
                                         <button type="submit" class="w-full py-3 bg-walnut-900 hover:bg-gold-600 text-gold-500 hover:text-white font-bold text-[0.65rem] uppercase tracking-[0.2em] transition duration-300">Setujui Retur</button>
                                     </form>
@@ -72,7 +72,7 @@
                                         @csrf
                                         <div class="space-y-2">
                                             <label class="text-[0.6rem] uppercase tracking-widest text-red-600 font-bold block">Alasan Penolakan (Wajib)</label>
-                                            <input type="text" name="admin_notes" required class="w-full px-4 py-2.5 bg-white border border-red-500/30 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-red-500 transition" placeholder="Alasan menolak retur..." />
+                                            <input type="text" name="admin_notes" required class="w-full px-4 py-2.5 bg-cream-50 border border-red-500/30 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-red-500 transition" placeholder="Alasan menolak retur..." />
                                         </div>
                                         <button type="submit" class="w-full py-3 border border-red-600 hover:bg-red-600 text-red-600 hover:text-white font-bold text-[0.65rem] uppercase tracking-[0.2em] transition duration-300">Tolak Retur</button>
                                     </form>

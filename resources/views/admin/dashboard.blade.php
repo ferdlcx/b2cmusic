@@ -78,7 +78,7 @@
                                 <td class="px-6 py-5 font-bold text-walnut-950">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                 <td class="px-6 py-5 text-center">
                                     @if($order->status === 'pending')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase">Pending</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                     @elseif($order->status === 'paid')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">Paid</span>
                                     @elseif($order->status === 'shipped')
@@ -86,7 +86,7 @@
                                     @elseif($order->status === 'completed')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">Completed</span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-50 text-slate-500 border border-slate-200 uppercase">Canceled</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Canceled</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-5 text-center">

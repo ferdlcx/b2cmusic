@@ -7,10 +7,10 @@
     <!-- Header -->
     <div class="border-b border-slate-100 pb-6 flex items-center justify-between gap-4">
         <div>
-            <span class="text-xs uppercase tracking-[0.45em] text-slate-500 font-bold">Interaksi Sistem</span>
+            <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Interaksi Sistem</span>
             <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Detail Pengguna</h1>
         </div>
-        <a href="{{ route('admin.users') }}" class="inline-flex items-center justify-center px-4 py-2.5 border border-slate-200 bg-white rounded-xl text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-50 transition">
+        <a href="{{ route('admin.users') }}" class="inline-flex items-center justify-center px-4 py-2.5 border border-walnut-800/10 bg-cream-50 rounded-xl text-xs font-semibold uppercase tracking-wider text-walnut-800 hover:bg-cream-100 transition">
             <i data-lucide="arrow-left" class="w-4 h-4 mr-2 text-slate-400"></i> Kembali
         </a>
     </div>
@@ -19,7 +19,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left: Profile Info card -->
         <div class="space-y-6">
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 text-center shadow-sm space-y-4">
+            <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-6 text-center shadow-sm space-y-4">
                 <div class="w-20 h-20 bg-indigo-50 border-2 border-indigo-200 rounded-full flex items-center justify-center font-display font-black text-2xl text-indigo-700 uppercase mx-auto overflow-hidden">
                     @if($user->profile_photo)
                         <img src="{{ Storage::url($user->profile_photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover" />
@@ -76,8 +76,8 @@
         <!-- Right: Addresses & Orders -->
         <div class="lg:col-span-2 space-y-8">
             <!-- Addresses -->
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+            <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-walnut-900 flex items-center gap-2">
                     <i data-lucide="map-pin" class="w-4 h-4 text-indigo-650"></i> Alamat Tersimpan ({{ $user->addresses->count() }})
                 </h3>
 
@@ -86,18 +86,18 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @foreach($user->addresses as $address)
-                            <div class="border border-slate-200 rounded-2xl p-4.5 space-y-2.5 relative {{ $address->is_default ? 'bg-indigo-50/20 border-indigo-200' : '' }}">
+                            <div class="border border-walnut-800/10 rounded-2xl p-4.5 space-y-2.5 relative {{ $address->is_default ? 'bg-indigo-50/20 border-indigo-200' : '' }}">
                                 <div class="flex items-center justify-between">
                                     <span class="font-display font-black text-[0.65rem] uppercase tracking-widest text-slate-800">{{ $address->label }}</span>
                                     @if($address->is_default)
                                         <span class="text-[0.55rem] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">Utama</span>
                                     @endif
                                 </div>
-                                <div class="text-xs font-semibold text-slate-700">
+                                <div class="text-xs font-semibold text-walnut-800">
                                     <strong>{{ $address->name }}</strong><br>
                                     {{ $address->phone }}
                                 </div>
-                                <p class="text-[0.7rem] text-slate-500 leading-relaxed font-normal">
+                                <p class="text-[0.7rem] text-muted leading-relaxed font-normal">
                                     {{ $address->address }}, {{ $address->village }}, {{ $address->district }}, {{ $address->city }}, {{ $address->province }}, {{ $address->postal_code }}
                                 </p>
                             </div>
@@ -107,8 +107,8 @@
             </div>
 
             <!-- Orders -->
-            <div class="bg-white border border-slate-200/80 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+            <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-walnut-900 flex items-center gap-2">
                     <i data-lucide="shopping-bag" class="w-4 h-4 text-indigo-650"></i> Riwayat Pesanan ({{ $user->orders->count() }})
                 </h3>
 
@@ -128,13 +128,13 @@
                             </thead>
                             <tbody>
                                 @foreach($user->orders as $order)
-                                    <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition">
-                                        <td class="py-3.5 font-bold uppercase text-slate-900 text-xs">#{{ $order->order_code }}</td>
-                                        <td class="py-3.5 text-slate-500 font-medium text-xs">{{ $order->created_at->format('d M Y') }}</td>
+                                    <tr class="border-b border-slate-50 last:border-0 hover:bg-cream-100/50 transition">
+                                        <td class="py-3.5 font-bold uppercase text-walnut-900 text-xs">#{{ $order->order_code }}</td>
+                                        <td class="py-3.5 text-muted font-medium text-xs">{{ $order->created_at->format('d M Y') }}</td>
                                         <td class="py-3.5 font-bold text-slate-800 text-xs">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                                         <td class="py-3.5 text-center">
                                             @if($order->status === 'pending')
-                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">Pending</span>
+                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-gold-50 text-gold-700 border border-gold-200 px-2 py-0.5 rounded">Pending</span>
                                             @elseif($order->status === 'paid' || $order->status === 'processing')
                                                 <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded">Paid</span>
                                             @elseif($order->status === 'shipped')

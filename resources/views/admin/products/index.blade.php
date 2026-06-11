@@ -70,7 +70,7 @@
                                 @if($product->stock <= 0)
                                     <span class="text-[0.65rem] font-bold text-red-700 uppercase tracking-widest">Habis</span>
                                 @elseif($product->stock <= 5)
-                                    <span class="text-[0.65rem] font-bold text-amber-700 uppercase tracking-widest">{{ $product->stock }} (Tipis)</span>
+                                    <span class="text-[0.65rem] font-bold text-gold-700 uppercase tracking-widest">{{ $product->stock }} (Tipis)</span>
                                 @else
                                     <span class="text-[0.65rem] font-bold text-walnut-900 uppercase tracking-widest">{{ $product->stock }}</span>
                                 @endif

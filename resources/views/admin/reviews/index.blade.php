@@ -6,21 +6,21 @@
 <div class="space-y-6">
     <!-- Header -->
     <div class="border-b border-slate-100 pb-6">
-        <span class="text-xs uppercase tracking-[0.45em] text-slate-500 font-bold">Interaksi</span>
+        <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Interaksi</span>
         <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 mt-2">Moderasi Ulasan</h1>
-        <p class="text-xs text-slate-500">Moderasi ulasan produk yang masuk dari pelanggan sebelum ditampilkan ke publik.</p>
+        <p class="text-xs text-muted">Moderasi ulasan produk yang masuk dari pelanggan sebelum ditampilkan ke publik.</p>
     </div>
 
     <!-- Table -->
     @if($reviews->isEmpty())
-        <div class="bg-white border border-slate-200/80 rounded-[32px] p-12 text-center text-slate-500">
+        <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-12 text-center text-muted">
             <i data-lucide="message-square" class="w-10 h-10 text-slate-350 mx-auto mb-3"></i>
             <p class="text-xs font-semibold">Belum ada ulasan masuk.</p>
         </div>
     @else
-        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[32px] border border-walnut-800/10 bg-cream-50 shadow-sm">
             <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-slate-50 border-b border-slate-100">
+                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
                     <tr>
                         <th class="px-6 py-4">Pengulas & Produk</th>
                         <th class="px-6 py-4">Rating & Komentar</th>
@@ -31,15 +31,15 @@
                 </thead>
                 <tbody>
                     @foreach($reviews as $review)
-                        <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                        <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
                             <td class="px-6 py-5">
-                                <span class="font-bold text-slate-900 block">{{ $review->user->name }}</span>
+                                <span class="font-bold text-walnut-900 block">{{ $review->user->name }}</span>
                                 <span class="text-[0.65rem] text-slate-400 font-semibold block">{{ $review->user->email }}</span>
                                 <span class="text-[0.65rem] text-indigo-600 font-bold block mt-2 uppercase tracking-wide">Produk: {{ $review->product->name }}</span>
                             </td>
                             <td class="px-6 py-5 max-w-sm">
                                 <!-- Stars -->
-                                <div class="flex items-center gap-0.5 text-amber-400 mb-1.5">
+                                <div class="flex items-center gap-0.5 text-gold-400 mb-1.5">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($i <= $review->rating)
                                             <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
@@ -48,7 +48,7 @@
                                         @endif
                                     @endfor
                                 </div>
-                                <p class="text-xs text-slate-700 font-medium leading-relaxed">{{ $review->comment }}</p>
+                                <p class="text-xs text-walnut-800 font-medium leading-relaxed">{{ $review->comment }}</p>
                                 <span class="text-[0.6rem] text-slate-400 block mt-1">{{ $review->created_at->format('d M Y, H:i') }}</span>
                             </td>
                             <td class="px-6 py-5">
@@ -63,7 +63,7 @@
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @if($review->status === 'pending')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase">Pending</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                 @elseif($review->status === 'approved')
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-emerald-50 text-emerald-700 border border-emerald-250 uppercase">Disetujui</span>
                                 @else

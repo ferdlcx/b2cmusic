@@ -104,17 +104,23 @@ class TrackingController extends Controller
             ];
         }
 
-            if ($order->shipment && $order->shipment->status === 'delivered') {
-                $checkpoints[] = [
-                    'status' => 'Terkirim',
-                    'description' => 'Paket telah diterima di alamat tujuan',
-                    'location' => $order->address->address ?? $destinationCity,
-                    'lat' => $order->address->latitude ?? -6.9210,
-                    'lng' => $order->address->longitude ?? 107.6210,
-                    'datetime' => ($order->shipment->delivered_at ?? now())->format('d M Y, H:i') . ' WIB',
-                    'completed' => true,
-                ];
-            }
+        }
+
+        $hasDelivered = collect($checkpoints)->contains(function ($cp) {
+            return in_array(strtolower($cp['status']), ['delivered', 'terkirim']);
+        });
+
+        if (!$hasDelivered && $order->shipment && $order->shipment->status === 'delivered') {
+            $destinationCity = $order->address ? $order->address->city : 'Kota Tujuan';
+            $checkpoints[] = [
+                'status' => 'Terkirim',
+                'description' => 'Paket telah diterima di alamat tujuan',
+                'location' => $order->address->address ?? $destinationCity,
+                'lat' => $order->address->latitude ?? -6.9210,
+                'lng' => $order->address->longitude ?? 107.6210,
+                'datetime' => ($order->shipment->delivered_at ?? now())->format('d M Y, H:i') . ' WIB',
+                'completed' => true,
+            ];
         }
 
         return view('orders.tracking', compact('order', 'checkpoints'));

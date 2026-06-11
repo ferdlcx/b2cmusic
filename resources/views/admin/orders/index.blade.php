@@ -7,21 +7,21 @@
     <!-- Header -->
     <div class="border-b border-slate-100 pb-8 flex items-center justify-between">
         <div>
-            <span class="text-xs uppercase tracking-[0.45em] text-slate-500 font-bold">Menu Admin</span>
+            <span class="text-xs uppercase tracking-[0.45em] text-muted font-bold">Menu Admin</span>
             <h1 class="text-4xl md:text-5xl font-black uppercase tracking-[-0.04em] text-slate-950 mt-3">Daftar Pesanan</h1>
         </div>
-        <a href="{{ route('admin.dashboard') }}" class="text-xs uppercase tracking-widest font-bold text-slate-500 hover:text-slate-950 transition">← Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}" class="text-xs uppercase tracking-widest font-bold text-muted hover:text-slate-950 transition">← Dashboard</a>
     </div>
 
     <!-- Orders Table -->
     @if($orders->isEmpty())
-        <div class="bg-white border border-slate-200 rounded-[32px] p-16 text-center text-slate-500">
+        <div class="bg-cream-50 border border-walnut-800/10 rounded-[32px] p-16 text-center text-muted">
             Belum ada pesanan masuk dari pembeli.
         </div>
     @else
-        <div class="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[32px] border border-walnut-800/10 bg-cream-50 shadow-sm">
             <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-slate-50 border-b border-slate-100">
+                <thead class="text-xs uppercase tracking-widest text-slate-400 bg-cream-100 border-b border-slate-100">
                     <tr>
                         <th class="px-6 py-4">Kode Invoice</th>
                         <th class="px-6 py-4">Nama Pelanggan</th>
@@ -34,31 +34,31 @@
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
-                        <tr class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
+                        <tr class="border-b border-slate-100 last:border-0 hover:bg-cream-100/50">
                             <!-- Invoice Code -->
-                            <td class="px-6 py-6 font-bold text-slate-900 uppercase">
+                            <td class="px-6 py-6 font-bold text-walnut-900 uppercase">
                                 #{{ $order->order_code }}
                             </td>
 
                             <!-- Customer Name -->
-                            <td class="px-6 py-6 text-slate-700 font-medium">
+                            <td class="px-6 py-6 text-walnut-800 font-medium">
                                 {{ $order->user->name }}
                             </td>
 
                             <!-- Date -->
-                            <td class="px-6 py-6 text-slate-500">
+                            <td class="px-6 py-6 text-muted">
                                 {{ $order->created_at->format('d M Y, H:i') }}
                             </td>
 
                             <!-- Total Bill -->
-                            <td class="px-6 py-6 font-bold text-slate-900">
+                            <td class="px-6 py-6 font-bold text-walnut-900">
                                 Rp {{ number_format($order->total, 0, ',', '.') }}
                             </td>
 
                             <!-- Order Status -->
                             <td class="px-6 py-6 text-center">
                                 @if($order->status === 'pending')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase">Pending</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                 @elseif($order->status === 'paid')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">Paid</span>
                                 @elseif($order->status === 'shipped')
@@ -66,13 +66,13 @@
                                 @elseif($order->status === 'completed')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">Completed</span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-50 text-slate-500 border border-slate-200 uppercase">Canceled</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Canceled</span>
                                 @endif
                             </td>
 
                             <!-- Payment Status -->
                             <td class="px-6 py-6 text-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $order->payment && $order->payment->status === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }} uppercase">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $order->payment && $order->payment->status === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-gold-50 text-gold-700' }} uppercase">
                                     {{ $order->payment && $order->payment->status === 'paid' ? 'Lunas' : 'Belum Lunas' }}
                                 </span>
                             </td>

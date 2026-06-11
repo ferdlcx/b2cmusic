@@ -17,7 +17,7 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Cari area (kecamatan/kodepos) untuk dropdown form checkout
+     * Cari area (kecamatan/kodepos) untuk dropdown form checkout via Biteship Maps API
      */
     public function searchArea(Request $request)
     {
@@ -28,6 +28,8 @@ class RajaOngkirController extends Controller
         }
 
         try {
+            /* 
+            // === OLD KOMERCE RAJAONGKIR CODE ===
             $response = Http::withHeaders([
                 'key' => $this->apiKey,
             ])->get("{$this->baseUrl}/destination/domestic-destination", [
@@ -42,8 +44,8 @@ class RajaOngkirController extends Controller
                 
                 $formatted = array_map(function($area) {
                     return [
-                        'id' => $area['id'], // Subdistrict ID
-                        'text' => $area['label'], // e.g. GROGOL, JAKARTA BARAT, DKI JAKARTA, 11450
+                        'id' => $area['id'],
+                        'text' => $area['label'],
                         'postal_code' => $area['zip_code'],
                         'city' => $area['city_name'],
                         'province' => $area['province_name']
@@ -52,10 +54,72 @@ class RajaOngkirController extends Controller
 
                 return response()->json($formatted);
             }
+            // ===================================
+            */
 
-            return response()->json([]);
+            // === NEW BITESHIP MAPS API ===
+            $biteshipKey = env('BITESHIP_API_KEY');
+            if (!$biteshipKey) {
+                return response()->json([]);
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => $biteshipKey
+            ])->get("https://api.biteship.com/v1/maps/areas", [
+                'countries' => 'ID',
+                'input' => $search,
+                'type' => 'single'
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $areas = $data['areas'] ?? [];
+                
+                $formatted = array_map(function($area) {
+                    $postalCode = '';
+                    if (preg_match('/(\d{5})$/', trim($area['name']), $matches)) {
+                        $postalCode = $matches[1];
+                    }
+                    return [
+                        'id' => $area['id'], // Biteship Area ID
+                        'text' => $area['name'], // e.g. "Gambir, Jakarta Pusat, DKI Jakarta. 10110"
+                        'postal_code' => $postalCode,
+                        'city' => $area['administrative_division_level_2_name'] ?? '',
+                        'province' => $area['administrative_division_level_1_name'] ?? ''
+                    ];
+                }, $areas);
+
+                return response()->json($formatted);
+            } else {
+                Log::warning('Biteship Maps Failed/Limit Reached. Using Mock Data.');
+                return response()->json([
+                    [
+                        'id' => 'IDNP6IDNC147IDND828', // Dummy Biteship Area ID
+                        'text' => 'Kebayoran Lama, Jakarta Selatan, DKI Jakarta (Mock Data)',
+                        'postal_code' => '12240',
+                        'city' => 'Jakarta Selatan',
+                        'province' => 'DKI Jakarta'
+                    ],
+                    [
+                        'id' => 'IDNP6IDNC147IDND827',
+                        'text' => 'Gambir, Jakarta Pusat, DKI Jakarta (Mock Data)',
+                        'postal_code' => '10110',
+                        'city' => 'Jakarta Pusat',
+                        'province' => 'DKI Jakarta'
+                    ]
+                ]);
+            }
         } catch (\Exception $e) {
-            return response()->json([]);
+            Log::error('Biteship Maps Error: ' . $e->getMessage());
+            return response()->json([
+                [
+                    'id' => 'IDNP6IDNC147IDND828',
+                    'text' => 'Kebayoran Lama, Jakarta Selatan, DKI Jakarta (Mock Fallback)',
+                    'postal_code' => '12240',
+                    'city' => 'Jakarta Selatan',
+                    'province' => 'DKI Jakarta'
+                ]
+            ]);
         }
     }
 
@@ -152,17 +216,11 @@ class RajaOngkirController extends Controller
         $weight = ceil($request->weight);
         if ($weight < 1) $weight = 1000; // minimum 1kg
         
-        // Origin set to Kebayoran Lama (Subdistrict ID 17464) as default
-        $originSubdistrictId = env('RAJAONGKIR_ORIGIN_ID', 17464); 
-        $couriers = ['jne', 'pos', 'tiki'];
-        $formattedCosts = [];
-
-        // Hitung jarak KM
+        // Hitung jarak KM untuk info tambahan
         $lat = $request->latitude;
         $lng = $request->longitude;
 
         if (!$lat || !$lng) {
-            // Coba ambil dari alamat di DB
             $address = \App\Models\Address::where('area_id', $request->destination_area_id)
                 ->where('user_id', \Illuminate\Support\Facades\Auth::id())
                 ->first();
@@ -173,16 +231,21 @@ class RajaOngkirController extends Controller
         }
 
         if (!$lat || !$lng) {
-            // Cari estimasi koordinat dari kota/provinsi
             $approx = $this->getApproximateCoordinates($request->city ?? '', $request->province ?? '');
             $lat = $approx['latitude'];
             $lng = $approx['longitude'];
         }
 
-        // Koordinat toko (Kebayoran Lama)
         $originLat = -6.2253;
         $originLng = 106.7994;
         $distance = $this->calculateDistance($originLat, $originLng, $lat, $lng);
+
+        /* 
+        // === OLD KOMERCE RAJAONGKIR RATES ===
+        // Origin set to Kebayoran Lama (Subdistrict ID 17464) as default
+        $originSubdistrictId = env('RAJAONGKIR_ORIGIN_ID', 17464); 
+        $couriers = ['jne', 'pos', 'tiki'];
+        $formattedCosts = [];
 
         try {
             foreach ($couriers as $courier) {
@@ -216,10 +279,108 @@ class RajaOngkirController extends Controller
             Log::error('RajaOngkir V2 Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
         }
-
-        /* 
-        // Biteship Rates API implementation (PAID in Sandbox, requires balance)
-        // ...
+        // ====================================
         */
+
+        // === NEW BITESHIP RATES API ===
+        try {
+            $biteshipKey = env('BITESHIP_API_KEY');
+            // Origin Area ID for Kebayoran Lama in Biteship
+            $originAreaId = env('BITESHIP_ORIGIN_AREA_ID', 'IDNP6IDNC147IDND828'); 
+            
+            $formattedCosts = [];
+
+            if ($biteshipKey) {
+                $response = Http::withHeaders([
+                    'Authorization' => $biteshipKey,
+                    'Content-Type' => 'application/json'
+                ])->post("https://api.biteship.com/v1/rates/couriers", [
+                    'origin_area_id' => $originAreaId,
+                    'destination_area_id' => $request->destination_area_id,
+                    'couriers' => 'jne,sicepat,jnt,pos',
+                    'items' => [
+                        [
+                            'name' => 'Produk',
+                            'description' => 'Produk Musik',
+                            'value' => 100000,
+                            'length' => 10,
+                            'width' => 10,
+                            'height' => 10,
+                            'weight' => $weight,
+                            'quantity' => 1
+                        ]
+                    ]
+                ]);
+
+                if ($response->successful()) {
+                    $results = $response->json()['pricing'] ?? [];
+                    foreach ($results as $rate) {
+                        $formattedCosts[] = [
+                            'service' => strtoupper($rate['courier_name']) . ' - ' . strtoupper($rate['courier_service_name']),
+                            'description' => $rate['description'] ?? '',
+                            'cost' => $rate['price'] ?? 0,
+                            'etd' => $rate['duration'] ?? ''
+                        ];
+                    }
+                } else {
+                    $errData = $response->json();
+                    if (isset($errData['error']) && str_contains(strtolower($errData['error']), 'balance')) {
+                        // FALLBACK MOCK DATA IF INSUFFICIENT BALANCE (Untuk keperluan UAS testing)
+                        Log::warning('Biteship Insufficient Balance. Using Mock Data.');
+                        $formattedCosts = $this->getMockRates($distance, $weight);
+                    }
+                }
+            } else {
+                $formattedCosts = $this->getMockRates($distance, $weight);
+            }
+
+            return response()->json([
+                'costs' => $formattedCosts,
+                'distance' => $distance
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Biteship Rates Error: ' . $e->getMessage());
+            return response()->json([
+                'costs' => $this->getMockRates($distance, $weight),
+                'distance' => $distance
+            ]);
+        }
+    }
+
+    /**
+     * MOCK DATA (Fallback jika Biteship limit/saldo habis saat testing)
+     * Mengkalkulasi harga berdasarkan jarak * 500 + (berat * 10)
+     */
+    private function getMockRates($distance, $weight)
+    {
+        $basePrice = 10000;
+        $distanceCost = $distance * 250;
+        $weightCost = ($weight / 1000) * 5000;
+        
+        $totalCost = round($basePrice + $distanceCost + $weightCost);
+        // Bulatkan ke ribuan terdekat
+        $totalCost = ceil($totalCost / 1000) * 1000;
+
+        return [
+            [
+                'service' => 'JNE - REG (MOCK)',
+                'description' => 'Layanan Reguler',
+                'cost' => $totalCost,
+                'etd' => '2-3 Hari'
+            ],
+            [
+                'service' => 'SICEPAT - HALU (MOCK)',
+                'description' => 'Harga Mulai Lima Ribu',
+                'cost' => max(5000, $totalCost - 3000),
+                'etd' => '3-5 Hari'
+            ],
+            [
+                'service' => 'J&T - EZ (MOCK)',
+                'description' => 'Reguler Service',
+                'cost' => $totalCost + 2000,
+                'etd' => '2-3 Hari'
+            ]
+        ];
     }
 }

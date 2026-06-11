@@ -152,43 +152,29 @@ class CheckoutController extends Controller
             return ($item->product->weight ?: 1000) * $item->quantity;
         });
 
-        // Calculate shipping cost using RajaOngkir cost API if key is set
-        $shippingCost = $request->courier === 'JNE_YES' ? 40000 : 25000; // default fallback
-        $apiKey = env('RAJAONGKIR_API_KEY', config('services.rajaongkir.api_key'));
-        $originCity = env('RAJAONGKIR_ORIGIN_ID', 17464); // default Kebayoran Lama subdistrict
+        $shippingCost = 15000; // default fallback
         
-        $selectedCourier = explode('_', strtolower($request->courier))[0] ?? 'jne';
-        if (!in_array($selectedCourier, ['jne', 'pos', 'tiki'])) {
+        $selectedCourier = explode(' ', strtolower($request->courier))[0] ?? 'jne';
+        if (!in_array($selectedCourier, ['jne', 'pos', 'tiki', 'sicepat', 'jnt', 'j&t', 'anteraja'])) {
             $selectedCourier = 'jne'; // fallback if invalid
         }
+        
+        // Cek saldo / API key Biteship (Biteship Rates berbayar, gunakan mock jika saldo kurang)
+        // Kita menggunakan fallback berbasis pulau & berat untuk simulasi UAS
+        $province = strtolower($address->province ?? '');
+        $weightInKg = ceil($totalWeight / 1000);
+        if ($weightInKg < 1) $weightInKg = 1;
 
-        if ($apiKey && $address->area_id) {
-            try {
-                $response = Http::asForm()->withoutVerifying()->timeout(5)->withHeaders([
-                    'key' => $apiKey,
-                ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
-                    'origin' => (int) $originCity,
-                    'destination' => (int) $address->area_id,
-                    'weight' => (int) ceil($totalWeight),
-                    'courier' => $selectedCourier
-                ]);
-                
-                if ($response->successful()) {
-                    $results = $response->json()['data'] ?? [];
-                    if (!empty($results)) {
-                        $matchedCost = $results[0]['cost'] ?? 0;
-                        foreach ($results as $c) {
-                            if (str_contains(strtolower($request->courier), strtolower($c['service'] ?? ''))) {
-                                $matchedCost = $c['cost'];
-                                break;
-                            }
-                        }
-                        $shippingCost = $matchedCost;
-                    }
-                }
-            } catch (\Exception $e) {
-                logger()->error('RajaOngkir cost calculation failed on process: ' . $e->getMessage());
-            }
+        if (str_contains($province, 'jawa') || str_contains($province, 'dki') || str_contains($province, 'banten') || str_contains($province, 'yogyakarta') || str_contains($province, 'jogja')) {
+            $shippingCost = 15000 + (($weightInKg - 1) * 10000);
+        } else if (str_contains($province, 'sumatra') || str_contains($province, 'sumatera') || str_contains($province, 'bali') || str_contains($province, 'nusa tenggara')) {
+            $shippingCost = 35000 + (($weightInKg - 1) * 20000);
+        } else if (str_contains($province, 'kalimantan') || str_contains($province, 'sulawesi')) {
+            $shippingCost = 45000 + (($weightInKg - 1) * 30000);
+        } else if (str_contains($province, 'papua') || str_contains($province, 'maluku')) {
+            $shippingCost = 80000 + (($weightInKg - 1) * 60000);
+        } else {
+            $shippingCost = 25000 + (($weightInKg - 1) * 15000);
         }
 
         $discount = 0;

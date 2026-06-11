@@ -144,6 +144,9 @@
                     <a href="{{ route('catalog') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('catalog') ? 'text-gold-600' : '' }}">
                         Shop Catalog
                     </a>
+                    <a href="{{ route('docs') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('docs') ? 'text-gold-600' : '' }}">
+                        Docs
+                    </a>
                 </nav>
 
                 <!-- Auth & Cart Actions -->
@@ -245,6 +248,9 @@
                 </a>
                 <a href="{{ route('catalog') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
                     <i data-lucide="shopping-bag" class="w-4 h-4"></i> Shop Catalog
+                </a>
+                <a href="{{ route('docs') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> Docs
                 </a>
                 @auth
                     <hr class="border-walnut-800/10 my-2" />

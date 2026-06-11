@@ -87,34 +87,34 @@
                             $cs = strtolower($currentStatus);
                             if (in_array($cs, ['pending', 'processing', 'confirmed'])) {
                                 $nextStatuses = [
-                                    'courier_not_found' => 'KURIR TIDAK KETEMU',
-                                    'allocated' => 'ALLOCATE',
-                                    'cancelled' => 'CANCEL'
+                                    'courier_not_found' => 'Kurir Tidak Ketemu',
+                                    'allocated' => 'Alocate',
+                                    'cancelled' => 'Cancel'
                                 ];
                             } elseif ($cs === 'allocated') {
-                                $nextStatuses = ['picking_up' => 'Menuju Penjemputan'];
+                                $nextStatuses = ['picking_up' => 'Picking Up'];
                             } elseif ($cs === 'picking_up') {
                                 $nextStatuses = ['picked' => 'Barang Dijemput', 'on_hold' => 'Ditahan'];
                             } elseif ($cs === 'picked') {
-                                $nextStatuses = ['in_transit' => 'Dalam Perjalanan', 'dropping_off' => 'Dalam Pengantaran'];
+                                $nextStatuses = ['in_transit' => 'Dalam Perjalanan', 'dropping_off' => 'Menuju Pelanggan'];
                             } elseif ($cs === 'in_transit') {
-                                $nextStatuses = ['dropping_off' => 'Dalam Pengantaran'];
+                                $nextStatuses = ['dropping_off' => 'Menuju Pelanggan'];
                             } elseif ($cs === 'dropping_off' || $cs === 'shipped') {
                                 $nextStatuses = [
-                                    'delivered' => 'SELESAI',
-                                    'on_hold' => 'DITAHAN',
-                                    'return_in_transit' => 'RETURN PROCESS',
-                                    'disposed' => 'HANCURKAN PAKET'
+                                    'delivered' => 'Selesai',
+                                    'on_hold' => 'Ditahan',
+                                    'return_in_transit' => 'Return Process',
+                                    'disposed' => 'Hancurkan Paket'
                                 ];
                             } elseif ($cs === 'on_hold') {
                                 $nextStatuses = [
-                                    'delivered' => 'SELESAI', 
-                                    'rejected' => 'REJECTED', 
-                                    'return_in_transit' => 'RETURN PROCESS', 
-                                    'disposed' => 'HANCURKAN PAKET'
+                                    'delivered' => 'Selesai', 
+                                    'rejected' => 'Rejected', 
+                                    'return_in_transit' => 'Return Process', 
+                                    'disposed' => 'Hancurkan Paket'
                                 ];
                             } elseif ($cs === 'return_in_transit') {
-                                $nextStatuses = ['returned' => 'RETURNED'];
+                                $nextStatuses = ['returned' => 'Returned'];
                             }
                         @endphp
                         <tr class="hover:bg-walnut-50/30 transition-colors group">

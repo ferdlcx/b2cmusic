@@ -5,9 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['user_id', 'shipping_address_id', 'order_code', 'subtotal', 'shipping_cost', 'discount', 'total', 'status'])]
 class Order extends Model
 {
+    protected $fillable = [
+        'user_id', 'shipping_address_id', 'order_code', 'subtotal', 
+        'shipping_cost', 'discount', 'total', 'status', 
+        'biteship_order_id', 'tracking_id', 'waybill_id'
+    ];
+
     protected $casts = [
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',

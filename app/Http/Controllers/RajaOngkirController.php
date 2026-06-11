@@ -28,7 +28,6 @@ class RajaOngkirController extends Controller
         }
 
         try {
-        try {
             $response = Http::withHeaders([
                 'key' => $this->apiKey,
             ])->get("{$this->baseUrl}/destination/domestic-destination", [

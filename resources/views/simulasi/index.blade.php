@@ -25,93 +25,152 @@
     <div class="bg-white border border-walnut-800/10 shadow-sm overflow-hidden rounded-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-cream-50 text-walnut-600 text-[0.65rem] tracking-widest font-bold">
+                <thead class="bg-white border-b border-walnut-800/10 text-walnut-600 text-[0.7rem] font-bold">
                     <tr>
-                        <th class="px-6 py-4">Kec. Tujuan<br><span class="text-walnut-400 font-normal">Kode Pos</span></th>
-                        <th class="px-6 py-4">Nama Penerima<br><span class="text-walnut-400 font-normal">No. Telepon</span></th>
-                        <th class="px-6 py-4">Total Item<br><span class="text-walnut-400 font-normal">Total Bobot (kg)</span></th>
-                        <th class="px-6 py-4">Total Ongkir<br><span class="text-walnut-400 font-normal">Nilai COD</span></th>
-                        <th class="px-6 py-4">Status<br><span class="text-walnut-400 font-normal">Tanggal Terakhir Update</span></th>
-                        <th class="px-6 py-4">Aksi<br><span class="text-walnut-400 font-normal">Webhook</span></th>
-                        <th class="px-6 py-4">Tag<br><span class="text-walnut-400 font-normal">Sumber Order</span></th>
+                        <th class="px-4 py-4">Order ID<br><span class="text-walnut-400 font-normal">Reference ID</span></th>
+                        <th class="px-4 py-4">Nomor Resi<br><span class="text-walnut-400 font-normal">Kurir - Layanan</span></th>
+                        <th class="px-4 py-4">Tanggal Dibuat<br><span class="text-walnut-400 font-normal">Jam Dibuat</span></th>
+                        <th class="px-4 py-4">Kec. Tujuan<br><span class="text-walnut-400 font-normal">Kode Pos</span></th>
+                        <th class="px-4 py-4">Nama Penerima<br><span class="text-walnut-400 font-normal">No. Telepon</span></th>
+                        <th class="px-4 py-4">Total Item<br><span class="text-walnut-400 font-normal">Total Bobot (kg)</span></th>
+                        <th class="px-4 py-4">Total Ongkir<br><span class="text-walnut-400 font-normal">Nilai COD</span></th>
+                        <th class="px-4 py-4">Status<br><span class="text-walnut-400 font-normal">Tanggal Terakhir Update</span></th>
+                        <th class="px-4 py-4 text-center">Aksi<br><span class="text-walnut-400 font-normal">Webhook</span></th>
+                        <th class="px-4 py-4">Tag<br><span class="text-walnut-400 font-normal">Sumber Order</span></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-walnut-800/5 text-walnut-950 font-medium text-xs">
+                <tbody class="divide-y divide-walnut-800/5 text-walnut-950 font-medium text-[0.75rem]">
                     @forelse($orders as $order)
                         @php
                             $address = $order->address;
                             $bobot = $order->items->sum(function($i) { return ($i->product->weight ?? 1000) * $i->quantity; }) / 1000;
                             $qty = $order->items->sum('quantity');
                             $biteshipId = $order->biteship_order_id ?? ('SIM-' . $order->id);
+                            
+                            $currentStatus = $order->shipment->status ?? 'pending';
+                            $statusPill = match(strtolower($currentStatus)) {
+                                'delivered' => 'bg-emerald-50 text-emerald-600',
+                                'cancelled', 'rejected' => 'bg-red-50 text-red-600',
+                                'dropping_off' => 'bg-blue-100 text-blue-700',
+                                'in_transit' => 'bg-blue-50 text-blue-600',
+                                'picked' => 'bg-teal-50 text-teal-600',
+                                'picking_up' => 'bg-amber-50 text-amber-600',
+                                'allocated' => 'bg-orange-50 text-orange-600',
+                                'confirmed' => 'bg-gray-100 text-gray-700',
+                                default => 'bg-gray-50 text-gray-600'
+                            };
+
+                            $statusLabel = match(strtolower($currentStatus)) {
+                                'delivered' => 'Berhasil Dikirim',
+                                'cancelled' => 'Dibatalkan',
+                                'dropping_off' => 'Dalam Pengantaran',
+                                'in_transit' => 'Dalam Perjalanan',
+                                'picked' => 'Barang Dijemput',
+                                'picking_up' => 'Menuju Lokasi Penjemputan',
+                                'allocated' => 'Alokasi',
+                                'confirmed' => 'Terkonfirmasi',
+                                'processing' => 'Diproses',
+                                'shipped' => 'Dikirim',
+                                'pending' => 'Pending',
+                                default => ucfirst($currentStatus)
+                            };
+
+                            $nextStatuses = [];
+                            if (in_array(strtolower($currentStatus), ['pending', 'processing', 'confirmed'])) {
+                                $nextStatuses = ['allocated' => 'Alokasikan Pesanan'];
+                            } elseif (strtolower($currentStatus) === 'allocated') {
+                                $nextStatuses = ['picking_up' => 'Menuju Penjemputan'];
+                            } elseif (strtolower($currentStatus) === 'picking_up') {
+                                $nextStatuses = ['picked' => 'Barang Dijemput'];
+                            } elseif (strtolower($currentStatus) === 'picked') {
+                                $nextStatuses = ['in_transit' => 'Dalam Perjalanan'];
+                            } elseif (strtolower($currentStatus) === 'in_transit') {
+                                $nextStatuses = ['dropping_off' => 'Dalam Pengantaran'];
+                            } elseif (strtolower($currentStatus) === 'dropping_off' || strtolower($currentStatus) === 'shipped') {
+                                $nextStatuses = [
+                                    'delivered' => 'Selesai',
+                                    'on_hold' => 'Ditahan',
+                                    'return_in_transit' => 'RETURN PROCESS',
+                                    'disposed' => 'HANCURKAN PAKET'
+                                ];
+                            }
                         @endphp
-                        <tr class="hover:bg-walnut-50/50 transition-colors group">
-                            <td class="px-6 py-4">
+                        <tr class="hover:bg-walnut-50/30 transition-colors group">
+                            <td class="px-4 py-3">
+                                <span class="font-bold text-purple-700 underline decoration-dashed underline-offset-2 cursor-pointer">{{ substr($biteshipId, 0, 15) }}...</span><br>
+                                <span class="text-walnut-500 text-[0.65rem]">-</span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">{{ $order->shipment->tracking_number ?? 'WYB-'.rand(10000000, 99999999) }}</span><br>
+                                <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white">{{ strtoupper($order->shipment->courier ?? 'JNE') }} - {{ strtoupper($order->shipment->service ?? 'REG') }}</span>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="font-bold">{{ $order->created_at->format('d M Y') }}</span><br>
+                                <span class="text-walnut-500 text-[0.65rem]">{{ $order->created_at->format('H.i') }} WIB</span>
+                            </td>
+                            <td class="px-4 py-3">
                                 <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">{{ $address->city ?? 'Jakarta' }}</span><br>
                                 <span class="text-walnut-500 text-[0.65rem]">{{ $address->postal_code ?? '12345' }}</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-3">
                                 <span class="font-bold">{{ $address->recipient_name ?? $order->user->name }}</span><br>
                                 <span class="text-walnut-500 text-[0.65rem]">{{ $address->phone ?? $order->user->phone }}</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-3">
                                 <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">{{ $qty }} Item</span><br>
-                                <span class="text-walnut-500 text-[0.65rem]">{{ number_format($bobot, 1) }} kg</span>
+                                <span class="text-walnut-500 text-[0.65rem]">{{ number_format($bobot, 2) }} kg</span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-3">
                                 <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5 cursor-pointer">Rp{{ number_format($order->shipping_cost, 0, ',', '.') }}</span><br>
                                 <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/20 text-walnut-500 rounded text-[0.6rem]">Non COD</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-[0.65rem] font-bold">{{ ucfirst($order->shipment->status ?? 'pending') }}</span><br>
-                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem]">
+                            <td class="px-4 py-3">
+                                <span class="inline-flex px-2 py-1 rounded-full text-[0.65rem] font-bold {{ $statusPill }}">{{ $statusLabel }}</span><br>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white">
                                     {{ ($order->shipment->updated_at ?? $order->updated_at)->format('d M Y') }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex flex-col gap-2 relative">
-                                    <button @click="openDropdown('{{ $biteshipId }}')" class="inline-flex items-center justify-between w-[120px] px-3 py-1.5 border border-gold-500 text-gold-600 hover:bg-gold-50/50 rounded-lg text-[0.65rem] font-bold transition">
-                                        <span class="flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Update Status</span>
-                                    </button>
-                                    
-                                    <button @click="openPriceModal('{{ $biteshipId }}', {{ $order->shipping_cost }})" class="inline-flex items-center justify-between w-[120px] px-3 py-1.5 border border-gold-500 text-gold-600 hover:bg-gold-50/50 rounded-lg text-[0.65rem] font-bold transition">
-                                        <span class="flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Update Price</span>
-                                    </button>
-
-                                    <!-- Dropdown Menu for Status -->
-                                    <div x-show="activeDropdown === '{{ $biteshipId }}'" @click.away="activeDropdown = null" style="display: none;" class="absolute top-8 left-0 z-50 w-56 bg-white border border-walnut-800/10 shadow-xl rounded-xl py-2">
-                                        @php
-                                            $statuses = [
-                                                'confirmed', 'scheduled', 'allocated', 'picking_up', 
-                                                'picked', 'cancelled', 'on_hold', 'in_transit', 
-                                                'dropping_off', 'return_in_transit', 'returned', 
-                                                'rejected', 'disposed', 'courier_not_found', 'delivered'
-                                            ];
-                                        @endphp
-                                        <div class="max-h-60 overflow-y-auto">
-                                            @foreach($statuses as $st)
-                                                <form action="{{ route('simulasi.webhook.status') }}" method="POST" class="w-full">
-                                                    @csrf
-                                                    <input type="hidden" name="order_id" value="{{ $biteshipId }}">
-                                                    <input type="hidden" name="status" value="{{ $st }}">
-                                                    <button type="submit" class="w-full text-left px-4 py-1.5 hover:bg-gold-50 text-[0.65rem] font-bold text-walnut-900 uppercase flex items-center gap-2 transition">
-                                                        <i data-lucide="truck" class="w-3 h-3 text-gold-600"></i> {{ str_replace('_', ' ', $st) }}
-                                                    </button>
-                                                </form>
-                                            @endforeach
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex flex-col items-center gap-1.5 relative">
+                                    @if(count($nextStatuses) > 0)
+                                        <button @click="openDropdown('{{ $biteshipId }}')" class="inline-flex items-center justify-center w-[110px] px-2 py-1 border border-gold-500 text-gold-600 bg-gold-50/30 hover:bg-gold-50 rounded-lg text-[0.6rem] font-bold transition">
+                                            <span class="flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Update Status</span>
+                                        </button>
+                                        
+                                        <!-- Dropdown Menu for Status -->
+                                        <div x-show="activeDropdown === '{{ $biteshipId }}'" @click.away="activeDropdown = null" style="display: none;" class="absolute top-8 left-1/2 -translate-x-1/2 z-50 w-48 bg-white border border-walnut-800/10 shadow-xl rounded-xl py-2">
+                                            <div class="max-h-60 overflow-y-auto">
+                                                @foreach($nextStatuses as $val => $label)
+                                                    <form action="{{ route('simulasi.webhook.status') }}" method="POST" class="w-full">
+                                                        @csrf
+                                                        <input type="hidden" name="order_id" value="{{ $biteshipId }}">
+                                                        <input type="hidden" name="status" value="{{ $val }}">
+                                                        <button type="submit" class="w-full text-left px-4 py-2 hover:bg-purple-50 text-[0.65rem] font-bold text-purple-700 uppercase flex items-center gap-2 transition">
+                                                            <i data-lucide="truck" class="w-3 h-3"></i> {{ $label }}
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    </div>
+                                    @else
+                                        <span class="text-[0.6rem] text-walnut-400 italic">No Actions</span>
+                                    @endif
+                                    
+                                    <button @click="openPriceModal('{{ $biteshipId }}', {{ $order->shipping_cost }})" class="inline-flex items-center justify-center w-[110px] px-2 py-1 border border-gold-500 text-gold-600 bg-gold-50/30 hover:bg-gold-50 rounded-lg text-[0.6rem] font-bold transition">
+                                        <span class="flex items-center gap-1"><i data-lucide="dollar-sign" class="w-3 h-3"></i> Update Price</span>
+                                    </button>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center gap-1 text-[0.65rem] font-bold text-purple-700">
-                                    <i data-lucide="tag" class="w-3 h-3"></i> Tambah Tags
+                            <td class="px-4 py-3">
+                                <span class="inline-flex items-center gap-1 text-[0.65rem] font-bold text-purple-700 cursor-pointer">
+                                    <i data-lucide="tag" class="w-3 h-3 fill-purple-700"></i> Tambah Tags
                                 </span><br>
-                                <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem]">API</span>
+                                <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white">API</span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-walnut-500 font-medium text-sm">
+                            <td colspan="10" class="px-6 py-12 text-center text-walnut-500 font-medium text-sm">
                                 Tidak ada pesanan untuk disimulasikan.
                             </td>
                         </tr>

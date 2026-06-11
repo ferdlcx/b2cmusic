@@ -4,16 +4,11 @@ Rates API	Paid*	Paid
 Order API	Simulated	Real shipments
 Tracking API	Paid*	Paid
 
-hanya ini yang gratis 
-Order API	Simulated	Real shipments
-
-
 
 api : judas
 biteship_test.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoianVkYXMiLCJ1c2VySWQiOiI2YTI5NmFiNWU1NDcyNDcwZjA0MzI4NTUiLCJpYXQiOjE3ODExMDc5NDV9.CheR3TZkvTsBNyiB4sE8uvRkM277K6Cq-ocD_4o4pG8
 
 
-nih doc
 Sandbox Environment
 Before going live with your Biteship integration, you should thoroughly test your implementation in our sandbox environment. This guide explains how to use the sandbox effectively.
 
@@ -813,3 +808,153 @@ POST	/v1/orders	40009002	Payment method is not found
 POST	/v1/orders	40009003	Payment failed to process. Please contact support@biteship.com for this matter.
 POST	/v1/orders	40009004	Failed to create transaction
 
+Overview
+You can configure webhook endpoints directly from your personal dashboard. Biteship has multiple webhook events
+
+order.status
+Webhook will be fired every time there is an status update
+order.price
+Webhook will be fired every time there is a change in price. This happens when the shipping rates is different from the actual weight
+order.waybill_id
+Webhook will be fired every time there is an update for your waybill number
+Benefits of Webhooks for Tracking Shipments
+Webhooks offer several advantages for tracking shipments:
+
+Real-time Updates: Webhooks provide instant notifications about shipment status changes, allowing you to stay up-to-date without constantly polling the API.
+
+Automated Workflows: You can trigger automated actions in your system based on shipment events, such as sending customer notifications or updating internal databases.
+
+Improved Customer Experience: With real-time data, you can keep your customers informed about their shipments promptly, enhancing their satisfaction.
+
+Reduced API Load: Webhooks eliminate the need for frequent API calls to check for updates, reducing the load on both your system and Biteship's servers.
+
+Efficient Resource Usage: By receiving updates only when changes occur, you can optimize your system's resource allocation and processing.
+
+Enhanced Tracking Accuracy: Webhooks ensure you have the most current information about shipments, improving the accuracy of your tracking systems.
+
+Scalability: As your business grows, webhooks can easily handle increased shipment volumes without requiring changes to your integration.
+
+By leveraging webhooks for shipment tracking, you can create a more responsive, efficient, and customer-friendly logistics system.
+
+Event Type
+Order Status
+The Order Status webhook provides real-time updates about the status changes of your shipments. By implementing this webhook, you can maintain real-time synchronization between Biteship's system and your own, ensuring you always have the most up-to-date information about your orders.
+
+JSON Body Request
+{
+    "event": "order.status"
+    "courier_tracking_id": "XYZ-123-PQS"
+    "courier_waybill_id": "SKS-XXXXX",
+    "courier_company": "JNE",
+    "courier_type": "REG",
+    "courier_driver_name": "Maulana Imran",
+    "courier_driver_phone": "088888888888",
+    "courier_driver_photo_url": "https://picsum.photos/200",
+    "courier_driver_plate_number": "B 1234 AAA",
+    "courier_link": "https://xxx-yyy-zzz.com",
+    "order_id": "5dd6da88f43bd430ecd5aa2e",
+    "order_price": 100000,
+    "status": "confirmed"
+}
+
+Order Price
+The Order Price webhook provides real-time updates about the price changes of your shipments. By implementing this webhook, you can maintain real-time synchronization between Biteship's system and your own, ensuring you always have the most up-to-date information about your orders.
+
+Price changes when the actual weight is different from the weight used to calculate the price. Order price is the price that will be charged to the customer.
+
+JSON Body Request
+{
+    "cash_on_delivery_fee": 100000,
+    "courier_tracking_id": "ASjsd92Asd2d1ASdj91",
+    "courier_waybill_id": "Abc-123",
+    "event": "order.price",
+    "order_id": "ASjsd92Asd2d1ASdj91",
+    "price": 100000,
+    "proof_of_delivery_fee": 2000,
+    "shippment_fee": 10000,
+    "status": "picked"
+}
+
+Order Waybill Id
+The Order Waybill Id webhook provides real-time updates about the waybill id changes of your shipments. By implementing this webhook, you can maintain real-time synchronization between Biteship's system and your own, ensuring you always have the most up-to-date information about your orders.
+
+Order waybill id changes when the courier has updated the waybill id for the shipment. It happens when the shipment is picked up by the courier and then there's a switch to the next courier.
+
+JSON Body Request
+{
+    "order_id": "AbSASD12213dadas",
+    "courier_tracking_id": "AbSASD12213dadas",
+    "courier_waybill_id": "abc-1234",
+    "event": "order.waybill_id",
+    "status": "picked"
+}
+
+Add Webhook
+This endpoint allows you to add a new webhook to your account.
+
+Create a new webhook
+To add a new webhook to your account, follow these steps:
+
+Navigate to the Biteship dashboard integration page at Integration Page
+
+Click on the "Pengaturan" (Settings) button to access the webhook configuration section
+
+Biteship Generate New Token for API Image
+Click "Tambah Webhook" button to add a new webhook
+
+Biteship Generate New Token for API Image
+In the webhook configuration area, you'll find options to:
+
+Enter the URL where you want to receive webhook notifications
+Select the specific events you want to be notified about (e.g., order status changes, price updates)
+Set up any necessary authentication for your webhook endpointBiteship Generate New Token for API Image
+After configuring your webhook settings, click the "Save" or "Add Webhook" button to activate it
+
+Remember to ensure that your webhook endpoint is properly set up to receive and process the incoming data from Biteship
+
+
+Play Webhook
+This webhook is triggered when a play event occurs in the system.
+
+Update Webhook
+To update the webhook, you need to see there's a yellow button on each order. Click the button to update the webhook based on the Webhook event type. Each button will update the webhook based on the event type.
+
+Make sure to activate your "Mode Testing" toggle at the sidebar to test the webhook.
+
+
+Errors
+Biteship uses conventional HTTP response codes to show success or failure of an API request. Codes in the 2xx range shows a success, codes for the 4xx range shows an error that resulted from the provided information (e.g. a required field was missing, wrong format, etc.), and codes in the 5xx range indicate an error with Biteship's servers.
+
+Status
+Error List Summary
+200 - Works fine.
+
+400 - Bad request. Missing required parameters or other else.
+
+401 - Request is not authorized
+
+402 - Request is failed
+
+403 - Key doesn't have access to request API calls
+
+404 - The request is not exist
+
+500 - Something's wrong with Biteship's internal server
+
+This is how Biteship respond to error request
+
+Error List Summary
+{
+     success: false,
+     error: "Required parameter is missing"
+}
+
+Base URL
+All URLs referenced in the API documentation have the following base:
+
+Base URL
+https://api.biteship.com
+
+This REST API is served over HTTPS. To ensure data privacy, unencrypted HTTP is not supported.
+
+You can use the Biteship API in test mode, which doesn't affect your live data or interact with the actual shipping mode. The API key you use to authenticate the request determines whether the request is live mode or test mode.

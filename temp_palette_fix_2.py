@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-root = Path('resources/views/admin')
+root = Path('resources/views')
 
 replacements = {
     # Indigo to gold

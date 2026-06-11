@@ -137,7 +137,23 @@
                             <div class="flex flex-col gap-1">
                                 <span class="text-[0.65rem] uppercase tracking-widest font-bold">Status Ekspedisi</span>
                                 <span class="inline-block self-start px-2 py-1 text-[0.6rem] font-bold {{ $order->shipment->status === 'delivered' ? 'bg-walnut-900 text-gold-500' : 'border border-walnut-900 text-walnut-900' }} uppercase tracking-widest">
-                                    {{ $order->shipment->status === 'delivered' ? 'Terkirim' : ($order->shipment->status === 'shipped' ? 'Dalam Perjalanan' : $order->shipment->status) }}
+                                    @php
+                                        $expStatus = match(strtolower($order->shipment->status)) {
+                                            'delivered' => 'Terkirim',
+                                            'dropping_off' => 'Dalam Pengantaran',
+                                            'in_transit' => 'Dalam Perjalanan',
+                                            'picked' => 'Barang Dijemput',
+                                            'picking_up' => 'Menuju Penjemputan',
+                                            'allocated' => 'Kurir Dialokasikan',
+                                            'shipped' => 'Dikirim',
+                                            'processing' => 'Diproses',
+                                            'on_hold' => 'Ditahan',
+                                            'returned' => 'Dikembalikan',
+                                            'cancelled' => 'Dibatalkan',
+                                            default => $order->shipment->status
+                                        };
+                                    @endphp
+                                    {{ $expStatus }}
                                 </span>
                             </div>
                             <div class="flex flex-col gap-1">

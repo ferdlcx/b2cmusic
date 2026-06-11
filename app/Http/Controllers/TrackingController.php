@@ -57,7 +57,7 @@ class TrackingController extends Controller
         ];
 
         $webhookRequest = Request::create('/api/biteship/webhook', 'POST', $payload);
-        app()->handle($webhookRequest);
+        $this->biteshipWebhook($webhookRequest);
 
         return back()->with('success', 'Webhook order.status (' . $request->status . ') berhasil disimulasikan!');
     }
@@ -89,7 +89,7 @@ class TrackingController extends Controller
         // While currently biteshipWebhook only handles 'order.status' and 'waybill.status',
         // we simulate sending this just as Biteship would. You can expand biteshipWebhook to handle 'order.price' later.
         $webhookRequest = Request::create('/api/biteship/webhook', 'POST', $payload);
-        app()->handle($webhookRequest);
+        $this->biteshipWebhook($webhookRequest);
 
         return back()->with('success', 'Webhook order.price (' . $request->price . ') berhasil disimulasikan!');
     }
@@ -363,14 +363,19 @@ class TrackingController extends Controller
                             'user_agent' => request()->userAgent(),
                         ]);
                     } catch (\Exception $e) {}
-                } elseif ($status === 'picking_up' || $status === 'in_transit' || $status === 'dropping_off' || $status === 'picked') {
-                    if ($order->status === 'processing' || $order->status === 'paid') {
-                        $order->update(['status' => 'shipped']);
-                        $order->shipment->update([
-                            'status' => 'shipped',
-                            'shipped_at' => now(),
-                        ]);
+                } elseif (in_array($status, ['allocated', 'picking_up', 'picked', 'in_transit', 'dropping_off', 'shipped', 'on_hold', 'return_in_transit', 'returned', 'disposed', 'rejected', 'courier_not_found'])) {
+                    // Update main order status to shipped if it was processing/paid and the package is moving
+                    if (in_array($status, ['picking_up', 'picked', 'in_transit', 'dropping_off', 'shipped'])) {
+                        if ($order->status === 'processing' || $order->status === 'paid') {
+                            $order->update(['status' => 'shipped']);
+                        }
                     }
+
+                    // Store exact Biteship status in shipment
+                    $order->shipment->update([
+                        'status' => $status,
+                        'shipped_at' => $order->shipment->shipped_at ?: now(),
+                    ]);
                 }
             }
             return response('ok', 200);

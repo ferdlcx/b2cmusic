@@ -80,21 +80,44 @@ class ProfileController extends Controller
             'is_default'  => ['nullable', 'boolean'],
         ]);
 
-        $isDefault = $request->boolean('is_default');
+        try {
+            $isDefault = $request->boolean('is_default');
 
-        // If this is set as default, unset previous default
-        if ($isDefault) {
-            $user->addresses()->where('is_default', true)->update(['is_default' => false]);
+            // If this is the first address, ALWAYS make it default
+            $isFirstAddress = $user->addresses()->count() === 0;
+            if ($isFirstAddress) {
+                $isDefault = true;
+            }
+
+            // If this is set as default, unset previous default
+            if ($isDefault) {
+                $user->addresses()->where('is_default', true)->update(['is_default' => false]);
+            }
+
+            $address = $user->addresses()->create(array_merge($validated, ['is_default' => $isDefault]));
+
+            // Return JSON for AJAX/API requests (e.g., from checkout page)
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Alamat berhasil ditambahkan.',
+                    'address' => $address,
+                ], 201);
+            }
+
+            return back()->with('success', 'Alamat berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Store address failed: ' . $e->getMessage());
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menyimpan alamat: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->withErrors(['address' => 'Gagal menyimpan alamat.']);
         }
-
-        // If this is the first address, make it default automatically
-        if ($user->addresses()->count() === 0) {
-            $isDefault = true;
-        }
-
-        $user->addresses()->create(array_merge($validated, ['is_default' => $isDefault]));
-
-        return back()->with('success', 'Alamat berhasil ditambahkan.');
     }
 
     /**

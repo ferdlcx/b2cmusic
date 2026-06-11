@@ -203,6 +203,47 @@
 
         <!-- Right Column: Order Summary & Payment -->
         <div class="space-y-8">
+            <!-- Sandbox Simulation Panel (Visible in local or testing) -->
+            <div class="bg-amber-500/10 border border-amber-500/30 p-8 space-y-6">
+                <div class="flex items-center gap-2 pb-4 border-b border-amber-500/20">
+                    <span class="w-2 h-2 bg-amber-500 rounded-full animate-ping"></span>
+                    <h3 class="font-display text-lg font-black uppercase tracking-tighter text-amber-950">UAS Sandbox Simulator</h3>
+                </div>
+                <p class="text-[0.7rem] text-amber-900 leading-relaxed font-medium">
+                    Gunakan panel ini untuk mensimulasikan alur transaksi secara instan layaknya Shopee tanpa memotong saldo API / gateway asli.
+                </p>
+
+                @if($order->status === 'pending')
+                    <form action="{{ route('orders.simulatePayment', $order->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" 
+                            class="w-full py-3 bg-amber-600 text-white font-bold uppercase text-[0.65rem] tracking-widest hover:bg-amber-700 transition duration-300">
+                            Simulasikan Bayar Lunas
+                        </button>
+                    </form>
+                @elseif(in_array($order->status, ['paid', 'processing']))
+                    <form action="{{ route('orders.simulateShipment', $order->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" 
+                            class="w-full py-3 bg-amber-600 text-white font-bold uppercase text-[0.65rem] tracking-widest hover:bg-amber-700 transition duration-300">
+                            Simulasikan Admin Kirim Barang
+                        </button>
+                    </form>
+                @elseif($order->status === 'shipped' && (!$order->shipment || $order->shipment->status !== 'delivered'))
+                    <form action="{{ route('orders.sandboxArrive', $order->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" 
+                            class="w-full py-3 bg-amber-600 text-white font-bold uppercase text-[0.65rem] tracking-widest hover:bg-amber-700 transition duration-300">
+                            Simulasikan Kurir Tiba (Delivered)
+                        </button>
+                    </form>
+                @else
+                    <div class="p-4 bg-amber-50 border border-amber-200 text-[0.7rem] text-amber-800 font-bold uppercase tracking-wider text-center">
+                        Simulasi Selesai / Status: {{ strtoupper($order->status) }}
+                    </div>
+                @endif
+            </div>
+
             <!-- Payment Info -->
             <div class="bg-cream-50 border border-walnut-800/10 p-8 space-y-6">
                 <div class="pb-4 border-b border-walnut-800/10">

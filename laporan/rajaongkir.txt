@@ -1,0 +1,936 @@
+Shipping Cost api key =
+ 1oKzkr5Qf967fe03de1d601bxUErSPD8
+
+docs 
+
+
+Welcome to Live Chat
+Sebelum melanjutkan ke livechat tolong masukkan email kamu terlebih dahulu
+
+Masukkan email kamu
+
+Search docs...
+📦 Delivery API - By Komship
+Getting Started 🚀
+Store Order 📦
+To use the Komship Delivery API, you must first retrieve your API key from the Collaborator dashboard. This API key is essential for authenticating your requests and accessing the services provided by the API.
+
+Follow these steps to locate your API key:
+
+Login to your 
+Navigate to the Integration menu
+Click on Api Key
+Unlock your Shipping Delivery APIKEY.
+ danger
+⚠️ Keep your API key secure. Do not share it or expose it in public-facing code or repositories.
+
+Komerce may offer multiple API keys for different services. Make sure to:
+
+Use the API key labeled Shipping Delivery.
+Do not use API keys intended for other services (e.g., RajaOngkir, Shipping Cost, etc.)
+ danger
+Using the wrong API key will result in failed authentication or limited functionality.
+
+Include your API key as a Middleware in the HEADER of each API request:
+
+x-api-key: YOUR_API_KEY
+curl --request GET \
+  --url https://api-sandbox.collaborator.komerce.id
+  --header 'x-api-key: YOUR_API_KEY'
+This will return the list of available couriers for your delivery orders.
+
+If your API key is compromised or you need to rotate it, you can regenerate a new one from the same API Key section in your Komerce dashboard.
+
+On this page
+
+
+All Komerce API requests are made through a centralized base URL. Depending on the environment you are working in (production or sandbox/testing), you should direct your requests to the appropriate endpoint.
+
+This is the live environment where real delivery orders, shipping rate calculations, and plugin communications occur.
+
+Base URL:
+
+https://api.collaborator.komerce.id/
+Use this URL when your integration is ready for production and has passed sandbox testing. All production requests must be authenticated with a valid production token.
+
+The sandbox environment is designed for testing purposes. No real shipments are created, and you can experiment safely with all endpoints.
+
+Base URL:
+
+https://api-sandbox.collaborator.komerce.id/
+This endpoint behaves identically to production but operates in a separate, isolated environment.
+
+To switch environments, you only need to change the base URL in your requests:
+
+Use the sandbox URL during development or testing.
+Use the production URL when your app is live.
+⚠️ Make sure to use the correct authentication APIKEY for each environment. Sandbox APIKEY won't work in production when you didn't have any approval access from our Administrator.
+
+Here's a sample curl request to retrieve the list of available couriers in production:
+
+curl --request GET \
+  --url https://api.collaborator.komerce.id/
+  --header 'x-api-key: YOUR_PRODUCTION_KEY'
+For sandbox testing, just replace the base URL:
+
+curl --request GET \
+  --url https://api-sandbox.collaborator.komerce.id/
+  --header 'x-api-key: YOUR_SANDBOX_KEY'
+Name	Path	Method	Description
+Search Destination
+/tariff/api/v1/destination/
+GET
+for Search origin or destination
+id
+Calculate
+/tariff/api/v1/calculate
+GET
+for Search estimated shipping cost by origin and destination
+Store Order
+/order/api/v1/orders/store
+POST
+for Submit an order's
+Cancel Order
+/order/api/v1/orders/cancel
+PUT
+for Cancel an order's
+Detail Order
+/order/api/v1/orders/detail
+GET
+for Getting more information about Submited order
+History AWB
+/order/api/v1/orders/history-airway-bill
+GET
+for Checking track AWB
+Pickup Order
+/order/api/v1/pickup/request
+POST
+for Request a order Pickup time
+Label Order
+/order/api/v1/orders/print-label
+POST
+for Getting an label order's
+Webhook
+/Used your webhook handler URL
+PUT
+for Getting automation respon's about the order's
+Always test new features or workflows in the sandbox before going live.
+Maintain separate credentials for sandbox and production.
+Never use sandbox credentials or URLs in your production app.
+Monitor responses and logs to ensure you're hitting the correct environmen
+
+
+The Store Order Endpoint allows users to create an order that will be validated and processed by Komerce. This endpoint integrates data obtained from previous steps:
+
+Search Destination Endpoint → Provides origin & destination IDs.
+Calculate Endpoint → Provides shipping cost details, including courier information.
+Once an order is created, the system automatically deducts the shipping fee from the user's dashboard balance (if using the Bank Transfer method). If the balance is insufficient, the order will not be processed, and an error response will be returned.
+
+✅ Seamless Order Creation - Integrates with previous endpoints to streamline the process.
+✅ Automated Balance Deduction - Ensures smooth transactions for prepaid orders.
+✅ Strict Data Validation - Ensures correct phone number format & other required fields.
+✅ Supports Multiple Payment Methods - Including COD and Bank Transfer.
+
+Users must provide the following details:
+
+Order Information → Order date, brand name, shipper & receiver details.
+Shipping Details → Courier name, service type, shipping cost.
+Payment Method → COD or Bank Transfer. Unfortunetly, we don't have invoicing method automaticly. But, you can use invoicing method if you contact our Business Development for request invoicing method.
+Product Details → Name, variant, weight, dimensions, quantity.
+ warning
+Phone numbers must start with 0 or 62 (e.g., 081234567890, 6281234567890), not start with +62.
+An insufficient balance will prevent order processing if your balance is less than the value of the shipping charges to be made.
+Ensure all required fields are formatted correctly to avoid errors.
+Once an order is submitted:
+
+The system validates the order details, including phone numbers, shipping cost, and payment method.
+If using Bank Transfer, the shipping cost is deducted from the user's balance.
+If all data is valid, the order is sent to us for processing.
+The system returns a confirmation response, indicating the order has been successfully created.
+curl --location 'https://api-sandbox.collaborator.komerce.id/order/api/v1/orders/store' \
+--header 'x-api-key: inputapikey' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "order_date": "2025-05-21",
+    "brand_name": "Xiaomi Official",
+    "shipper_name": "XIAOMI",
+    "shipper_phone": "0853123413241",
+    "shipper_destination_id": 5969,
+    "shipper_address": "Alamat pengirim",
+    "origin_pin_point": "-7.274631, 109.207174",
+    "receiver_name": "Buyer Bandung",
+    "receiver_phone": "08123458282",
+    "receiver_destination_id": 4956,
+    "receiver_address": "Alamat penerima",
+    "shipper_email": "admin@admin.com",
+    "destination_pin_point": "-7.274631, 109.207174",
+    "shipping": "JNE",
+    "shipping_type": "REG23",
+    "payment_method": "BANK TRANSFER",
+    "shipping_cost": 16000,
+    "shipping_cashback": 4000,
+    "service_fee": 0,
+    "additional_cost": 0,
+    "grand_total": 516000,
+    "cod_value": 0,
+    "insurance_value": 5631.11,
+    "order_details": [
+        {
+            "product_name": "Xiaomi Redmi Note 99",
+            "product_variant_name": "Blue 8/256",
+            "product_price": 315555,
+            "product_weight": 1000,
+            "product_width": 10,
+            "product_height": 8,
+            "product_length": 50,
+            "qty": 1,
+            "subtotal": 315555
+        }
+    ]
+}'
+Key	Type	Description
+x-api-key
+*
+string
+this Value contain an secret APIKEY identic for Shipping API
+Key	Type	Description
+order_date
+*
+date-time
+The date and time when the order was created.
+brand_name
+*
+string
+The brand name displayed on the shipping label.
+shipper_name
+*
+string
+The name of the person sending the package.
+shipper_phone
+*
+string
+The phone number of the sender.
+shipper_destination_id
+*
+int
+The ID representing the pickup location for the shipment.
+origin_pin_point
+string
+Geolocation (latitude, longitude) of the pickup address.
+shipper_address
+*
+string
+Full address of the sender for pickup.
+shipper_email
+*
+string
+Email address of the sender.
+receiver_name
+*
+string
+The name of the recipient.
+receiver_phone
+*
+string
+The phone number of the recipient.
+receiver_destination_id
+*
+int
+The ID representing the delivery destination.
+destination_pin_point
+string
+Geolocation (latitude, longitude) of the delivery address.
+receiver_address
+*
+string
+Full delivery address of the recipient.
+receiver_email
+string
+Email address of the recipient.
+shipping
+*
+string
+Selected shipping courier, e.g., JNE, SICEPAT, SAP, IDEXPRESS, J&T, NINJA.
+shipping_type
+*
+string
+Shipping service type, such as REG19, GOKIL, REGULER, INSTANT, etc.
+shipping_cost
+*
+int
+The standard shipping cost charged to the user.
+shipping_cashback
+*
+int
+Discount or cashback applied to the shipping cost.
+payment_method
+*
+string
+The payment method used for the order (e.g., COD, bank transfer).
+service_fee
+*
+int
+Get from calculate. 2.8% from
+cod_value
+,
+service_fee = 0
+for
+BANK TRANSFER
+payment method.
+additional_cost
+*
+int
+Any extra costs related to the order (e.g., packaging, handling).
+grand_total
+*
+int
+Total payment amount, calculated as: product total + shipping cost + additional cost.
+cod_value
+*
+int
+COD payment amount. This value must match the
+grand_total
+.
+insurance_value
+*
+float
+Declared value for insurance, if insurance is used.
+product_name
+*
+string
+Name of the product being shipped.
+product_variant_name
+*
+string
+Variant or specific type of the product (if applicable).
+product_price
+*
+int
+Price per unit of the product.
+product_width
+*
+int
+Product width in centimeters.
+product_height
+*
+int
+Product height in centimeters.
+product_length
+*
+int
+Product length in centimeters.
+product_weight
+*
+int
+Product weight in grams.
+qty
+*
+int
+Quantity of the product ordered.
+subtotal
+*
+int
+Total product value, calculated as
+product_price
+*
+qty
+.
+Pinpoint information
+
+Additional information for the using origin or destination, pin_point is used to calculate the estimated shipping cost by using Instant or LionParcel Courier. Make sure the pin_point data sent is in accordance with the estimated delivery from the origin location to the destination so that the courier can pick up and deliver to the appropriate address.
+
+ danger
+For each header and parameter that has a * sign, it is a parameter that must be Required when making a request, otherwise there will be a system error that will warn the user regarding the request made.
+
+Key	Value
+meta.message
+Response for creating an order
+meta.code
+Any respons have different status code
+meta.status
+Bollean status for creating an order
+data.order_id
+An unique
+id
+if successfully creating an order
+data.order_no
+An unique number for order
+{
+  "meta": {
+    "message": "Success Create New Order",
+    "code": 201,
+    "status": "success"
+  },
+  "data": {
+    "order_id": 9999,
+    "order_no": "KOMXXXXXXXXXXXXXXXXX"
+  }
+}
+{
+  "meta": {
+    "message": "{{ error.message }}",
+    "code": 400,
+    "status": "failed"
+  },
+  "data": null
+}
+Code	Status	Description	How to Fix
+400
+Failed
+There is a mismatch in one or more of the parameters used
+Check all available parameters, make sure the values entered match the desired conditions.
+401
+Unauthorized
+API key invalid or missing from parameter
+Make sure your API key is valid using your Account.
+422
+Unprocessable Entity
+Parameter is missing
+Add an valid parameter in your requested query. Parameter Request can't be null or missing
+500
+-
+-
+-
+Always include the Authorization header with a valid token.
+Do not leave the any parameter empty - it's required.
+Makesure all parameters using correct value
+Use the correct endpoint and query structure.
+
+
+The Search Destination Endpoint is designed to provide a fast and accurate way to find locations within the shipping system. This endpoint supports searching for various administrative levels, including:
+
+City
+Districts
+Sub-districts
+Postal Codes
+By integrating this endpoint, users can easily retrieve precise location details without manually mapping regional hierarchies. This ensures greater flexibility and accuracy in defining both origin and destination areas.
+
+✅ Comprehensive Location Search - Supports multi-level search from provinces to sub-districts.
+✅ Optimized for Efficiency - Fast response times without additional processing on the user's side.
+✅ Seamless Logistics Integration - Ensures accurate regional mapping for shipping cost calculations.
+✅ Error Minimization - Reduces inconsistencies caused by mismatched regional data structures.
+
+The Search Destination Endpoint streamlines the process of finding and selecting locations within a shipping workflow. Instead of requiring users to manually filter through Province → City → District → Sub-district, the system automates the search and presents relevant location options based on input criteria.
+
+1️⃣ Automatic Location Hierarchy Processing
+
+Users can input search queries using City, District, Sub-district, or Postal Code.
+The system automatically maps and retrieves related location data without additional configuration.
+2️⃣ Precise & Reliable Data Retrieval
+
+The response includes region IDs corresponding to the searched origin or destination.
+Users receive a structured JSON response containing multiple location options to select from.
+3️⃣ Seamless Transition to Cost Calculation
+
+Once a user selects a location, the region ID can be used in the Calculate Endpoint for shipping cost estimation.
+This workflow ensures smooth data transition from location selection to shipping fee calculation.
+The Search Destination Endpoint returns a JSON object containing:
+
+Region ID - Unique identifier for the location.
+Location Name - Full name of the matched region.
+Hierarchy Details - Information on province, city, and sub-district levels.
+Users must select one of the provided options to finalize their destination before proceeding to cost estimation. This step ensures that the most accurate location is used for logistics calculations.
+
+By leveraging the Search Destination Endpoint, users can enhance their shipping processes with:
+
+✔ Faster location searches
+✔ More accurate origin & destination mapping
+✔ Effortless integration with the shipping fee calculation system
+
+This approach eliminates manual regional data mapping, improving efficiency and reducing errors in shipping operations.
+
+curl --location 'https://api-sandbox.collaborator.komerce.id/tariff/api/v1/destination/search?keyword=53131' \
+--header 'x-api-key: yourapikey'
+{
+  "meta": {
+    "message": "Sucessfully Get Destination Data",
+    "code": 200,
+    "status": "success"
+  },
+  "data": [
+    {
+      "id": 34167,
+      "label": "PURWOKERTO, NGADILUWIH, KEDIRI, 64171",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "NGADILUWIH",
+      "city_name": "KEDIRI",
+      "zip_code": "64171"
+    },
+    {
+      "id": 67150,
+      "label": "PURWOKERTO, KAYEN, PATI, 59171",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "KAYEN",
+      "city_name": "PATI",
+      "zip_code": "59171"
+    },
+    {
+      "id": 67266,
+      "label": "PURWOKERTO, TAYU, PATI, 59155",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "TAYU",
+      "city_name": "PATI",
+      "zip_code": "59155"
+    },
+    {
+      "id": 46940,
+      "label": "PURWOKERTO, SRENGAT, BLITAR, 66152",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "SRENGAT",
+      "city_name": "BLITAR",
+      "zip_code": "66152"
+    },
+    {
+      "id": 66703,
+      "label": "PURWOKERTO, BRANGSONG, KENDAL, 51371",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "BRANGSONG",
+      "city_name": "KENDAL",
+      "zip_code": "51371"
+    },
+    {
+      "id": 66793,
+      "label": "PURWOKERTO, PATEBON, KENDAL, 51351",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "PATEBON",
+      "city_name": "KENDAL",
+      "zip_code": "51351"
+    },
+    {
+      "id": 69997,
+      "label": "PURWOKERTO, NGIMBANG, LAMONGAN, 62273",
+      "subdistrict_name": "PURWOKERTO",
+      "district_name": "NGIMBANG",
+      "city_name": "LAMONGAN",
+      "zip_code": "62273"
+    },
+    {
+      "id": 72907,
+      "label": "-, PURWOKERTO, PURWOKERTO, 0",
+      "subdistrict_name": "-",
+      "district_name": "PURWOKERTO",
+      "city_name": "PURWOKERTO",
+      "zip_code": "0"
+    },
+    {
+      "id": 72908,
+      "label": "BANTARSOKA, PURWOKERTO BARAT, BANYUMAS, 53133",
+      "subdistrict_name": "BANTARSOKA",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53133"
+    },
+    {
+      "id": 72909,
+      "label": "KARANGLEWAS LOR, PURWOKERTO BARAT, BANYUMAS, 53136",
+      "subdistrict_name": "KARANGLEWAS LOR",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53136"
+    },
+    {
+      "id": 72910,
+      "label": "KEDUNGWULUH, PURWOKERTO BARAT, BANYUMAS, 53131",
+      "subdistrict_name": "KEDUNGWULUH",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53131"
+    },
+    {
+      "id": 72911,
+      "label": "KOBER, PURWOKERTO BARAT, BANYUMAS, 53132",
+      "subdistrict_name": "KOBER",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53132"
+    },
+    {
+      "id": 72912,
+      "label": "PASIR KIDUL, PURWOKERTO BARAT, BANYUMAS, 53135",
+      "subdistrict_name": "PASIR KIDUL",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53135"
+    },
+    {
+      "id": 72913,
+      "label": "PASIRMUNCANG, PURWOKERTO BARAT, BANYUMAS, 53137",
+      "subdistrict_name": "PASIRMUNCANG",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53137"
+    },
+    {
+      "id": 72914,
+      "label": "REJASARI, PURWOKERTO BARAT, BANYUMAS, 53134",
+      "subdistrict_name": "REJASARI",
+      "district_name": "PURWOKERTO BARAT",
+      "city_name": "BANYUMAS",
+      "zip_code": "53134"
+    },
+    {
+      "id": 72915,
+      "label": "BERKOH, PURWOKERTO SELATAN, BANYUMAS, 53146",
+      "subdistrict_name": "BERKOH",
+      "district_name": "PURWOKERTO SELATAN",
+      "city_name": "BANYUMAS",
+      "zip_code": "53146"
+    },
+    {
+      "id": 72916,
+      "label": "KARANG KLESEM, PURWOKERTO SELATAN, BANYUMAS, 53144",
+      "subdistrict_name": "KARANG KLESEM",
+      "district_name": "PURWOKERTO SELATAN",
+      "city_name": "BANYUMAS",
+      "zip_code": "53144"
+    },
+    {
+      "id": 72917,
+      "label": "KARANG PUCUNG, PURWOKERTO SELATAN, BANYUMAS, 53142",
+      "subdistrict_name": "KARANG PUCUNG",
+      "district_name": "PURWOKERTO SELATAN",
+      "city_name": "BANYUMAS",
+      "zip_code": "53142"
+    }
+  ]
+}
+
+The Calculate Endpoint is designed to help users retrieve accurate shipping cost estimates based on various factors such as origin, destination, and package weight. This endpoint is a crucial part of the Komship Delivery API, which integrates six courier services to facilitate seamless shipping operations.
+
+By leveraging this endpoint, users can efficiently determine shipping fees without needing manual calculations, ensuring a faster, error-free, and automated process.
+
+✅ Multi-Courier Support - Access shipping costs from six courier services in one request.
+✅ Automated Data Validation - Ensures accurate calculations based on verified origin & destination IDs.
+✅ Decimal Weight Handling - Supports precise weight calculations with automatic rounding.
+✅ Seamless API Workflow - Integrates with the Search Destination Endpoint for smooth data transition.
+
+To perform a shipping cost calculation, users must provide:
+
+Origin ID - Obtained from the Search Destination Endpoint.
+Destination ID - Also retrieved from the Search Destination Endpoint.
+Origin and Destination pinpoint - If you want to deliver you order into customer using the instant courier, you must filled this param's to check availability for instant delivery or maybe a one of regular shipping needed
+Package weight - Expressed in kilograms (kg).
+ note
+💡 Important: Incorrect origin or destination IDs will lead to inaccurate shipping costs. Always ensure the data is correct before making a request.
+
+Users often ask:
+
+ note
+"How does the system handle decimal weights?"
+
+The Calculate Endpoint supports decimal weight values, which should be formatted using a dot (.) as the decimal separator. To comply with courier service standards, the system automatically rounds weights as needed, preventing errors and ensuring smooth validation.
+
+Once all required data is submitted:
+
+The system validates the origin, destination, pinpoint, and weight values.
+The API fetches real-time shipping cost data from multiple courier services in our systems.
+A JSON response is returned, detailing available shipping options, prices, and simulate our store_order services for your maximize information.
+curl --location 'https://api-sandbox.collaborator.komerce.id/tariff/api/v1/calculate?shipper_destination_id=31597&receiver_destination_id=46116&weight=1&item_value=300000&cod=yes&origin_pin_point=-7.279849431298132\%2C109.35114360314475&destination_pin_point=-7.30585\%2C109.36814' \
+--header 'x-api-key: inputapikey'
+Key	Type	Description
+x-api-key
+string
+this Value contain an secret APIKEY identic for Shipping API
+Key	Type	Description
+shipper_destination_id
+*
+int
+this Value containt an
+id
+during Search Destination
+receiver_destination_id
+*
+int
+this Value containt an
+id
+during Search Destination
+origin_pin_point
+*
+string
+this Value contain an a geolocation from origin
+latitude, longitude
+address
+destination_pin_point
+*
+string
+this Value contain an a geolocation from destination
+latitude, longitude
+address
+weight
+*
+float
+this Value is an Kilogram, use dot(.) for float value
+item_value
+*
+int
+this Value is an Item Price
+cod
+boolean
+this Value is containt an a boolean method (yes/no) method of shipping if cod=yes system will give response of Coverage Area or possibility to COD or not
+Additional information for the using origin or destination, pin_point is used to calculate the estimated shipping cost by using instant courier. Make sure pin_point data submitted is in accordance with the estimated delivery from the origin location to the destination.
+
+ danger
+For each header and parameter that has a * sign, it is a parameter that must be Required when making a request, otherwise there will be a system error that will warn the user regarding the request made.
+
+Key	Value
+meta.message
+Response for searching address
+meta.code
+Any response have different code
+meta.status
+Boolean status for checking address
+data.calculate_reguler
+List of available couriers for regular delivery
+data.calculate_cargo
+List of available couriers for cargo delivery
+data.calculate_instant
+List of available couriers for instan or sameday delivery
+data.calculate_{{servicetype}}.shipping_name
+Name of the courier that can be used for delivery of goods
+data.calculate_{{servicetype}}.service_name
+The name of the courier delivery service that can be used to deliver goods
+data.calculate_{{servicetype}}.weight
+Weight of goods from request
+data.calculate_{{servicetype}}.is_cod
+COD delivery usage information
+data.calculate_{{servicetype}}.shipping_cost
+Original shipping price
+data.calculate_{{servicetype}}.shipping_cashback
+Discounted price on shipping costs
+data.calculate_{{servicetype}}.shipping_cost_net
+Shipping cost price after discount
+data.calculate_{{servicetype}}.grandtotal
+The total payment price that the seller gets
+data.calculate_{{servicetype}}.service_fee
+Value of 2.8% of
+grand_total
+if the package is delivered using COD payment
+data.calculate_{{servicetype}}.net_income
+Net income earned by the seller
+data.calculate_{{servicetype}}.etd
+Estimated delivery time
+{
+  "meta": {
+    "message": "Success Calculate Shipping",
+    "code": 200,
+    "status": "success"
+  },
+  "data": {
+    "calculate_reguler": [
+      {
+        "shipping_name": "NINJA",
+        "service_name": "Standard",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 83000,
+        "shipping_cashback": 37350,
+        "shipping_cost_net": 45650,
+        "grandtotal": 383000,
+        "service_fee": 10724,
+        "net_income": 326626,
+        "etd": "-"
+      },
+      {
+        "shipping_name": "SAP",
+        "service_name": "SAPFlat",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 46500,
+        "shipping_cashback": 0,
+        "shipping_cost_net": 46500,
+        "grandtotal": 346500,
+        "service_fee": 9702,
+        "net_income": 290298,
+        "etd": ""
+      },
+      {
+        "shipping_name": "JNE",
+        "service_name": "REG23",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 80000,
+        "shipping_cashback": 20000,
+        "shipping_cost_net": 60000,
+        "grandtotal": 380000,
+        "service_fee": 10640,
+        "net_income": 309360,
+        "etd": "3-4 day"
+      },
+      {
+        "shipping_name": "SICEPAT",
+        "service_name": "REG",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 76500,
+        "shipping_cashback": 22950,
+        "shipping_cost_net": 53550,
+        "grandtotal": 376500,
+        "service_fee": 10542,
+        "net_income": 312408,
+        "etd": "2-4 day"
+      },
+      {
+        "shipping_name": "IDEXPRESS",
+        "service_name": "STD",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 135500,
+        "shipping_cashback": 33875,
+        "shipping_cost_net": 101625,
+        "grandtotal": 435500,
+        "service_fee": 12194,
+        "net_income": 321681,
+        "etd": "-"
+      },
+      {
+        "shipping_name": "LION",
+        "service_name": "REGPACK",
+        "weight": 5,
+        "is_cod": false,
+        "shipping_cost": 80000,
+        "shipping_cashback": 16000,
+        "shipping_cost_net": 64000,
+        "grandtotal": 380000,
+        "service_fee": 10640,
+        "net_income": 305360,
+        "etd": "3-5 day"
+      },
+      {
+        "shipping_name": "JNT",
+        "service_name": "EZ",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 75000,
+        "shipping_cashback": 18750,
+        "shipping_cost_net": 56250,
+        "grandtotal": 375000,
+        "service_fee": 10500,
+        "net_income": 308250,
+        "etd": "-"
+      }
+    ],
+    "calculate_cargo": [
+      {
+        "shipping_name": "SAP",
+        "service_name": "DRGREG",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 52500,
+        "shipping_cashback": 15750,
+        "shipping_cost_net": 36750,
+        "grandtotal": 352500,
+        "service_fee": 9870,
+        "net_income": 305880,
+        "etd": "3-5 day"
+      },
+      {
+        "shipping_name": "JNE",
+        "service_name": "JTR23",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 50000,
+        "shipping_cashback": 1250,
+        "shipping_cost_net": 48750,
+        "grandtotal": 350000,
+        "service_fee": 9800,
+        "net_income": 291450,
+        "etd": "3-4 day"
+      },
+      {
+        "shipping_name": "SICEPAT",
+        "service_name": "GOKIL",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 60000,
+        "shipping_cashback": 3000,
+        "shipping_cost_net": 57000,
+        "grandtotal": 360000,
+        "service_fee": 10080,
+        "net_income": 292920,
+        "etd": "3-5 day"
+      },
+      {
+        "shipping_name": "IDEXPRESS",
+        "service_name": "Idtruck",
+        "weight": 5,
+        "is_cod": true,
+        "shipping_cost": 42500,
+        "shipping_cashback": 850,
+        "shipping_cost_net": 41650,
+        "grandtotal": 342500,
+        "service_fee": 9590,
+        "net_income": 291260,
+        "etd": "-"
+      },
+      {
+        "shipping_name": "LION",
+        "service_name": "BIGPACK",
+        "weight": 5,
+        "is_cod": false,
+        "shipping_cost": 90000,
+        "shipping_cashback": 18000,
+        "shipping_cost_net": 72000,
+        "grandtotal": 390000,
+        "service_fee": 10920,
+        "net_income": 307080,
+        "etd": "3-7 day"
+      }
+    ],
+    "calculate_instant": [
+      {
+        "shipping_name": "GOSEND",
+        "service_name": "Instant",
+        "weight": 5,
+        "is_cod": false,
+        "shipping_cost": 9500,
+        "shipping_cashback": 0,
+        "shipping_cost_net": 9500,
+        "grandtotal": 309500,
+        "service_fee": 0,
+        "net_income": 300000,
+        "etd": "1-2 hours"
+      }
+    ]
+  }
+}
+{
+    "meta": {
+        "message": "Success Calculate Shipping",
+        "code": 200,
+        "status": "success"
+    },
+    "data": {
+        "calculate_reguler": [],
+        "calculate_cargo": [],
+        "calculate_instant": []
+    }
+}
+ warning
+This response can occur if only the parameters shipper_destination_id, receiver_destination_id, origin_pin_point, and destination_pin_point are not filled in during the request.
+
+Code	Status	Description	How To Fix
+400
+Bad request
+The request parameter has an error
+Check the desired request parameters again, this usually happens because there is a mismatch between the request and the expectations of the request that occurred.
+401
+Unauthorized
+API key invalid or missing from parameter
+Make sure your API key is valid using your Account
+422
+Unprocessable Entity
+Keywoard parameter is missing
+Add an valid keywoard parameter in your requested query. Parameter Request can't be null or missing
+500
+-
+-
+-
+Ensure required parameters are present:
+
+shipper_destination_id & receiver_destination_id → this value you can get from Search_destination EndPoint when you searching the origin or destination address using District/SubDistrict/PostalCode. This value can helping you to get more information about Regular or Cargo Shipping.
+origin_pin_point & destination_pin_point → this value you can get from ThirdParty maps to ensure identic pinpoint for origin and destination address for using InstantDelivery like GoSend, etc.
+weight → the total weight of the items (in Calculate EndPoint this value using an grams).
+item_value → the total value of the items (in IDR currency), this value can helping you to understand when using store_order parameter and describe more value to using the service.
+
+
+

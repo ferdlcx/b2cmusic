@@ -73,9 +73,22 @@
                       alert('Silakan cari dan pilih kecamatan/kodepos terlebih dahulu dari daftar pencarian.');
                       return;
                   }
+                  
+                  // Validate required fields
+                  let label = document.querySelector('input[name=new_address_label]').value.trim();
+                  let name = document.querySelector('input[name=new_address_name]').value.trim();
+                  let phone = document.querySelector('input[name=new_address_phone]').value.trim();
+                  let address = document.querySelector('textarea[name=new_address_address]').value.trim();
+                  
+                  if (!label || !name || !phone || !address) {
+                      alert('Silakan lengkapi semua field yang diperlukan (Label, Nama, Telepon, Alamat).');
+                      return;
+                  }
+                  
                   try {
                       let res = await fetch('{{ route("profile.address.store") }}', {
                           method: 'POST',
+                          redirect: 'error', // Don't follow redirects - catch auth/CSRF failures
                           headers: {
                               'Content-Type': 'application/json',
                               'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -83,26 +96,34 @@
                               'X-Requested-With': 'XMLHttpRequest'
                           },
                           body: JSON.stringify({
-                              label: document.querySelector('input[name=new_address_label]').value,
-                              name: document.querySelector('input[name=new_address_name]').value,
-                              phone: document.querySelector('input[name=new_address_phone]').value,
-                              address: document.querySelector('textarea[name=new_address_address]').value,
+                              label: label,
+                              name: name,
+                              phone: phone,
+                              address: address,
                               area_id: this.selectedNewAreaId,
                               city: this.city,
                               province: this.province,
                               postal_code: this.postalCode,
-                              is_default: 0
+                              is_default: 1
                           })
                       });
-                      if (res.ok) {
+                      
+                      let data = await res.json();
+                      
+                      if (res.ok && data.success) {
                           alert('Alamat berhasil disimpan!');
                           window.location.reload();
                       } else {
-                          let err = await res.json();
-                          alert('Gagal menyimpan alamat: ' + (err.message || 'Periksa kembali kelengkapan data'));
+                          // Show validation errors or server errors
+                          let errorMsg = data.message || '';
+                          if (data.errors) {
+                              errorMsg = Object.values(data.errors).flat().join('\n');
+                          }
+                          alert('Gagal menyimpan alamat:\n' + (errorMsg || 'Periksa kembali kelengkapan data'));
                       }
                   } catch (e) {
-                      alert('Terjadi kesalahan koneksi.');
+                      console.error('Save address error:', e);
+                      alert('Terjadi kesalahan koneksi. Coba refresh halaman dan ulangi.');
                   }
               },
               async fetchCourierOptions() {

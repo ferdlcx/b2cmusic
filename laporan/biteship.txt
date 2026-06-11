@@ -1,0 +1,815 @@
+Feature	Sandbox	Production
+Maps API	Paid*	Paid
+Rates API	Paid*	Paid
+Order API	Simulated	Real shipments
+Tracking API	Paid*	Paid
+
+hanya ini yang gratis 
+Order API	Simulated	Real shipments
+
+
+
+api : judas
+biteship_test.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoianVkYXMiLCJ1c2VySWQiOiI2YTI5NmFiNWU1NDcyNDcwZjA0MzI4NTUiLCJpYXQiOjE3ODExMDc5NDV9.CheR3TZkvTsBNyiB4sE8uvRkM277K6Cq-ocD_4o4pG8
+
+
+nih doc
+Sandbox Environment
+Before going live with your Biteship integration, you should thoroughly test your implementation in our sandbox environment. This guide explains how to use the sandbox effectively.
+
+About the Sandbox
+The sandbox environment is a safe testing space that mimics our production environment. It allows you to:
+
+Test API integrations without creating real shipments
+Validate your implementation logic
+Simulate various shipping scenarios
+Test error handling
+Getting Started
+Sign up for a Biteship account at our registration page
+Navigate to the API section in your dashboard
+Activate the sandbox environment by clicking the "Mode Testing" toggle in the sidebar
+Generate a sandbox API key
+Use this key for all your test API calls
+Sandbox vs Production
+Key differences between sandbox and production environments for Core API:
+
+Feature	Sandbox	Production
+Maps API	Paid*	Paid
+Rates API	Paid*	Paid
+Order API	Simulated	Real shipments
+Tracking API	Paid*	Paid
+*Since Maps, Rates and Tracking are GET methods, we provide them a real data in sandbox environment, therefore it is considered as paid usage. Please contact our support for more information.
+
+Testing Guidelines
+Test All API Endpoints
+
+Rate calculations
+Order creation
+Tracking
+Label generation
+Simulate Edge Cases
+
+Invalid addresses
+Out-of-range weights
+Missing required fields
+Error responses
+Verify Integration Logic
+
+Rate display
+Order flow
+Error handling
+User notifications
+
+Overview
+Order API Introduction
+Order objects are created to handle sellers’ shipments. You can create, retrieve, update, and cancel individual orders. Orders are identified by a unique, random ID
+
+Endpoints
+POST    /v1/orders
+GET     /v1/orders/:id
+POST    /v1/orders/:id
+POST    /v1/orders/:id/cancel
+DELETE  /v1/orders/:id  // deprecated
+
+Status Flow
+Below is the order flow of general shipment with Biteship
+
+Biteship Flow Order
+Order Status
+No	Status	Description	Available to Delete
+1	confirmed	Order is ready to be confirmed. AWB has been generated.	✅
+2	scheduled	Order has been scheduled to be delivered. AWB has been generated.	✅
+3	allocated	Order has been allocated, courier will pickup the package.	✅
+4	picking_up	Courier is on the way to pickup the package. (First Mile)	✅
+5	picked	Package has been picked up by courier.	❌
+6	cancelled	Order has been cancelled.	❌
+7	on_hold	Order is on hold for any reason.	❌
+8	in_transit	Package is on the transit to the destination. (Middle Mile)	❌
+8	dropping_off	Courier is dropping off the package to the receiver. (Last Mile)	❌
+9	return_in_transit	Package is on the transit for a return to sender.	❌
+10	returned	Package has been returned to sender.	❌
+11	rejected	Order has been rejected.	❌
+12	disposed	Package has been disposed / destroyed.	❌
+13	courier_not_found	Cannot find courier for the order.	❌
+14	delivered	Package has been delivered to the receiver.	❌
+Courier Status Availability
+For each uniqueness of all courier status, please go to this link All Courier Status Availability
+
+Previous
+Error Codes
+
+
+Endpoint
+POST /v1/orders
+
+To request a new order to be picked up by the courier, you need to create a new order object. Make sure your Biteship Balance is sufficient when making this request. Try to request for invoice payment for more custom ordering.
+
+If your environment is still in Staging, the courier will not pick up your request, though everything else will occur as if in live mode.
+
+API Parameters
+shipper_contact_name string
+Optional
+The name of the shipper.
+shipper_contact_phone string
+Optional
+The phone number of the shipper.
+shipper_contact_email string
+Optional
+The email of the shipper.
+shipper_organization string
+Optional
+The organization of the shipper.
+origin_contact_name string
+REQUIRED
+The name of the person in the pickup location.
+origin_contact_phone string
+REQUIRED
+The phone number of the person in the pickup location.
+origin_contact_email string
+Optional
+The email of the person in the pickup location.
+origin_address string
+REQUIRED
+Complete address of the pickup location.
+origin_note string
+Optional
+Additional information of the pickup location to ease pickup process.
+origin_postal_code number
+*REQUIRED / OPTIONAL
+Postal code of the pickup location.
+origin_coordinate object
+*REQUIRED / OPTIONAL
+Coordinates of the pickup location. If you use an instant courier, you must use coordinate.
+Show child parameters
+origin_area_id string
+*REQUIRED / OPTIONAL
+Use area_id from Maps API.
+origin_location_id string
+Optional
+Use location_id from Locations API.
+origin_collection_method string
+Optional
+Use the available_collection_method from Rates API. Value can be pickup, or drop_off. Default to pickup.
+pickup your package will be picked by courier based on origin that you specify.
+drop_off you must drop off the package to the nearest courier agent.
+destination_contact_name string
+REQUIRED
+The name of the person in destination location.
+destination_contact_phone string
+REQUIRED
+The phone number of the person in destination location.
+destination_contact_email string
+Optional
+The email of the person in destination location.
+destination_address string
+REQUIRED
+Complete address of the destination location.
+destination_note string
+Optional
+Additional information of the destination location to ease destination process.
+destination_postal_code number
+*REQUIRED / OPTIONAL
+Postal code of the destination location.
+destination_coordinate object
+*REQUIRED / OPTIONAL
+Coordinates of the destination location. If you use an instant courier, you must use coordinate.
+Show child parameters
+destination_area_id string
+*REQUIRED / OPTIONAL
+Use area_id from Maps API.
+destination_location_id string
+Optional
+Use location_id from Locations API.
+destination_cash_on_delivery number
+Optional
+State the COD Amount if you want to activate COD delivery.
+destination_cash_on_delivery_type string
+Optional
+The COD disbursement window. Value can be 7_days, 5_days, or 3_days.
+7_days you will receiver your money 7 days after the item is delivered.
+5_days you will receiver your money 5 days after the item is delivered.
+3_days you will receiver your money 3 days after the item is delivered.
+destination_proof_of_delivery boolean
+Optional
+Proof of delivery feature.
+destination_proof_of_delivery_note string
+*REQUIRED / OPTIONAL
+Notes for proof of delivery. It is required if proof of delivery feature is activated.
+courier_company string
+REQUIRED
+Shipping provider that will be used for this particular shipment. List of available courier can be found using Couriers API.
+courier_type string
+REQUIRED
+Courier type based on the courier company used. Each type can be different for each company. Value of type can be found within the Rates API and Couriers API.
+courier_insurance number
+Optional
+The amount of the insurance value. This is optional if you want to insured your shipment. For example, if your item is valued at IDR 1.000.000, then you should put 1000000 for the value.
+delivery_type string
+REQUIRED
+Type of delivery order is now and scheduled.
+now will generate waybill instantly and pickup right away.
+scheduled will generate waybill instantly and pickup based on delivery date and delivery time.
+delivery_date string
+Optional
+The delivery date format: “YYYY-MM-DD”
+delivery_time string
+Optional
+The delivery time format: “HH:mm”
+order_note string
+Optional
+Additional information for the shipment.
+metadata object
+Optional
+You can insert any kind of data through this object for internal purposes.
+reference_id string
+Optional
+You can insert your internal order id here. Must unique for each order id.
+tags array
+Optional
+You can insert multiple custom tags (in string) for filtering your orders by tag later on.
+items array
+REQUIRED
+The list of item you will send for delivery
+Show child parameters
+Type of Request
+Order for Standard Couriers
+JSON Body Request
+{
+  "shipper_contact_name": "Amir",
+  "shipper_contact_phone": "088888888888",
+  "shipper_contact_email": "biteship@test.com",
+  "shipper_organization": "Biteship Org Test",
+  "origin_contact_name": "Amir",
+  "origin_contact_phone": "088888888888",
+  "origin_address": "Plaza Senayan, Jalan Asia Afrik...",
+  "origin_note": "Deket pintu masuk STC",
+  "origin_postal_code": 12440,
+  "destination_contact_name": "John Doe",
+  "destination_contact_phone": "088888888888",
+  "destination_contact_email": "jon@test.com",
+  "destination_address": "Lebak Bulus MRT...",
+  "destination_postal_code": 12950,
+  "destination_note": "Near the gas station",
+  "courier_company": "jne",
+  "courier_type": "reg",
+  "courier_insurance": 500000,
+  "delivery_type": "now",
+  "order_note": "Please be careful",
+  "metadata": {},
+  "items": [
+    {
+      "name": "Black L",
+      "description": "White Shirt",
+      "category": "fashion",
+      "value": 165000,
+      "quantity": 1,
+      "height": 10,
+      "length": 10,
+      "weight": 200,
+      "width": 10
+    }
+  ]
+}
+
+Order for Instant Couriers
+JSON Body Request
+{
+  "shipper_contact_name": "Amir",
+  "shipper_contact_phone": "088888888888",
+  "shipper_contact_email": "biteship@test.com",
+  "shipper_organization": "Biteship Org Test",
+  "origin_contact_name": "Amir",
+  "origin_contact_phone": "088888888888",
+  "origin_address": "Plaza Senayan, Jalan Asia Afrik...",
+  "origin_note": "Deket pintu masuk STC",
+  "origin_coordinate": {
+    "latitude": -6.2253114,
+    "longitude": 106.7993735
+  },
+  "destination_contact_name": "John Doe",
+  "destination_contact_phone": "088888888888",
+  "destination_contact_email": "jon@test.com",
+  "destination_address": "Lebak Bulus MRT...",
+  "destination_note": "Near the gas station",
+  "destination_coordinate": {
+    "latitude": -6.28927,
+    "longitude": 106.77492000000007
+  },
+  "courier_company": "grab",
+  "courier_type": "instant",
+  "courier_insurance": 500000,
+  "delivery_type": "now",
+  "order_note": "Please be careful",
+  "metadata": {},
+  "items": [
+    {
+      "name": "Black L",
+      "description": "White Shirt",
+      "category": "fashion",
+      "category": "fashion",
+      "value": 165000,
+      "quantity": 1,
+      "height": 10,
+      "length": 10,
+      "weight": 200,
+      "width": 10
+    }
+  ]
+}
+
+Order for Cash on Delivery
+JSON Body Request
+{
+  "shipper_contact_name": "Amir",
+  "shipper_contact_phone": "088888888888",
+  "shipper_contact_email": "biteship@test.com",
+  "shipper_organization": "Biteship Org Test",
+  "origin_contact_name": "Amir",
+  "origin_contact_phone": "088888888888",
+  "origin_address": "Plaza Senayan, Jalan Asia Afrik...",
+  "origin_note": "Deket pintu masuk STC",
+  "origin_postal_code": 12440,
+  "destination_contact_name": "John Doe",
+  "destination_contact_phone": "088888888888",
+  "destination_contact_email": "jon@test.com",
+  "destination_address": "Lebak Bulus MRT...",
+  "destination_note": "Near the gas station",
+  "destination_postal_code": 12950,
+  "destination_cash_on_delivery": 500000,
+  "destination_cash_on_delivery_type": "7_days",
+  "courier_company": "sicepat",
+  "courier_type": "reg",
+  "courier_insurance": 500000,
+  "delivery_type": "now",
+  "order_note": "Please be careful",
+  "metadata": {},
+  "items": [
+    {
+      "name": "Black L",
+      "description": "White Shirt",
+      "category": "fashion",
+      "value": 165000,
+      "quantity": 1,
+      "height": 10,
+      "length": 10,
+      "weight": 200,
+      "width": 10
+    }
+  ]
+}
+
+Order for Drop Off collection method
+JSON Body Request
+{
+  "shipper_contact_name": "Amir",
+  "shipper_contact_phone": "088888888888",
+  "shipper_contact_email": "biteship@test.com",
+  "shipper_organization": "Biteship Org Test",
+  "origin_contact_name": "Amir",
+  "origin_contact_phone": "088888888888",
+  "origin_address": "Plaza Senayan, Jalan Asia Afrik...",
+  "origin_note": "Deket pintu masuk STC",
+  "origin_postal_code": 12440,
+  "origin_collection_method": "drop_off",
+  "destination_contact_name": "John Doe",
+  "destination_contact_phone": "088888888888",
+  "destination_contact_email": "jon@test.com",
+  "destination_address": "Lebak Bulus MRT...",
+  "destination_note": "Near the gas station",
+  "destination_postal_code": 12950,
+  "courier_company": "sicepat",
+  "courier_type": "reg",
+  "courier_insurance": 500000,
+  "delivery_type": "now",
+  "order_note": "Please be careful",
+  "metadata": {},
+  "items": [
+    {
+      "name": "Black L",
+      "description": "White Shirt",
+      "category": "fashion",
+      "value": 165000,
+      "quantity": 1,
+      "height": 10,
+      "length": 10,
+      "weight": 200,
+      "width": 10
+    }
+  ]
+}
+
+*When you send origin and destination value, you must at least choose one type of origin or destination. Origin and destination must at least have postal codes, coordinates or area ids. You do not need to insert all of the three values.
+
+API Response
+Order Created
+Response
+{
+  "success": true,
+  "message": "Order successfully created",
+  "object": "order",
+  "id": "5dd599ebdefcd4158eb8470b",
+  "draft_order_id": null,
+  "shipper": {
+    "name": "Biteship Indonesia",
+    "email": "Biteship@gmail.com",
+    "phone": "08123456789",
+    "organization": "Biteship"
+  },
+  "origin": {
+    "contact_name": "Akbar",
+    "contact_phone": "08123456789",
+    "coordinate": {
+      "latitude": -6.2253114,
+      "longitude": 106.7993735
+    },
+    "address": "Plaza Senayan, Jalan Asia Afrika, RT.1/RW.3",
+    "note": "Deket pintu masuk STC",
+    "postal_code": 12440
+  },
+  "destination": {
+    "contact_name": "Bambang",
+    "contact_phone": "088888888888",
+    "contact_email": "mirsa@biteship.com",
+    "address": "Lebak Bulus MRT, Jalan R.A.Kartini",
+    "note": "Di deket pintu MRT",
+    "proof_of_delivery": {
+      "use": false,
+      "fee": 0,
+      "note": null,
+      "link": null
+    },
+    "cash_on_delivery": {
+      "id": "77bb0f60b029822ecb1411da",
+      "amount": 500000,
+      "amount_currency": "IDR",
+      "fee": 20000,
+      "fee_currency": "IDR",
+      "note": null,
+      "type": "7_days"
+    },
+    "coordinate": {
+      "latitude": -6.28927,
+      "longitude": 106.77492000000007
+    },
+    "postal_code": 12950
+  },
+  "courier": {
+    "tracking_id": "6de509ebdefgh4158ij3451c",
+    "waybill_id": "WYB-1112223333443",
+    "company": "anteraja",
+    "name": null,  // Deprecated
+    "phone": null, // Deprecated
+    "driver_name": null,
+    "driver_phone": null,
+    "driver_photo_url": null,
+    "driver_plate_number": null,
+    "type": "reg",
+    "link": null,
+    "insurance": {
+      "amount": 500000,
+      "amount_currency": "IDR",
+      "fee": 2500,
+      "fee_currency": "IDR",
+      "note": ""
+    },
+    "routing_code": null
+  },
+  "delivery": {
+    "datetime": "2029-09-24T12:00+07:00",
+    "note": null,
+    "type": "now",
+    "distance": 9.8,
+    "distance_unit": "kilometer"
+  },
+  "reference_id": null,
+  "items": [
+    {
+      "name": "Black L",
+      "description": "Feast/Bangkok'19 Invasion",
+      "sku": null,
+      "value": 165000,
+      "quantity": 1,
+      "length": 10,
+      "width": 10,
+      "height": 10,
+      "weight": 200
+    }
+  ],
+  "extra": [],
+  "currency": "IDR",
+  "tax_lines": [],
+  "price": 48000,
+  "metadata": {},
+  "note": "Please be careful",
+  "status": "confirmed"
+}
+
+Failed to Create Order due to Reference ID already used
+Response
+{
+  "success": false,
+  "error": "Reference id has already been used before. Please input other reference id",
+  "code": 40002060,
+  "details": {
+    "order_id": "660105377589b8dea565208b", // The order that uses given reference id
+    "waybill_id": "1028309128390", // The waybill of order that uses given reference id
+    "reference_id": "66010548c90b557a9e2dd7a4" // Given reference id
+  }
+}
+
+Retrieve an Order
+Endpoint
+GET /v1/orders/:id
+
+Check your order history or tracking by orderId. You can get the Order ID from the Order API request. Please assume all field Nullable.
+
+Response
+{
+  "success": true,
+  "message": "Order successfully retrieved",
+  "object": "order",
+  "id": "5dd599ebdefcd4158eb8470b",
+  "draft_order_id": null,
+  "short_id": "URf_UO2nY3V",
+  "shipper": {
+    "name": "Amir",
+    "email": "biteship@example.com",
+    "phone": "088888888888",
+    "organization": "Biteship Org"
+  },
+  "origin": {
+    "contact_name": "Amir",
+    "contact_phone": "088888888888",
+    "address": "Plaza Senayan, Jalan Asia Afrik...",
+    "note": "Deket pintu masuk STC",
+    "postal_code": 10270,
+    "coordinate": {
+      "latitude": -6.2253114,
+      "longitude": 106.7993735
+    }
+  },
+  "destination": {
+    "contact_name": "John Doe",
+    "contact_phone": "088888888888",
+    "contact_email": "jon@example.com",
+    "address": "Lebak Bulus MRT...",
+    "note": "Near the gas station",
+    "proof_of_delivery": {
+      "use": false,
+      "fee": 0,
+      "note": null,
+      "link": null
+    },
+    "postal_code": 12310,
+    "coordinate": {
+      "latitude": -6.28927,
+      "longitude": 106.77492000000007
+    },
+    "cash_on_delivery": {
+      "id": null,
+      "amount": 0,
+      "amount_currency": "IDR",
+      "fee": 0,
+      "fee_currency": "IDR",
+      "note": null,
+      "type": null
+    }
+  },
+  "delivery": {
+    "datetime": "2023-09-24T12:00+07:00",
+    "note": null,
+    "type": "now",
+    "distance": 15.2,
+    "distance_unit": "kilometer"
+  },
+  "voucher": {
+    "id": null,
+    "name": null,
+    "value": null,
+    "type": null
+  },
+  "courier": {
+    "tracking_id": "65ddac3879699035b83dc561",
+    "waybill_id": "WYB-1112223333442",
+    "company": "jnt",
+    "history": [
+      {
+        "service_type": "-",
+        "status": "confirmed",
+        "note": "Order has been confirmed. Locating nearest driver to pickup.",
+        "updated_at": "2021-01-11T14:03:41+07:00"
+      },
+      {
+        "service_type": "-",
+        "status": "allocated",
+        "note": "Courier has been allocated. Waiting to pick up.",
+        "updated_at": "2021-01-11T15:49:25+07:00"
+      }
+    ],
+    "link": "https://example.com/10298309123809",
+    "name": "John Doe",   // Deprecated
+    "phone": "0888888888",  // Deprecated
+    "driver_name": "John Doe",
+    "driver_phone": "0888888888",
+    "driver_photo_url": "https://picsum.photos/200",
+    "driver_plate_number": "B 1234 ABC",
+    "type": "instant",
+    "shipment_fee": 25000,
+    "insurance": {
+      "amount": 500000,
+      "amount_currency": "IDR",
+      "fee": 2500,
+      "fee_currency": "IDR",
+      "note": null
+    },
+    "routing_code": "123-JKT45A-67"
+  },
+  "reference_id": null,
+  "invoice_id": null,
+  "items": [
+    {
+      "name": "Black L",
+      "description": "Feast/Bangkok'19 Invasion",
+      "sku": null,
+      "value": 165000,
+      "quantity": 1,
+      "length": 72,
+      "width": 54,
+      "height": 1,
+      "weight": 200
+    }
+  ],
+  "extra": null,
+  "metadata": null,
+  "tags": [],
+  "note": "Please be careful",
+  "currency": "IDR",
+  "tax_lines": [],
+  "price": 27500,
+  "status": "allocated",
+  "ticket_status": null
+}
+
+Delete an Order
+Endpoint
+POST    /v1/orders/:id/cancel
+DELETE  /v1/orders/:id  // deprecated
+
+Order can be cancelled or rejected based on order id upon request.
+
+Cancellation Reason Codes
+To cancel an order, please use one of the codes provided by this endpoint. Each code is paired with a cancellation reason. The cancellation reasons are available in two languages: Bahasa (id) and English (en), represented by the lang query parameter. The default language is Bahasa if you do not specify a language upon retrieval.
+
+Endpoint
+GET    /v1/orders/cancellation_reasons?lang=id // in bahasa
+GET    /v1/orders/cancellation_reasons?lang=en // in english
+
+Cancellation Reasons in Bahasa
+Response Example
+{
+    "success": true,
+    "message": "Order cancellation reasons successfully retrieved",
+    "cancellation_reasons": [
+        {
+            "code": "change_courier",
+            "reason": "Ingin mengganti kurir"
+        },
+        {
+            "code": "pickup_delay",
+            "reason": "Waktu penjemputan terlalu lama"
+        },
+        {
+            "code": "change_address",
+            "reason": "Ingin mengganti alamat"
+        },
+        {
+            "code": "others",
+            "reason": "Pesanan dibatalkan oleh pedagang karena alasan lain"
+        }
+    ]
+}
+
+Cancellation Reasons in English
+Response Example
+{
+    "success": true,
+    "message": "Order cancellation reasons successfully retrieved",
+    "cancellation_reasons": [
+        {
+            "code": "change_courier",
+            "reason": "Want to change courier"
+        },
+        {
+            "code": "pickup_delay",
+            "reason": "Pickup time too long"
+        },
+        {
+            "code": "change_address",
+            "reason": "Want to change address"
+        },
+        {
+            "code": "others",
+            "reason": "Order cancelled by merchant for other reason"
+        }
+    ]
+}
+
+Type of Requests
+Using Cancellation Reason Code
+JSON Body Request
+{   
+    "cancellation_reason_code": "change_courier"
+}
+
+Custom Cancellation Reason
+JSON Body Request
+{   
+    "cancellation_reason_code": "others",
+    "cancellation_reason": "Accidentally ordered"
+}
+
+API Response
+Response
+{
+    "success": true,
+    "message": "Order successfully deleted",
+    "object": "order",
+    "id": "5dd5a396248481164a225af4",
+    "status": "cancelled",
+    "cancellation_reason_code": "others"
+    "cancellation_reason": "Accidentally ordered"
+}
+
+Error Codes
+Below are the list of Order error codes. You can use the 'Code' column and customize based on your platform.
+
+Method	Endpoint	Code	Message
+POST	/v1/orders	40002001	Booking courier API Key is not found
+POST	/v1/orders	40002002	Key has not been activated
+POST	/v1/orders	40002003	There's an error with your authentication key. Please contact support@biteship.com for this matter
+POST	/v1/orders	40002004	This is direct Biteship order and you're missing type field
+POST	/v1/orders	40002005	Delivery type has no value. Please specify whether it's a 'Now', or 'Scheduled' delivery type
+POST	/v1/orders	40002006	Please make sure to input the right delivery type value
+POST	/v1/orders	40002007	Courier is not available for scheduled delivery
+POST	/v1/orders	40002008	Please make sure you requested the correct extra feature(s)
+POST	/v1/orders	40002009	Courier is not available for cash on delivery service
+POST	/v1/orders	40002010	Either destination needs to have postal code or coordinate
+POST	/v1/orders	40002011	Either origin needs to have postal code or coordinate
+POST	/v1/orders	40002012	Destination addres is required for this courier
+POST	/v1/orders	40002013	Time already passed. Set new delivery time.
+POST	/v1/orders	40002014	Please make sure origin contact name is filled
+POST	/v1/orders	40002015	Please make sure origin contact phone is filled
+POST	/v1/orders	40002016	Please make sure origin address is filled
+POST	/v1/orders	40002017	Please make sure destination contact name is filled
+POST	/v1/orders	40002018	Please make sure destination contact phone is filled
+POST	/v1/orders	40002019	Please make sure destination address is filled
+POST	/v1/orders	40002020	Failed due to invalid or missing postal code. Please contact support@biteship.com for this matter.
+POST	/v1/orders	40002021	There's something wrong getting the courier rates. Please contact support@biteship.com for this matter.
+POST	/v1/orders	40002022	Origin coordinate must have both latitude and longitude value
+POST	/v1/orders	40002023	Selected courier needs to have origin coordinate value
+POST	/v1/orders	40002024	Destination coordinate must have both latitude and longitude value
+POST	/v1/orders	40002025	Selected courier needs to have destination coordinate value
+POST	/v1/orders	40002026	Selected courier does not exist
+POST	/v1/orders	40002027	Courier service type does not exist
+POST	/v1/orders	40002028	Your account is not available for {{Courier Name}} COD feature.
+POST	/v1/orders	40002029	Please specify the correct COD Type: 3_days, 5_days, 7_days or leave it null to set as default 7_days
+POST	/v1/orders	40002030	Cash on delivery value cannot exceed Rp. 15.000.000
+POST	/v1/orders	40002031	Existing courier cannot provide cash on delivery
+POST	/v1/orders	40002032	Need to fill proof of delivery note
+POST	/v1/orders	40002033	Courier is not available for providing proof of delivery service
+POST	/v1/orders	40002034	Courier is not available for providing insurance
+POST	/v1/orders	40002035	Delivery date has not been specified
+POST	/v1/orders	40002036	Delivery time has no been specified
+POST	/v1/orders	40002037	Restriction for same day delivery order time
+POST	/v1/orders	40002038	There's something wrong with the order item. Please contact support@biteship.com for more information
+POST	/v1/orders	40002039	There's something wrong with the payment. Please contact support@biteship.com for more information
+POST	/v1/orders	40002040	There's something wrong with ordering partner. Please contact support@biteship.com for more information.
+POST	/v1/orders	40002041	Failed to create order. Please contact support@biteship.com for this problem.
+POST	/v1/orders	40002060	Reference id has already been used before. Please input other reference id
+POST	/v1/orders	40002061	Delivery date must be in 'YYYY-MM-DD' format
+POST	/v1/orders	40002062	Delivery time must be in 'HH:mm' format
+POST	/v1/orders	40002999	Something is wrong with the order. Please contact support@biteship.com for more info
+GET	/v1/orders/:id	40002042	Something went wrong when getting the order's details.
+GET	/v1/orders/:id	40002057	Order not found
+POST	/v1/orders/:id	40002043	Something is wrong when updating a new order. Please contact support@biteship.com for this matter.
+POST	/v1/orders/:id	40002044	Order has already been confirmed therefore cannot edit order. Please create a new order instead.
+POST	/v1/orders/:id	40002045	Cannot update order because shipment already delivered
+POST	/v1/orders/:id	40002046	Cannot update order because shipment already cancelled
+POST	/v1/orders/:id	40002047	Cannot update order because shipment is on process
+POST	/v1/orders/:id	40002048	Something error in development mode
+POST	/v1/orders/:id	40002049	Something went wrong with the payment when updating the new order.
+POST	/v1/orders/:id	40002050	Order has already been {{new status}}
+POST	/v1/orders/:id	40002051	Order failed to confirm in development mode
+POST	/v1/orders/:id	40002052	Failed to confirm order. Please contact support@biteship.com for this matter
+POST	/v1/orders/:id	40002053	Cannot cancel order because order already {{status}}
+POST	/v1/orders/:id	40002054	Failed to cancel development order
+POST	/v1/orders/:id	40002055	Failed to cancel the courier. Please contact support@biteship.com for this matter
+POST	/v1/orders/:id	40002056	Something wrong when cancelling an order. Please contact support@biteship.com for this matter.
+POST	/v1/orders/:id	40002058	Tags must be in array format
+POST	/v1/orders/:id	40002059	Waybill id is already created and cannot be duplicated.
+POST	/v1/orders/:id	40002060	Reference id has already been used before. Please input other reference id
+POST	/v1/orders	40009001	Lack of transaction data
+POST	/v1/orders	40009002	Payment method is not found
+POST	/v1/orders	40009003	Payment failed to process. Please contact support@biteship.com for this matter.
+POST	/v1/orders	40009004	Failed to create transaction
+

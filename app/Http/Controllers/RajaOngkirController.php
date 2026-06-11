@@ -91,33 +91,27 @@ class RajaOngkirController extends Controller
 
                 return response()->json($formatted);
             } else {
-                Log::warning('Biteship Maps Failed/Limit Reached. Using Mock Data.');
+                Log::warning('Biteship Maps Failed. Status: ' . $response->status() . ' Body: ' . $response->body());
+                // Fallback dinamis berdasarkan input user agar checkout tidak stuck
                 return response()->json([
                     [
-                        'id' => 'IDNP6IDNC147IDND828', // Dummy Biteship Area ID
-                        'text' => 'Kebayoran Lama, Jakarta Selatan, DKI Jakarta (Mock Data)',
-                        'postal_code' => '12240',
-                        'city' => 'Jakarta Selatan',
-                        'province' => 'DKI Jakarta'
-                    ],
-                    [
-                        'id' => 'IDNP6IDNC147IDND827',
-                        'text' => 'Gambir, Jakarta Pusat, DKI Jakarta (Mock Data)',
-                        'postal_code' => '10110',
-                        'city' => 'Jakarta Pusat',
-                        'province' => 'DKI Jakarta'
+                        'id' => 'MOCK_' . strtoupper(substr(md5($search), 0, 8)),
+                        'text' => ucwords($search) . ' (Simulasi Bebas/API Limit)',
+                        'postal_code' => '12345',
+                        'city' => ucwords($search),
+                        'province' => 'Provinsi Mock'
                     ]
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Biteship Maps Error: ' . $e->getMessage());
+            Log::error('Biteship Maps Error Exception: ' . $e->getMessage());
             return response()->json([
                 [
-                    'id' => 'IDNP6IDNC147IDND828',
-                    'text' => 'Kebayoran Lama, Jakarta Selatan, DKI Jakarta (Mock Fallback)',
-                    'postal_code' => '12240',
-                    'city' => 'Jakarta Selatan',
-                    'province' => 'DKI Jakarta'
+                    'id' => 'MOCK_' . strtoupper(substr(md5($search), 0, 8)),
+                    'text' => ucwords($search) . ' (Simulasi Bebas/API Error)',
+                    'postal_code' => '12345',
+                    'city' => ucwords($search),
+                    'province' => 'Provinsi Mock'
                 ]
             ]);
         }
@@ -324,11 +318,9 @@ class RajaOngkirController extends Controller
                     }
                 } else {
                     $errData = $response->json();
-                    if (isset($errData['error']) && str_contains(strtolower($errData['error']), 'balance')) {
-                        // FALLBACK MOCK DATA IF INSUFFICIENT BALANCE (Untuk keperluan UAS testing)
-                        Log::warning('Biteship Insufficient Balance. Using Mock Data.');
-                        $formattedCosts = $this->getMockRates($distance, $weight);
-                    }
+                    // Gunakan mock data jika terjadi error apa pun (limit/saldo habis/area mock tidak valid)
+                    Log::warning('Biteship API Error / Limit. Using Mock Data. Detail: ' . json_encode($errData));
+                    $formattedCosts = $this->getMockRates($distance, $weight);
                 }
             } else {
                 $formattedCosts = $this->getMockRates($distance, $weight);

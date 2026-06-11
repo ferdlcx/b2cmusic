@@ -232,3 +232,83 @@ $adminRoutes = function () {
 // 2. Path prefix routing (domain.com/admin)
 Route::middleware(['auth', 'admin', 'ip_whitelist'])->prefix('admin')->name('admin.')->group($adminRoutes);
 
+// Route untuk cek limit API
+Route::get('/cekapi', function () {
+    $results = [];
+
+    // 1. Check Biteship Maps API
+    $biteshipKey = env('BITESHIP_API_KEY');
+    try {
+        $mapsStart = microtime(true);
+        $mapsRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+            'Authorization' => $biteshipKey
+        ])->get('https://api.biteship.com/v1/maps/areas', [
+            'countries' => 'ID',
+            'input' => 'jakarta',
+            'type' => 'single'
+        ]);
+        $mapsTime = round((microtime(true) - $mapsStart) * 1000) . 'ms';
+        
+        if ($mapsRes->successful()) {
+            $results['Biteship Maps API'] = ['status' => 'OK (Belum Limit)', 'code' => $mapsRes->status(), 'time' => $mapsTime, 'detail' => 'Berhasil fetch data area'];
+        } else {
+            $err = $mapsRes->json();
+            $results['Biteship Maps API'] = ['status' => 'LIMIT / ERROR', 'code' => $mapsRes->status(), 'time' => $mapsTime, 'detail' => $err['error'] ?? $mapsRes->body()];
+        }
+    } catch (\Exception $e) {
+        $results['Biteship Maps API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+    }
+
+    // 2. Check Biteship Rates API
+    try {
+        $ratesStart = microtime(true);
+        $ratesRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+            'Authorization' => $biteshipKey,
+            'Content-Type' => 'application/json'
+        ])->post('https://api.biteship.com/v1/rates/couriers', [
+            'origin_area_id' => env('BITESHIP_ORIGIN_AREA_ID', 'IDNP6IDNC147IDND828'),
+            'destination_area_id' => 'IDNP6IDNC147IDND827',
+            'couriers' => 'jne',
+            'items' => [
+                ['name' => 'Test', 'value' => 10000, 'weight' => 1000, 'quantity' => 1]
+            ]
+        ]);
+        $ratesTime = round((microtime(true) - $ratesStart) * 1000) . 'ms';
+
+        if ($ratesRes->successful()) {
+            $results['Biteship Rates API'] = ['status' => 'OK (Belum Limit)', 'code' => $ratesRes->status(), 'time' => $ratesTime, 'detail' => 'Berhasil fetch ongkir'];
+        } else {
+            $err = $ratesRes->json();
+            $results['Biteship Rates API'] = ['status' => 'LIMIT / ERROR', 'code' => $ratesRes->status(), 'time' => $ratesTime, 'detail' => $err['error'] ?? $ratesRes->body()];
+        }
+    } catch (\Exception $e) {
+        $results['Biteship Rates API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+    }
+
+    // 3. Check MailerSend API
+    $mailerKey = env('MAILERSEND_API_KEY');
+    try {
+        $mailStart = microtime(true);
+        $mailRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+            'Authorization' => 'Bearer ' . $mailerKey,
+            'Content-Type' => 'application/json'
+        ])->get('https://api.mailersend.com/v1/identities'); // domain endpoint
+        $mailTime = round((microtime(true) - $mailStart) * 1000) . 'ms';
+
+        if ($mailRes->successful()) {
+            $results['MailerSend API'] = ['status' => 'OK (Belum Limit)', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => 'Token valid'];
+        } else {
+            $err = $mailRes->json();
+            $results['MailerSend API'] = ['status' => 'LIMIT / ERROR', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => $err['message'] ?? $mailRes->body()];
+        }
+    } catch (\Exception $e) {
+         $results['MailerSend API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'API Status Check',
+        'data' => $results
+    ]);
+});
+

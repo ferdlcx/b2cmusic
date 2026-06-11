@@ -310,24 +310,7 @@ Route::get('/cekapi', function () {
         }
     }
 
-    $html = '<!DOCTYPE html><html><head><title>API Status Dashboard</title>';
-    $html .= '<style>body{font-family:system-ui,sans-serif;background:#f3f4f6;padding:2rem} .card{background:#fff;border-radius:8px;padding:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)} h1{color:#111827;margin-top:0} table{width:100%;border-collapse:collapse;margin-top:1rem} th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb} th{background:#f9fafb;color:#374151} .status-ok{color:#059669;font-weight:bold} .status-error{color:#dc2626;font-weight:bold} .status-skip{color:#6b7280;font-style:italic}</style>';
-    $html .= '</head><body><div class="card"><h1>🌐 API Status Dashboard</h1><table>';
-    $html .= '<tr><th>Layanan API</th><th>Status</th><th>Code</th><th>Response Time</th><th>Detail</th></tr>';
-    
-    foreach ($results as $name => $data) {
-        $statusClass = str_contains($data['status'], 'OK') ? 'status-ok' : (str_contains($data['status'], 'SKIPPED') ? 'status-skip' : 'status-error');
-        $html .= "<tr>";
-        $html .= "<td><strong>{$name}</strong></td>";
-        $html .= "<td class='{$statusClass}'>{$data['status']}</td>";
-        $html .= "<td><code>{$data['code']}</code></td>";
-        $html .= "<td>{$data['time']}</td>";
-        $html .= "<td><small>{$data['detail']}</small></td>";
-        $html .= "</tr>";
-    }
-    
-    $html .= '</table></div></body></html>';
-    return response($html);
+    return view('pages.cekapi', compact('results'));
 });
 
 

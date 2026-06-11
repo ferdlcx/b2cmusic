@@ -197,10 +197,10 @@ $adminRoutes = function () {
     Route::get('/orders/{id}', [AdminController::class, 'showOrder'])->name('orders.show');
     Route::post('/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
     Route::post('/orders/{id}/arrive', [AdminController::class, 'simulateCourierArrived'])->name('orders.arrive');
-    Route::get('/admin/orders/{id}/shipping', [App\Http\Controllers\AdminController::class, 'manageShipping'])->name('admin.orders.shipping');
-    Route::post('/admin/orders/{id}/ship', [App\Http\Controllers\AdminController::class, 'shipOrder'])->name('admin.orders.ship');
-    Route::get('/admin/orders/{id}/print-label', [App\Http\Controllers\AdminController::class, 'printLabel'])->name('admin.orders.print_label');
-    Route::post('/admin/orders/{id}/force-delivered', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('admin.orders.force_delivered');
+    Route::get('/orders/{id}/shipping', [App\Http\Controllers\AdminController::class, 'manageShipping'])->name('orders.shipping');
+    Route::post('/orders/{id}/ship', [App\Http\Controllers\AdminController::class, 'shipOrder'])->name('orders.ship');
+    Route::get('/orders/{id}/print-label', [App\Http\Controllers\AdminController::class, 'printLabel'])->name('orders.print_label');
+    Route::post('/orders/{id}/force-delivered', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('orders.force_delivered');
 
     // --- SUPER ADMIN ONLY FEATURES ---
     Route::middleware('super_admin')->group(function () {
@@ -327,3 +327,8 @@ Route::get('/cekapi', function () {
     return response($html);
 });
 
+
+Route::get('/symlink-fix', function () {
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    return 'Symlink berhasil dibuat! Silakan cek kembali gambar produk Anda.';
+});

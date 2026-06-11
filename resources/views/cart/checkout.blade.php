@@ -62,13 +62,18 @@
                   this.fetchCourierOptions();
               },
               async saveNewAddress() {
+                  if (!this.selectedNewAreaId || !this.postalCode) {
+                      alert('Silakan cari dan pilih kecamatan/kodepos terlebih dahulu dari daftar pencarian.');
+                      return;
+                  }
                   try {
                       let res = await fetch('{{ route("profile.address.store") }}', {
                           method: 'POST',
                           headers: {
                               'Content-Type': 'application/json',
                               'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                              'Accept': 'application/json'
+                              'Accept': 'application/json',
+                              'X-Requested-With': 'XMLHttpRequest'
                           },
                           body: JSON.stringify({
                               label: document.querySelector('input[name=new_address_label]').value,

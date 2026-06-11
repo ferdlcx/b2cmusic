@@ -88,7 +88,6 @@
                   try {
                       let res = await fetch('{{ route("profile.address.store") }}', {
                           method: 'POST',
-                          redirect: 'error', // Don't follow redirects - catch auth/CSRF failures
                           headers: {
                               'Content-Type': 'application/json',
                               'X-CSRF-TOKEN': '{{ csrf_token() }}',

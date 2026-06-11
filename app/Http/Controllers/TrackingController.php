@@ -1,12 +1,14 @@
 <?php
-
+ 
 namespace App\Http\Controllers;
-
+ 
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+ 
 class TrackingController extends Controller
 {
     public function track($id)
@@ -218,8 +220,11 @@ class TrackingController extends Controller
                 ]);
 
                 if ($status === 'delivered') {
-                    $order->update(['status' => 'completed']);
-                    $order->shipment->update(['delivered_at' => now()]);
+                    // Do NOT update order status directly to completed (Shopee flow)
+                    $order->shipment->update([
+                        'status' => 'delivered',
+                        'delivered_at' => now(),
+                    ]);
 
                     try {
                         \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\OrderArrivedMail($order));
@@ -233,15 +238,18 @@ class TrackingController extends Controller
                             'action' => 'courier_arrived_webhook',
                             'model_type' => Order::class,
                             'model_id' => $order->id,
-                            'description' => "Pesanan {$order->order_code} telah terkirim (Update via Biteship Webhook)",
+                            'description' => "Pesanan {$order->order_code} telah tiba di tujuan (Update via Biteship Webhook)",
                             'ip_address' => request()->ip(),
                             'user_agent' => request()->userAgent(),
                         ]);
                     } catch (\Exception $e) {}
-                } elseif ($status === 'picking_up' || $status === 'inTransit' || $status === 'droppingOff' || $status === 'picked') {
-                    if ($order->status === 'processing') {
+                } elseif ($status === 'picking_up' || $status === 'in_transit' || $status === 'dropping_off' || $status === 'picked') {
+                    if ($order->status === 'processing' || $order->status === 'paid') {
                         $order->update(['status' => 'shipped']);
-                        $order->shipment->update(['shipped_at' => now()]);
+                        $order->shipment->update([
+                            'status' => 'shipped',
+                            'shipped_at' => now(),
+                        ]);
                     }
                 }
             }
@@ -249,5 +257,87 @@ class TrackingController extends Controller
         }
 
         return response('ok', 200);
+    }
+
+    public function simulatePayment($id)
+    {
+        $order = Order::with('payment')->findOrFail($id);
+        
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Hanya pesanan pending yang dapat dibayar.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $order->update(['status' => 'paid']);
+            
+            if ($order->payment) {
+                $order->payment->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'transaction_id' => 'SIM-' . strtoupper(Str::random(10)),
+                ]);
+            }
+            
+            // Send notification
+            $order->user->notify(new \App\Notifications\PaymentSuccess($order));
+            
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'payment_simulated',
+                'model_type' => Order::class,
+                'model_id' => $order->id,
+                'description' => "Simulasi pembayaran lunas untuk pesanan {$order->order_code}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+            
+            DB::commit();
+            return back()->with('success', 'Simulasi: Pembayaran berhasil! Pesanan Anda kini berstatus PAID.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memproses simulasi pembayaran: ' . $e->getMessage());
+        }
+    }
+
+    public function simulateShipment($id)
+    {
+        $order = Order::with('shipment')->findOrFail($id);
+        
+        if (!in_array($order->status, ['paid', 'processing'])) {
+            return back()->with('error', 'Hanya pesanan yang sudah dibayar (paid/processing) yang dapat dikirim.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $order->update(['status' => 'shipped']);
+            
+            if ($order->shipment) {
+                $order->shipment->update([
+                    'status' => 'shipped',
+                    'shipped_at' => now(),
+                    'tracking_number' => 'SIM-RESI-' . rand(1000000000, 9999999999),
+                ]);
+            }
+            
+            // Send notification
+            $order->user->notify(new \App\Notifications\OrderShipped($order));
+            
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'shipment_simulated',
+                'model_type' => Order::class,
+                'model_id' => $order->id,
+                'description' => "Simulasi pengiriman barang oleh admin untuk pesanan {$order->order_code}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+            
+            DB::commit();
+            return back()->with('success', 'Simulasi: Pesanan telah dikirim! Resi pelacakan otomatis dibuat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memproses simulasi pengiriman: ' . $e->getMessage());
+        }
     }
 }

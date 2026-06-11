@@ -91,21 +91,44 @@
 
         <!-- Right: Action & Totals Summary -->
         <div class="space-y-6">
-            <!-- Status Information (Read-only) -->
+            <!-- Status Information (Interactive) -->
             <div class="bg-white border border-slate-200 rounded-[32px] p-8 shadow-sm space-y-6">
-                <h3 class="text-xl font-black uppercase tracking-tight text-slate-950 pb-4 border-b border-slate-100">Status Pesanan</h3>
+                <h3 class="text-xl font-black uppercase tracking-tight text-slate-950 pb-4 border-b border-slate-100">Kelola Status Pesanan</h3>
                 
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500 font-medium">Status Saat Ini</span>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-slate-100 text-slate-700">
-                            {{ $order->status }}
-                        </span>
+                <form action="{{ route('admin.orders.status', $order->id) }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div class="space-y-1.5">
+                        <label class="text-xs text-slate-500 font-bold uppercase tracking-widest">Ubah Status</label>
+                        <select name="status" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-400 font-medium">
+                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="paid" {{ $order->status === 'paid' ? 'selected' : '' }}>Paid (Lunas)</option>
+                            <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped (Dikirim)</option>
+                            <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
+                            <option value="canceled" {{ $order->status === 'canceled' ? 'selected' : '' }}>Canceled (Dibatalkan)</option>
+                        </select>
                     </div>
-                    <p class="text-xs text-slate-400 leading-relaxed italic">
-                        Pembaruan status pesanan dan nomor resi kini dikelola sepenuhnya secara otomatis melalui Biteship API dan Webhook. Anda dapat memantau status aktual di dashboard Biteship.
-                    </p>
-                </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs text-slate-500 font-bold uppercase tracking-widest">Nomor Resi / AWB</label>
+                        <input type="text" name="tracking_number" value="{{ $order->shipment ? $order->shipment->tracking_number : '' }}" placeholder="Masukkan Nomor Resi" 
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-slate-400 font-mono font-bold text-xs" />
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-slate-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-slate-800 transition duration-300">
+                        Perbarui Status & Resi
+                    </button>
+                </form>
+
+                @if($order->status === 'shipped' && $order->shipment && $order->shipment->status !== 'delivered')
+                    <div class="pt-4 border-t border-slate-100">
+                        <form action="{{ route('admin.orders.arrive', $order->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full py-3 bg-amber-600 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-amber-700 transition duration-300">
+                                Simulasikan Kurir Tiba (Delivered)
+                            </button>
+                        </form>
+                    </div>
+                @endif
             </div>
 
             <!-- Totals Card -->

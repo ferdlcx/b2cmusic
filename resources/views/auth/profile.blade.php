@@ -56,14 +56,12 @@
                 document.getElementById('add-city').value = area.city;
                 document.getElementById('add-province').value = area.province;
                 document.getElementById('add-postal').value = area.postal_code;
-                document.getElementById('add-district').value = '';
             } else {
                 this.areaSearchQuery = area.text;
                 this.editAddressData.area_id = area.id;
                 this.editAddressData.city = area.city;
                 this.editAddressData.province = area.province;
                 this.editAddressData.postal_code = area.postal_code;
-                this.editAddressData.district = '';
             }
             this.areaSearchResults = [];
         },

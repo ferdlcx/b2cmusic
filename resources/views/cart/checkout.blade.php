@@ -23,6 +23,11 @@
               courierOptions: [],
               totalWeight: {{ $cartItems->sum(function($item) { return ($item->product->weight ?: 1000) * $item->quantity; }) }},
               selectedCityId: '{{ $defaultAddress ? ($defaultAddress->area_id ?: ($defaultAddress->city_id ?: "")) : "" }}',
+              city: '{{ $defaultAddress ? $defaultAddress->city : "" }}',
+              province: '{{ $defaultAddress ? $defaultAddress->province : "" }}',
+              postalCode: '{{ $defaultAddress ? $defaultAddress->postal_code : "" }}',
+              latitude: '{{ $defaultAddress ? $defaultAddress->latitude : "" }}',
+              longitude: '{{ $defaultAddress ? $defaultAddress->longitude : "" }}',
               couponCode: '',
               discount: 0,
               subtotal: {{ $subtotal }},
@@ -57,6 +62,8 @@
                   this.postalCode = area.postal_code || '';
                   this.city = area.city || '';
                   this.province = area.province || '';
+                  this.latitude = '';
+                  this.longitude = '';
                   this.areaSearchResults = [];
                   this.selectedCityId = area.id; // use selectedCityId as area_id for consistency
                   this.fetchCourierOptions();
@@ -116,7 +123,11 @@
                           body: JSON.stringify({
                               destination_area_id: this.selectedCityId,
                               postal_code: this.postalCode,
-                              weight: this.totalWeight
+                              weight: this.totalWeight,
+                              city: this.city,
+                              province: this.province,
+                              latitude: this.latitude,
+                              longitude: this.longitude
                           })
                       });
                       if (res.ok) {
@@ -129,7 +140,8 @@
                                       service: c.description,
                                       description: c.description,
                                       cost: c.cost,
-                                      etd: c.etd
+                                      etd: c.etd,
+                                      distance: data.distance || null
                                   });
                               });
                           }
@@ -222,7 +234,7 @@
                     @else
                         <div class="space-y-4">
                             @foreach($addresses as $addr)
-                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->area_id ?: $addr->city_id }}'; fetchCourierOptions()" 
+                                <div @click="addressId = '{{ $addr->id }}'; selectedCityId = '{{ $addr->area_id ?: $addr->city_id }}'; postalCode = '{{ $addr->postal_code }}'; city = '{{ $addr->city }}'; province = '{{ $addr->province }}'; latitude = '{{ $addr->latitude }}'; longitude = '{{ $addr->longitude }}'; fetchCourierOptions()" 
                                      :class="addressId == '{{ $addr->id }}' ? 'border-gold-500 bg-cream-50' : 'border-walnut-800/20'"
                                      class="flex gap-4 p-6 border cursor-pointer hover:bg-cream-50 transition duration-300">
                                     <div class="pt-0.5">
@@ -345,6 +357,9 @@
                                             <span class="text-[0.65rem] text-muted font-medium block mt-1" x-text="option.description"></span>
                                             <span class="text-[0.6rem] text-gold-600 font-bold mt-0.5 block">
                                                 Estimasi: <span x-text="option.etd"></span> hari
+                                                <template x-if="option.distance">
+                                                    <span> | Jarak: <span x-text="option.distance"></span> km</span>
+                                                </template>
                                             </span>
                                         </div>
                                     </div>

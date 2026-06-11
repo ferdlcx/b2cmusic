@@ -54,10 +54,27 @@ class RajaOngkirController extends Controller
                 return response()->json($formatted);
             }
             
-            return response()->json([]);
+            Log::warning('RajaOngkir Maps Failed. Status: ' . $response->status() . ' Body: ' . $response->body());
+            return response()->json([
+                [
+                    'id' => '17464', // Dummy ID
+                    'text' => ucwords($search) . ' (Simulasi Bebas/API Limit)',
+                    'postal_code' => '12345',
+                    'city' => ucwords($search),
+                    'province' => 'Provinsi Mock'
+                ]
+            ]);
         } catch (\Exception $e) {
             Log::error('RajaOngkir Maps Error: ' . $e->getMessage());
-            return response()->json([]);
+            return response()->json([
+                [
+                    'id' => '17464',
+                    'text' => ucwords($search) . ' (Simulasi Bebas/API Error)',
+                    'postal_code' => '12345',
+                    'city' => ucwords($search),
+                    'province' => 'Provinsi Mock'
+                ]
+            ]);
         }
     }
 
@@ -183,6 +200,7 @@ class RajaOngkirController extends Controller
         $formattedCosts = [];
 
         try {
+            $hasApiSuccess = false;
             foreach ($couriers as $courier) {
                 $response = Http::asForm()->withHeaders([
                     'key' => $this->apiKey,
@@ -195,6 +213,7 @@ class RajaOngkirController extends Controller
                 if ($response->successful()) {
                     $results = $response->json()['data'] ?? [];
                     if (!empty($results)) {
+                        $hasApiSuccess = true;
                         foreach ($results as $costDetail) {
                             $formattedCosts[] = [
                                 'service' => strtoupper($courier) . ' - ' . ($costDetail['service'] ?? ''),
@@ -204,15 +223,27 @@ class RajaOngkirController extends Controller
                             ];
                         }
                     }
+                } else {
+                    Log::warning("RajaOngkir Rates Failed for $courier. Body: " . $response->body());
                 }
             }
+
+            // Jika semua gagal (termasuk karena limit/429 atau area ID dummy), gunakan mock!
+            if (!$hasApiSuccess) {
+                Log::warning('RajaOngkir Limits Reached. Using Mock Rates.');
+                $formattedCosts = $this->getMockRates($distance, $weight);
+            }
+
             return response()->json([
                 'costs' => $formattedCosts,
                 'distance' => $distance
             ]);
         } catch (\Exception $e) {
             Log::error('RajaOngkir V2 Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
+            return response()->json([
+                'costs' => $this->getMockRates($distance, $weight),
+                'distance' => $distance
+            ]);
         }
     }
 

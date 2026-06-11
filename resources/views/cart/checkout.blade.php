@@ -164,7 +164,7 @@
                                   this.courierOptions.push({
                                       courier: c.service.split(' - ')[0] || 'COURIER',
                                       courier_name: c.service.split(' - ')[0] || 'COURIER',
-                                      service: c.description,
+                                      service: c.service.split(' - ')[1] || c.description,
                                       description: c.description,
                                       cost: c.cost,
                                       etd: c.etd,

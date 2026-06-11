@@ -214,6 +214,10 @@ class RajaOngkirController extends Controller
                     if (!empty($results)) {
                         $hasApiSuccess = true;
                         foreach ($results as $costDetail) {
+                            $serviceCode = strtoupper($costDetail['service'] ?? '');
+                            // Filter out motorcycle shipping services
+                            if (in_array($serviceCode, ['JTR150', 'JTR250', 'JTR>250'])) continue;
+
                             $formattedCosts[] = [
                                 'service' => strtoupper($courier) . ' - ' . ($costDetail['service'] ?? ''),
                                 'description' => $costDetail['description'] ?? '',

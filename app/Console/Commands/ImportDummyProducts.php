@@ -107,7 +107,7 @@ class ImportDummyProducts extends Command
                     $foundFile = basename($existingFiles[0]);
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image' => 'products/' . $foundFile,
+                        'image' => '/storage/products/' . $foundFile,
                         'is_primary' => true
                     ]);
                 }

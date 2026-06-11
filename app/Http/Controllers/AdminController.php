@@ -509,6 +509,24 @@ class AdminController extends Controller
         return back()->with('success', 'Status pengguna berhasil diperbarui!');
     }
 
+    public function destroyUser($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'super_admin') {
+            return back()->with('error', 'Akun Super Admin tidak dapat dihapus.');
+        }
+
+        // If you don't use soft deletes, deleting a user might fail if there are foreign key constraints (like orders).
+        // Since this is an admin action, we delete the user.
+        $userName = $user->name;
+        $user->delete();
+
+        $this->logActivity('delete_user', User::class, $id, "Menghapus user {$userName}");
+
+        return redirect()->route('admin.users')->with('success', 'Pengguna berhasil dihapus permanen.');
+    }
+
     // --- COUPONS CRUD ---
     public function coupons()
     {

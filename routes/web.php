@@ -199,6 +199,7 @@ $adminRoutes = function () {
         Route::get('/users', [AdminController::class, 'users'])->name('users');
         Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('users.show');
         Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('users.toggleStatus');
+        Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 
         // Coupons Management
         Route::get('/coupons', [AdminController::class, 'coupons'])->name('coupons');

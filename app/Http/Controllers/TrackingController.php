@@ -93,6 +93,28 @@ class TrackingController extends Controller
 
         return back()->with('success', 'Webhook order.price (' . $request->price . ') berhasil disimulasikan!');
     }
+
+    public function clearSimulator()
+    {
+        $orders = Order::whereNotNull('biteship_order_id')->get();
+        $apiKey = env('BITESHIP_API_KEY');
+
+        foreach ($orders as $order) {
+            if ($apiKey) {
+                try {
+                    // Coba delete hard secara API (Meskipun deprecated, kadang di Sandbox jalan)
+                    \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                        'Authorization' => $apiKey
+                    ])->delete("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+                } catch (\Exception $e) {}
+            }
+        }
+
+        Order::query()->delete();
+        \App\Models\ActivityLog::where('model_type', Order::class)->delete();
+
+        return back()->with('success', 'Semua pesanan berhasil dihapus dari sistem lokal, dan request penghapusan telah dikirim ke Sandbox Biteship.');
+    }
     public function track(Request $request, $id)
     {
         $user = Auth::user();

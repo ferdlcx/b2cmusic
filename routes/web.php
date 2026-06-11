@@ -151,6 +151,7 @@ Route::post('/simulasi/{id}/ship', [App\Http\Controllers\TrackingController::cla
 Route::post('/simulasi/{id}/arrive', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('simulasi.arrive');
 Route::post('/simulasi/webhook/status', [App\Http\Controllers\TrackingController::class, 'triggerWebhookStatus'])->name('simulasi.webhook.status');
 Route::post('/simulasi/webhook/price', [App\Http\Controllers\TrackingController::class, 'triggerWebhookPrice'])->name('simulasi.webhook.price');
+Route::post('/simulasi/clear', [App\Http\Controllers\TrackingController::class, 'clearSimulator'])->name('simulasi.clear');
 
 // Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)
 $adminRoutes = function () {

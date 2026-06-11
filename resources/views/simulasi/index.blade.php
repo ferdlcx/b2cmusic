@@ -2,11 +2,19 @@
 
 @section('content')
 <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="simulator()">
-    <div class="mb-6">
-        <h1 class="text-2xl font-black uppercase tracking-tight text-walnut-950 flex items-center gap-2">
-            <i data-lucide="truck" class="w-6 h-6 text-gold-600"></i> Biteship Webhook Simulator
-        </h1>
-        <p class="text-[0.7rem] font-bold text-muted mt-1">Menguji webhook order.status dan order.price (Mendukung Payload Asli Biteship)</p>
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+            <h1 class="text-2xl font-black uppercase tracking-tight text-walnut-950 flex items-center gap-2">
+                <i data-lucide="truck" class="w-6 h-6 text-gold-600"></i> Biteship Webhook Simulator
+            </h1>
+            <p class="text-[0.7rem] font-bold text-muted mt-1">Menguji webhook order.status dan order.price (Mendukung Payload Asli Biteship)</p>
+        </div>
+        <form action="{{ route('simulasi.clear') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus seluruh riwayat pesanan dari database lokal dan Biteship? Data yang dihapus tidak bisa dikembalikan.');">
+            @csrf
+            <button type="submit" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-xl text-[0.65rem] font-bold uppercase tracking-widest transition flex items-center gap-2">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear All Orders
+            </button>
+        </form>
     </div>
 
     @if(session('success'))

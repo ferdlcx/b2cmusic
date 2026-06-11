@@ -309,6 +309,27 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
+                <div class="bg-cream-50 border-l-4 border-rose-600 px-6 py-4 flex flex-col justify-center shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+                            <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">Validasi Gagal</span>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" class="text-walnut-400 hover:text-rose-600 transition ml-4">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <ul class="mt-2 text-xs text-rose-600 font-medium list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+
         <!-- Content -->
         <main class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
             @yield('content')

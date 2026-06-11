@@ -47,6 +47,30 @@
     </div>
 
     {{-- ═══════════════════════════════════════════ --}}
+    {{-- QUICK LINKS / TEST SIMULATORS --}}
+    {{-- ═══════════════════════════════════════════ --}}
+    <div class="grid md:grid-cols-2 gap-4 border border-gold-500/30 bg-gold-500/5 rounded-3xl p-6 md:p-8">
+        <div class="space-y-3">
+            <h3 class="font-display text-lg font-black uppercase tracking-tight text-walnut-950 flex items-center gap-2">
+                <i data-lucide="credit-card" class="w-5 h-5 text-gold-600"></i> Midtrans Simulator
+            </h3>
+            <p class="text-[0.7rem] text-muted">Gunakan simulator ini untuk menguji pembayaran Midtrans (Sandbox) setelah melakukan checkout.</p>
+            <a href="https://simulator.sandbox.midtrans.com/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-walnut-900 text-gold-500 text-xs font-bold uppercase tracking-widest hover:bg-gold-600 hover:text-white transition rounded-xl">
+                Buka Simulator Midtrans <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+        <div class="space-y-3">
+            <h3 class="font-display text-lg font-black uppercase tracking-tight text-walnut-950 flex items-center gap-2">
+                <i data-lucide="truck" class="w-5 h-5 text-gold-600"></i> Biteship Simulator
+            </h3>
+            <p class="text-[0.7rem] text-muted">Simulasikan status pengiriman kurir (Pickup & Delivered) untuk pesanan yang sudah diproses Admin.</p>
+            <a href="{{ route('simulasi.index') }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-walnut-900 text-gold-500 text-xs font-bold uppercase tracking-widest hover:bg-gold-600 hover:text-white transition rounded-xl">
+                Buka Simulator Biteship <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+    </div>
+
+    {{-- ═══════════════════════════════════════════ --}}
     {{-- TAB: OVERVIEW --}}
     {{-- ═══════════════════════════════════════════ --}}
     <div x-show="activeTab === 'overview'" x-transition class="space-y-10">

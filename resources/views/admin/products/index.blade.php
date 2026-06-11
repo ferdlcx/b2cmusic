@@ -68,7 +68,7 @@
                             <!-- Stock -->
                             <td class="px-6 py-5 text-center">
                                 @if($product->stock <= 0)
-                                    <span class="text-[0.65rem] font-bold text-red-700 uppercase tracking-widest">Habis</span>
+                                    <span class="text-[0.65rem] font-bold text-rose-700 uppercase tracking-widest">Habis</span>
                                 @elseif($product->stock <= 5)
                                     <span class="text-[0.65rem] font-bold text-gold-700 uppercase tracking-widest">{{ $product->stock }} (Tipis)</span>
                                 @else
@@ -84,7 +84,7 @@
                                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-red-600 hover:text-red-800 transition">Hapus</button>
+                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-rose-600 hover:text-rose-700 transition">Hapus</button>
                                     </form>
                                 </div>
                             </td>

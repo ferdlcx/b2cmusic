@@ -58,9 +58,9 @@
                                     $isActive = $userStatus === 'active' || $user->status == '1';
                                 @endphp
                                 @if($isActive)
-                                    <span class="inline-flex items-center px-2 py-0.5 text-[0.65rem] font-bold border border-green-600/30 text-green-600 uppercase tracking-wider bg-green-50">Aktif</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[0.65rem] font-bold border border-walnut-800/20 text-walnut-950 uppercase tracking-wider bg-walnut-950/5">Aktif</span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 text-[0.65rem] font-bold border border-red-600/30 text-red-600 uppercase tracking-wider bg-red-50">Ditangguhkan</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[0.65rem] font-bold border border-rose-500/30 text-rose-600 uppercase tracking-wider bg-rose-50">Ditangguhkan</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-muted text-[0.7rem] font-bold uppercase tracking-widest">{{ $user->created_at->format('d M Y') }}</td>
@@ -70,7 +70,7 @@
                                 @if($user->role !== 'admin' && $user->role !== 'super_admin')
                                     <form action="{{ route('admin.users.toggleStatus', $user->id) }}" method="POST" class="inline">
                                         @csrf
-                                        <button type="submit" class="text-[0.65rem] font-bold uppercase tracking-widest {{ $isActive ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800' }} transition">
+                                        <button type="submit" class="text-[0.65rem] font-bold uppercase tracking-widest {{ $isActive ? 'text-rose-600 hover:text-rose-700' : 'text-walnut-950 hover:text-walnut-800' }} transition">
                                             {{ $isActive ? 'Tangguhkan' : 'Aktifkan' }}
                                         </button>
                                     </form>
@@ -78,7 +78,7 @@
                                     <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini secara permanen? Semua data terkait pengguna ini akan hilang.')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[0.65rem] font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition">
+                                        <button type="submit" class="text-[0.65rem] font-bold uppercase tracking-widest text-rose-600 hover:text-rose-700 transition">
                                             Hapus
                                         </button>
                                     </form>

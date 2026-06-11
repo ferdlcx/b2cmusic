@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('title', 'Kelola Pesanan #' . $order->order_code . ' - Admin DjudasMS')
 
-@section('content')
+@section('admin_content')
 <div class="space-y-10 py-4">
     <!-- Header -->
     <div class="border-b border-walnut-800/10 pb-8 flex items-center justify-between">

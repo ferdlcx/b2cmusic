@@ -58,7 +58,7 @@
 
         <!-- Orders Count -->
         <div class="bg-cream-50 border border-walnut-800/10 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+            <div class="w-12 h-12 bg-oak-600/10 rounded-2xl flex items-center justify-center text-oak-600 shrink-0">
                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
             </div>
             <div>
@@ -70,7 +70,7 @@
 
         <!-- Average Order Value -->
         <div class="bg-cream-50 border border-walnut-800/10 rounded-[28px] p-6 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
+            <div class="w-12 h-12 bg-walnut-950/5 rounded-2xl flex items-center justify-center text-walnut-800 shrink-0">
                 <i data-lucide="trending-up" class="w-5 h-5"></i>
             </div>
             <div>

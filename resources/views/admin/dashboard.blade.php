@@ -82,9 +82,9 @@
                                     @elseif($order->status === 'paid')
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Paid</span>
                                     @elseif($order->status === 'shipped')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Shipped</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-oak-600/10 text-oak-700 border border-oak-600/20 uppercase">Shipped</span>
                                     @elseif($order->status === 'completed')
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">Completed</span>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-walnut-950/5 text-walnut-950 border border-walnut-800/20 uppercase">Completed</span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Canceled</span>
                                     @endif

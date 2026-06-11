@@ -26,6 +26,7 @@ Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product
 // Static Pages
 Route::view('/about', 'pages.about')->name('about');
 Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/doctest', 'pages.doctest')->name('doctest');
 Route::post('/midtrans/webhook', [OrderController::class, 'handleWebhook'])->name('midtrans.webhook');
 Route::any('/api/biteship/webhook', [App\Http\Controllers\TrackingController::class, 'biteshipWebhook'])->name('biteship.webhook');
 

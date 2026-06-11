@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-walnut-800/10">
         <div class="space-y-2">
-            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-red-600 font-bold block">Sampah Produk</span>
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-rose-600 font-bold block">Sampah Produk</span>
             <h1 class="font-display text-4xl font-black uppercase tracking-tighter text-walnut-950">Produk Terhapus.</h1>
         </div>
         <div class="flex items-center gap-3">
@@ -79,7 +79,7 @@
                                     <form action="{{ route('admin.products.forceDelete', $product->id) }}" method="POST" onsubmit="return confirm('PENGHAPUSAN PERMANEN: Apakah Anda yakin ingin menghapus produk ini dari database secara total? Tindakan ini tidak dapat dibatalkan.')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-red-600 hover:text-red-800 transition">Hapus Permanen</button>
+                                        <button type="submit" class="text-[0.65rem] uppercase tracking-widest font-bold text-rose-600 hover:text-rose-700 transition">Hapus Permanen</button>
                                     </form>
                                 </div>
                             </td>

@@ -41,7 +41,7 @@
                             @elseif($return->status === 'approved')
                                 <span class="inline-block text-[0.6rem] font-bold uppercase tracking-widest bg-gold-100 text-gold-800 border border-gold-300 px-3 py-1">Disetujui</span>
                             @else
-                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-widest bg-red-100 text-red-800 border border-red-200 px-3 py-1">Ditolak</span>
+                                <span class="inline-block text-[0.6rem] font-bold uppercase tracking-widest bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1">Ditolak</span>
                             @endif
                         </div>
 
@@ -71,10 +71,10 @@
                                     <form action="{{ route('admin.returns.reject', $return->id) }}" method="POST" class="space-y-4">
                                         @csrf
                                         <div class="space-y-2">
-                                            <label class="text-[0.6rem] uppercase tracking-widest text-red-600 font-bold block">Alasan Penolakan (Wajib)</label>
-                                            <input type="text" name="admin_notes" required class="w-full px-4 py-2.5 bg-cream-50 border border-red-500/30 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-red-500 transition" placeholder="Alasan menolak retur..." />
+                                            <label class="text-[0.6rem] uppercase tracking-widest text-rose-600 font-bold block">Alasan Penolakan (Wajib)</label>
+                                            <input type="text" name="admin_notes" required class="w-full px-4 py-2.5 bg-cream-50 border border-rose-500/30 text-walnut-900 text-[0.75rem] font-medium focus:outline-none focus:border-rose-500 transition" placeholder="Alasan menolak retur..." />
                                         </div>
-                                        <button type="submit" class="w-full py-3 border border-red-600 hover:bg-red-600 text-red-600 hover:text-white font-bold text-[0.65rem] uppercase tracking-[0.2em] transition duration-300">Tolak Retur</button>
+                                        <button type="submit" class="w-full py-3 border border-rose-500 hover:bg-rose-600 text-rose-600 hover:text-white font-bold text-[0.65rem] uppercase tracking-[0.2em] transition duration-300">Tolak Retur</button>
                                     </form>
                                 </div>
                             </div>
@@ -106,7 +106,7 @@
                                 <i data-lucide="video" class="w-4 h-4 mr-2"></i> Lihat Video Unboxing
                             </a>
                         @else
-                            <div class="w-full py-3 border border-red-500/30 bg-red-50 text-center text-[0.6rem] uppercase tracking-widest font-bold text-red-600">
+                            <div class="w-full py-3 border border-rose-500/30 bg-rose-50 text-center text-[0.6rem] uppercase tracking-widest font-bold text-rose-600">
                                 <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i> Tidak Ada Video
                             </div>
                         @endif

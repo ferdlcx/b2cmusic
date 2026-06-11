@@ -65,7 +65,7 @@
                                 @if($review->status === 'pending')
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-gold-50 text-gold-700 border border-gold-200 uppercase">Pending</span>
                                 @elseif($review->status === 'approved')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-emerald-50 text-emerald-700 border border-emerald-250 uppercase">Disetujui</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-walnut-950/5 text-walnut-950 border border-walnut-800/20 uppercase">Disetujui</span>
                                 @else
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.6rem] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase">Ditolak</span>
                                 @endif
@@ -74,7 +74,7 @@
                                 @if($review->status === 'pending')
                                     <form action="{{ route('admin.reviews.approve', $review->id) }}" method="POST" class="block">
                                         @csrf
-                                        <button type="submit" class="text-xs font-bold text-emerald-600 hover:underline">Setujui</button>
+                                        <button type="submit" class="text-xs font-bold text-walnut-800 hover:underline">Setujui</button>
                                     </form>
                                     <form action="{{ route('admin.reviews.reject', $review->id) }}" method="POST" class="block">
                                         @csrf

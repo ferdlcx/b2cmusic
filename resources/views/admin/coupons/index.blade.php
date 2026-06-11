@@ -64,7 +64,7 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 @if($coupon->status)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-emerald-50 text-emerald-700 border border-emerald-250 uppercase">Aktif</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-walnut-950/5 text-walnut-950 border border-walnut-800/20 uppercase">Aktif</span>
                                 @else
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Non-Aktif</span>
                                 @endif

@@ -67,8 +67,8 @@
             </h3>
 
             @if($lowStockProducts->isEmpty())
-                <div class="text-center py-10 bg-emerald-50/30 border border-emerald-100/50 rounded-2xl text-emerald-800">
-                    <p class="text-xs font-semibold flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-emerald-600"></i> Inventaris aman! Tidak ada stok rendah.</p>
+                <div class="text-center py-10 bg-walnut-950/5 border border-walnut-800/10 rounded-2xl text-walnut-950">
+                    <p class="text-xs font-semibold flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-walnut-800"></i> Inventaris aman! Tidak ada stok rendah.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">

@@ -56,7 +56,7 @@
                                 @if($isActive)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-gold-50 text-gold-700 border border-amber-255 uppercase animate-pulse">Berlangsung</span>
                                 @elseif($sale->status && $sale->start_time > $now)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">Mendatang</span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-oak-600/10 text-oak-700 border border-oak-600/20 uppercase">Mendatang</span>
                                 @else
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-cream-100 text-muted border border-walnut-800/10 uppercase">Berakhir / Non-Aktif</span>
                                 @endif

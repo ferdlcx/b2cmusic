@@ -48,7 +48,7 @@
                                 $isActive = $userStatus === 'active' || $user->status == '1';
                             @endphp
                             @if($isActive)
-                                <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-250 px-2 py-0.5 rounded-full">Aktif</span>
+                                <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-walnut-950/5 text-walnut-950 border border-walnut-800/20 px-2 py-0.5 rounded-full">Aktif</span>
                             @else
                                 <span class="text-[0.6rem] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full">Ditangguhkan</span>
                             @endif
@@ -138,9 +138,9 @@
                                             @elseif($order->status === 'paid' || $order->status === 'processing')
                                                 <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-gold-50 text-gold-700 border border-gold-200 px-2 py-0.5 rounded">Paid</span>
                                             @elseif($order->status === 'shipped')
-                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded">Shipped</span>
+                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-oak-600/10 text-oak-700 border border-oak-600/20 px-2 py-0.5 rounded">Shipped</span>
                                             @elseif($order->status === 'completed')
-                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded">Completed</span>
+                                                <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-walnut-950/5 text-walnut-950 border border-walnut-800/20 px-2 py-0.5 rounded">Completed</span>
                                             @else
                                                 <span class="inline-block text-[0.55rem] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded">Canceled</span>
                                             @endif

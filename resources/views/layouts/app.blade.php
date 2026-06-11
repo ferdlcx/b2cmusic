@@ -514,7 +514,7 @@ function chatWidget() {
                     }
                 }
                 if (!reply) {
-                    reply = 'Maaf, saya belum bisa menjawab pertanyaan tersebut. 🤔<br>Silakan hubungi CS kami via <a href="https://wa.me/6281234567890" target="_blank" class="text-indigo-600 font-bold underline">WhatsApp</a> untuk bantuan lebih lanjut.';
+                    reply = 'Maaf, saya belum bisa menjawab pertanyaan tersebut. 🤔<br>Silakan hubungi CS kami via <a href="https://wa.me/6281234567890" target="_blank" class="text-gold-600 font-bold underline">WhatsApp</a> untuk bantuan lebih lanjut.';
                 }
                 this.isTyping = false;
                 this.messages.push({ from: 'bot', text: reply });

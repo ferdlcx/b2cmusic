@@ -11,6 +11,11 @@ use Illuminate\Support\Str;
  
 class TrackingController extends Controller
 {
+    public function simulatorPage()
+    {
+        $orders = Order::with(['user', 'shipment'])->whereIn('status', ['paid', 'processing', 'shipped'])->orderBy('created_at', 'desc')->get();
+        return view('simulasi.index', compact('orders'));
+    }
     public function track(Request $request, $id)
     {
         $user = Auth::user();
@@ -327,11 +332,17 @@ class TrackingController extends Controller
             $order->update(['status' => 'shipped']);
             
             if ($order->shipment) {
-                $order->shipment->update([
+                $shipmentUpdate = [
                     'status' => 'shipped',
                     'shipped_at' => now(),
-                    'tracking_number' => 'SIM-RESI-' . rand(1000000000, 9999999999),
-                ]);
+                ];
+                
+                // Only generate a SIM-RESI if tracking_number is empty
+                if (empty($order->shipment->tracking_number)) {
+                    $shipmentUpdate['tracking_number'] = 'SIM-RESI-' . rand(1000000000, 9999999999);
+                }
+                
+                $order->shipment->update($shipmentUpdate);
             }
             
             // Send notification

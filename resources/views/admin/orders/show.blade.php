@@ -109,28 +109,6 @@
                     <a href="{{ route('admin.orders.print_label', $order->id) }}" target="_blank" class="w-full py-3 bg-walnut-950 text-white rounded-xl font-bold uppercase text-[0.7rem] tracking-widest hover:bg-walnut-800 transition duration-300 flex items-center justify-center gap-2">
                         <i data-lucide="printer" class="w-4 h-4"></i> Cetak Label Pengiriman
                     </a>
-
-                    @if(in_array($order->status, ['paid', 'processing']))
-                        <div class="pt-4 mt-4 border-t border-walnut-800/10">
-                            <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full py-2 bg-transparent border-2 border-dashed border-walnut-800/20 text-walnut-600 rounded-xl font-bold uppercase text-[0.65rem] tracking-widest hover:border-walnut-800 hover:text-walnut-950 transition duration-300 flex items-center justify-center gap-2">
-                                    <i data-lucide="test-tube" class="w-4 h-4"></i> Simulasi: Paket Di-pickup (Sandbox)
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-
-                    @if($order->status === 'shipped')
-                        <div class="pt-4 mt-4 border-t border-walnut-800/10">
-                            <form action="{{ route('admin.orders.force_delivered', $order->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full py-2 bg-transparent border-2 border-dashed border-emerald-800/20 text-emerald-600 rounded-xl font-bold uppercase text-[0.65rem] tracking-widest hover:border-emerald-800 hover:text-emerald-900 transition duration-300 flex items-center justify-center gap-2">
-                                    <i data-lucide="test-tube" class="w-4 h-4"></i> Simulasi: Paket Tiba (Sandbox)
-                                </button>
-                            </form>
-                        </div>
-                    @endif
                 </div>
 
 

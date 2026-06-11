@@ -141,6 +141,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+
+    // Simulator Sandbox (Untuk testing di luar admin)
+    Route::get('/simulasi', [App\Http\Controllers\TrackingController::class, 'simulatorPage'])->name('simulasi.index');
+    Route::post('/simulasi/{id}/ship', [App\Http\Controllers\TrackingController::class, 'simulateShipment'])->name('simulasi.ship');
+    Route::post('/simulasi/{id}/arrive', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('simulasi.arrive');
 });
 
 // Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)

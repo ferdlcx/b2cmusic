@@ -28,8 +28,7 @@ class RajaOngkirController extends Controller
         }
 
         try {
-            /* 
-            // === OLD KOMERCE RAJAONGKIR CODE ===
+        try {
             $response = Http::withHeaders([
                 'key' => $this->apiKey,
             ])->get("{$this->baseUrl}/destination/domestic-destination", [
@@ -54,66 +53,11 @@ class RajaOngkirController extends Controller
 
                 return response()->json($formatted);
             }
-            // ===================================
-            */
-
-            // === NEW BITESHIP MAPS API ===
-            $biteshipKey = env('BITESHIP_API_KEY');
-            if (!$biteshipKey) {
-                return response()->json([]);
-            }
-
-            $response = Http::withHeaders([
-                'Authorization' => $biteshipKey
-            ])->get("https://api.biteship.com/v1/maps/areas", [
-                'countries' => 'ID',
-                'input' => $search,
-                'type' => 'single'
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $areas = $data['areas'] ?? [];
-                
-                $formatted = array_map(function($area) {
-                    $postalCode = '';
-                    if (preg_match('/(\d{5})$/', trim($area['name']), $matches)) {
-                        $postalCode = $matches[1];
-                    }
-                    return [
-                        'id' => $area['id'], // Biteship Area ID
-                        'text' => $area['name'], // e.g. "Gambir, Jakarta Pusat, DKI Jakarta. 10110"
-                        'postal_code' => $postalCode,
-                        'city' => $area['administrative_division_level_2_name'] ?? '',
-                        'province' => $area['administrative_division_level_1_name'] ?? ''
-                    ];
-                }, $areas);
-
-                return response()->json($formatted);
-            } else {
-                Log::warning('Biteship Maps Failed. Status: ' . $response->status() . ' Body: ' . $response->body());
-                // Fallback dinamis berdasarkan input user agar checkout tidak stuck
-                return response()->json([
-                    [
-                        'id' => 'MOCK_' . strtoupper(substr(md5($search), 0, 8)),
-                        'text' => ucwords($search) . ' (Simulasi Bebas/API Limit)',
-                        'postal_code' => '12345',
-                        'city' => ucwords($search),
-                        'province' => 'Provinsi Mock'
-                    ]
-                ]);
-            }
+            
+            return response()->json([]);
         } catch (\Exception $e) {
-            Log::error('Biteship Maps Error Exception: ' . $e->getMessage());
-            return response()->json([
-                [
-                    'id' => 'MOCK_' . strtoupper(substr(md5($search), 0, 8)),
-                    'text' => ucwords($search) . ' (Simulasi Bebas/API Error)',
-                    'postal_code' => '12345',
-                    'city' => ucwords($search),
-                    'province' => 'Provinsi Mock'
-                ]
-            ]);
+            Log::error('RajaOngkir Maps Error: ' . $e->getMessage());
+            return response()->json([]);
         }
     }
 
@@ -234,9 +178,6 @@ class RajaOngkirController extends Controller
         $originLng = 106.7994;
         $distance = $this->calculateDistance($originLat, $originLng, $lat, $lng);
 
-        /* 
-        // === OLD KOMERCE RAJAONGKIR RATES ===
-        // Origin set to Kebayoran Lama (Subdistrict ID 17464) as default
         $originSubdistrictId = env('RAJAONGKIR_ORIGIN_ID', 17464); 
         $couriers = ['jne', 'pos', 'tiki'];
         $formattedCosts = [];
@@ -272,71 +213,6 @@ class RajaOngkirController extends Controller
         } catch (\Exception $e) {
             Log::error('RajaOngkir V2 Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan sistem'], 500);
-        }
-        // ====================================
-        */
-
-        // === NEW BITESHIP RATES API ===
-        try {
-            $biteshipKey = env('BITESHIP_API_KEY');
-            // Origin Area ID for Kebayoran Lama in Biteship
-            $originAreaId = env('BITESHIP_ORIGIN_AREA_ID', 'IDNP6IDNC147IDND828'); 
-            
-            $formattedCosts = [];
-
-            if ($biteshipKey) {
-                $response = Http::withHeaders([
-                    'Authorization' => $biteshipKey,
-                    'Content-Type' => 'application/json'
-                ])->post("https://api.biteship.com/v1/rates/couriers", [
-                    'origin_area_id' => $originAreaId,
-                    'destination_area_id' => $request->destination_area_id,
-                    'couriers' => 'jne,sicepat,jnt,pos',
-                    'items' => [
-                        [
-                            'name' => 'Produk',
-                            'description' => 'Produk Musik',
-                            'value' => 100000,
-                            'length' => 10,
-                            'width' => 10,
-                            'height' => 10,
-                            'weight' => $weight,
-                            'quantity' => 1
-                        ]
-                    ]
-                ]);
-
-                if ($response->successful()) {
-                    $results = $response->json()['pricing'] ?? [];
-                    foreach ($results as $rate) {
-                        $formattedCosts[] = [
-                            'service' => strtoupper($rate['courier_name']) . ' - ' . strtoupper($rate['courier_service_name']),
-                            'description' => $rate['description'] ?? '',
-                            'cost' => $rate['price'] ?? 0,
-                            'etd' => $rate['duration'] ?? ''
-                        ];
-                    }
-                } else {
-                    $errData = $response->json();
-                    // Gunakan mock data jika terjadi error apa pun (limit/saldo habis/area mock tidak valid)
-                    Log::warning('Biteship API Error / Limit. Using Mock Data. Detail: ' . json_encode($errData));
-                    $formattedCosts = $this->getMockRates($distance, $weight);
-                }
-            } else {
-                $formattedCosts = $this->getMockRates($distance, $weight);
-            }
-
-            return response()->json([
-                'costs' => $formattedCosts,
-                'distance' => $distance
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Biteship Rates Error: ' . $e->getMessage());
-            return response()->json([
-                'costs' => $this->getMockRates($distance, $weight),
-                'distance' => $distance
-            ]);
         }
     }
 

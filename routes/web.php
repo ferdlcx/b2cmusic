@@ -232,87 +232,89 @@ $adminRoutes = function () {
 // 2. Path prefix routing (domain.com/admin)
 Route::middleware(['auth', 'admin', 'ip_whitelist'])->prefix('admin')->name('admin.')->group($adminRoutes);
 
-// Route untuk cek limit API
+// Route untuk cek limit API (GUI Table)
 Route::get('/cekapi', function () {
     $results = [];
 
-    // 1. Check Biteship Maps API
+    // 1. Check RajaOngkir API (Komerce)
+    $roKey = env('RAJAONGKIR_API_KEY', config('services.rajaongkir.api_key'));
+    try {
+        $roStart = microtime(true);
+        $roRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+            'key' => $roKey
+        ])->get('https://rajaongkir.komerce.id/api/v1/destination/domestic-destination', [
+            'search' => 'jakarta',
+            'limit' => 1
+        ]);
+        $roTime = round((microtime(true) - $roStart) * 1000) . 'ms';
+        if ($roRes->successful()) {
+            $results['RajaOngkir API (Komerce)'] = ['status' => 'OK (Belum Limit)', 'code' => $roRes->status(), 'time' => $roTime, 'detail' => 'Berhasil fetch area'];
+        } else {
+            $results['RajaOngkir API (Komerce)'] = ['status' => 'LIMIT / ERROR', 'code' => $roRes->status(), 'time' => $roTime, 'detail' => $roRes->body()];
+        }
+    } catch (\Exception $e) {
+        $results['RajaOngkir API (Komerce)'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+    }
+
+    // 2. Check Biteship API (Hanya untuk Tracker)
     $biteshipKey = env('BITESHIP_API_KEY');
     try {
-        $mapsStart = microtime(true);
-        $mapsRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+        $bsStart = microtime(true);
+        $bsRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
             'Authorization' => $biteshipKey
-        ])->get('https://api.biteship.com/v1/maps/areas', [
-            'countries' => 'ID',
-            'input' => 'jakarta',
-            'type' => 'single'
-        ]);
-        $mapsTime = round((microtime(true) - $mapsStart) * 1000) . 'ms';
+        ])->get('https://api.biteship.com/v1/maps/areas', ['countries' => 'ID', 'input' => 'jkt', 'type' => 'single']);
+        $bsTime = round((microtime(true) - $bsStart) * 1000) . 'ms';
         
-        if ($mapsRes->successful()) {
-            $results['Biteship Maps API'] = ['status' => 'OK (Belum Limit)', 'code' => $mapsRes->status(), 'time' => $mapsTime, 'detail' => 'Berhasil fetch data area'];
+        if ($bsRes->successful()) {
+            $results['Biteship API (Tracking)'] = ['status' => 'OK (Belum Limit)', 'code' => $bsRes->status(), 'time' => $bsTime, 'detail' => 'Token Valid'];
         } else {
-            $err = $mapsRes->json();
-            $results['Biteship Maps API'] = ['status' => 'LIMIT / ERROR', 'code' => $mapsRes->status(), 'time' => $mapsTime, 'detail' => $err['error'] ?? $mapsRes->body()];
+            $err = $bsRes->json();
+            $results['Biteship API (Tracking)'] = ['status' => 'LIMIT / ERROR', 'code' => $bsRes->status(), 'time' => $bsTime, 'detail' => $err['error'] ?? $bsRes->body()];
         }
     } catch (\Exception $e) {
-        $results['Biteship Maps API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+        $results['Biteship API (Tracking)'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
     }
 
-    // 2. Check Biteship Rates API
-    try {
-        $ratesStart = microtime(true);
-        $ratesRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
-            'Authorization' => $biteshipKey,
-            'Content-Type' => 'application/json'
-        ])->post('https://api.biteship.com/v1/rates/couriers', [
-            'origin_area_id' => env('BITESHIP_ORIGIN_AREA_ID', 'IDNP6IDNC147IDND828'),
-            'destination_area_id' => 'IDNP6IDNC147IDND827',
-            'couriers' => 'jne',
-            'items' => [
-                ['name' => 'Test', 'value' => 10000, 'weight' => 1000, 'quantity' => 1]
-            ]
-        ]);
-        $ratesTime = round((microtime(true) - $ratesStart) * 1000) . 'ms';
-
-        if ($ratesRes->successful()) {
-            $results['Biteship Rates API'] = ['status' => 'OK (Belum Limit)', 'code' => $ratesRes->status(), 'time' => $ratesTime, 'detail' => 'Berhasil fetch ongkir'];
-        } else {
-            $err = $ratesRes->json();
-            $results['Biteship Rates API'] = ['status' => 'LIMIT / ERROR', 'code' => $ratesRes->status(), 'time' => $ratesTime, 'detail' => $err['error'] ?? $ratesRes->body()];
-        }
-    } catch (\Exception $e) {
-        $results['Biteship Rates API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
-    }
-
-    // 3. Check MailerSend API (Opsional karena user pakai SMTP)
+    // 3. Check MailerSend API
     $mailerKey = env('MAILERSEND_API_KEY');
     if (!$mailerKey) {
-        $results['MailerSend API'] = ['status' => 'SKIPPED', 'code' => '-', 'time' => '-', 'detail' => 'Menggunakan SMTP (MAIL_USERNAME), tidak menggunakan API Key'];
+        $results['MailerSend API'] = ['status' => 'SKIPPED', 'code' => '-', 'time' => '-', 'detail' => 'Pakai SMTP (MAIL_USERNAME)'];
     } else {
         try {
-            $mailStart = microtime(true);
-            $mailRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+            $msStart = microtime(true);
+            $msRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
                 'Authorization' => 'Bearer ' . $mailerKey,
                 'Content-Type' => 'application/json'
-            ])->get('https://api.mailersend.com/v1/identities'); // domain endpoint
-            $mailTime = round((microtime(true) - $mailStart) * 1000) . 'ms';
-
-            if ($mailRes->successful()) {
-                $results['MailerSend API'] = ['status' => 'OK (Belum Limit)', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => 'Token valid'];
+            ])->get('https://api.mailersend.com/v1/identities');
+            $msTime = round((microtime(true) - $msStart) * 1000) . 'ms';
+            if ($msRes->successful()) {
+                $results['MailerSend API'] = ['status' => 'OK', 'code' => $msRes->status(), 'time' => $msTime, 'detail' => 'Token valid'];
             } else {
-                $err = $mailRes->json();
-                $results['MailerSend API'] = ['status' => 'LIMIT / ERROR', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => $err['message'] ?? $mailRes->body()];
+                $err = $msRes->json();
+                $results['MailerSend API'] = ['status' => 'ERROR', 'code' => $msRes->status(), 'time' => $msTime, 'detail' => $err['message'] ?? $msRes->body()];
             }
         } catch (\Exception $e) {
-             $results['MailerSend API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
+            $results['MailerSend API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
         }
     }
 
-    return response()->json([
-        'success' => true,
-        'message' => 'API Status Check',
-        'data' => $results
-    ]);
+    $html = '<!DOCTYPE html><html><head><title>API Status Dashboard</title>';
+    $html .= '<style>body{font-family:system-ui,sans-serif;background:#f3f4f6;padding:2rem} .card{background:#fff;border-radius:8px;padding:2rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)} h1{color:#111827;margin-top:0} table{width:100%;border-collapse:collapse;margin-top:1rem} th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb} th{background:#f9fafb;color:#374151} .status-ok{color:#059669;font-weight:bold} .status-error{color:#dc2626;font-weight:bold} .status-skip{color:#6b7280;font-style:italic}</style>';
+    $html .= '</head><body><div class="card"><h1>🌐 API Status Dashboard</h1><table>';
+    $html .= '<tr><th>Layanan API</th><th>Status</th><th>Code</th><th>Response Time</th><th>Detail</th></tr>';
+    
+    foreach ($results as $name => $data) {
+        $statusClass = str_contains($data['status'], 'OK') ? 'status-ok' : (str_contains($data['status'], 'SKIPPED') ? 'status-skip' : 'status-error');
+        $html .= "<tr>";
+        $html .= "<td><strong>{$name}</strong></td>";
+        $html .= "<td class='{$statusClass}'>{$data['status']}</td>";
+        $html .= "<td><code>{$data['code']}</code></td>";
+        $html .= "<td>{$data['time']}</td>";
+        $html .= "<td><small>{$data['detail']}</small></td>";
+        $html .= "</tr>";
+    }
+    
+    $html .= '</table></div></body></html>';
+    return response($html);
 });
 

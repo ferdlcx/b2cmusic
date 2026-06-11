@@ -13,8 +13,85 @@ class TrackingController extends Controller
 {
     public function simulatorPage()
     {
-        $orders = Order::with(['user', 'shipment'])->whereIn('status', ['paid', 'processing', 'shipped'])->orderBy('created_at', 'desc')->get();
+        $orders = Order::with(['user', 'shipment', 'address'])->whereNotNull('biteship_order_id')->orderBy('created_at', 'desc')->get();
+        // Fallback: If no orders have biteship_order_id, just get all orders that are paid/processing/shipped/completed
+        if ($orders->isEmpty()) {
+            $orders = Order::with(['user', 'shipment', 'address'])->whereIn('status', ['paid', 'processing', 'shipped', 'completed'])->orderBy('created_at', 'desc')->get();
+            // Provide fake biteship IDs for simulation
+            foreach ($orders as $order) {
+                if (empty($order->biteship_order_id)) {
+                    $order->biteship_order_id = 'SIM-BITESHIP-' . $order->id;
+                    $order->save();
+                }
+            }
+        }
         return view('simulasi.index', compact('orders'));
+    }
+
+    public function triggerWebhookStatus(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required',
+            'status' => 'required|string'
+        ]);
+
+        $order = Order::with('shipment')->where('biteship_order_id', $request->order_id)->first();
+        if (!$order) {
+            return back()->with('error', 'Order dengan Biteship ID tersebut tidak ditemukan.');
+        }
+
+        $payload = [
+            'event' => 'order.status',
+            'courier_tracking_id' => $order->shipment ? $order->shipment->tracking_number : 'SIM-TRACK-' . rand(1000, 9999),
+            'courier_waybill_id' => $order->shipment ? $order->shipment->tracking_number : 'SIM-WAYBILL-' . rand(1000, 9999),
+            'courier_company' => $order->shipment ? $order->shipment->courier : 'JNE',
+            'courier_type' => $order->shipment ? $order->shipment->service : 'REG',
+            'courier_driver_name' => 'Budi Supir',
+            'courier_driver_phone' => '088888888888',
+            'courier_driver_photo_url' => 'https://picsum.photos/200',
+            'courier_driver_plate_number' => 'B 1234 AAA',
+            'courier_link' => 'https://biteship.com/track',
+            'order_id' => $order->biteship_order_id,
+            'order_price' => $order->total,
+            'status' => $request->status
+        ];
+
+        $webhookRequest = Request::create('/api/biteship/webhook', 'POST', $payload);
+        app()->handle($webhookRequest);
+
+        return back()->with('success', 'Webhook order.status (' . $request->status . ') berhasil disimulasikan!');
+    }
+
+    public function triggerWebhookPrice(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required',
+            'price' => 'required|numeric'
+        ]);
+
+        $order = Order::with('shipment')->where('biteship_order_id', $request->order_id)->first();
+        if (!$order) {
+            return back()->with('error', 'Order dengan Biteship ID tersebut tidak ditemukan.');
+        }
+
+        $payload = [
+            'event' => 'order.price',
+            'cash_on_delivery_fee' => 0,
+            'courier_tracking_id' => $order->shipment ? $order->shipment->tracking_number : 'SIM-TRACK',
+            'courier_waybill_id' => $order->shipment ? $order->shipment->tracking_number : 'SIM-WAYBILL',
+            'order_id' => $order->biteship_order_id,
+            'price' => $request->price,
+            'proof_of_delivery_fee' => 0,
+            'shippment_fee' => $request->price,
+            'status' => 'picked'
+        ];
+
+        // While currently biteshipWebhook only handles 'order.status' and 'waybill.status',
+        // we simulate sending this just as Biteship would. You can expand biteshipWebhook to handle 'order.price' later.
+        $webhookRequest = Request::create('/api/biteship/webhook', 'POST', $payload);
+        app()->handle($webhookRequest);
+
+        return back()->with('success', 'Webhook order.price (' . $request->price . ') berhasil disimulasikan!');
     }
     public function track(Request $request, $id)
     {

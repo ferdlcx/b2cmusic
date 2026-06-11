@@ -147,6 +147,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/simulasi', [App\Http\Controllers\TrackingController::class, 'simulatorPage'])->name('simulasi.index');
     Route::post('/simulasi/{id}/ship', [App\Http\Controllers\TrackingController::class, 'simulateShipment'])->name('simulasi.ship');
     Route::post('/simulasi/{id}/arrive', [App\Http\Controllers\TrackingController::class, 'sandboxArrive'])->name('simulasi.arrive');
+    Route::post('/simulasi/webhook/status', [App\Http\Controllers\TrackingController::class, 'triggerWebhookStatus'])->name('simulasi.webhook.status');
+    Route::post('/simulasi/webhook/price', [App\Http\Controllers\TrackingController::class, 'triggerWebhookPrice'])->name('simulasi.webhook.price');
 });
 
 // Admin Routes (Protected by auth & admin role - Supports both Subdomain admin.* and Path /admin)

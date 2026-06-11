@@ -178,6 +178,9 @@
                 </tbody>
             </table>
         </div>
+        <div class="p-4 border-t border-walnut-800/10">
+            {{ $orders->links() }}
+        </div>
     </div>
 
     <!-- Modal for Update Price -->

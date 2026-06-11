@@ -13,10 +13,10 @@ class TrackingController extends Controller
 {
     public function simulatorPage()
     {
-        $orders = Order::with(['user', 'shipment', 'address'])->whereNotNull('biteship_order_id')->orderBy('created_at', 'desc')->get();
+        $orders = Order::with(['user', 'shipment', 'address'])->whereNotNull('biteship_order_id')->orderBy('created_at', 'desc')->paginate(10);
         // Fallback: If no orders have biteship_order_id, just get all orders that are paid/processing/shipped/completed
         if ($orders->isEmpty()) {
-            $orders = Order::with(['user', 'shipment', 'address'])->whereIn('status', ['paid', 'processing', 'shipped', 'completed'])->orderBy('created_at', 'desc')->get();
+            $orders = Order::with(['user', 'shipment', 'address'])->whereIn('status', ['paid', 'processing', 'shipped', 'completed'])->orderBy('created_at', 'desc')->paginate(10);
             // Provide fake biteship IDs for simulation
             foreach ($orders as $order) {
                 if (empty($order->biteship_order_id)) {

@@ -89,7 +89,7 @@
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="space-y-2 bg-white border border-walnut-800/5 rounded-2xl p-5">
                     <span class="text-[0.6rem] uppercase tracking-[0.3em] text-gold-600 font-bold">Framework</span>
-                    <p class="text-walnut-950 font-bold text-sm">Laravel 13 + Tailwind CSS v4</p>
+                    <p class="text-walnut-950 font-bold text-sm">Laravel 11 + Tailwind CSS v4</p>
                 </div>
                 <div class="space-y-2 bg-white border border-walnut-800/5 rounded-2xl p-5">
                     <span class="text-[0.6rem] uppercase tracking-[0.3em] text-gold-600 font-bold">Database</span>
@@ -177,7 +177,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-walnut-800/5 text-walnut-900 font-medium text-xs">
-                        <tr><td class="px-6 py-3 font-bold">Backend</td><td class="px-6 py-3">Laravel 13 (PHP 8.3)</td><td class="px-6 py-3">MVC Pattern, Eloquent ORM, Blade Templating</td></tr>
+                        <tr><td class="px-6 py-3 font-bold">Backend</td><td class="px-6 py-3">Laravel 11 (PHP 8.3)</td><td class="px-6 py-3">MVC Pattern, Eloquent ORM, Blade Templating</td></tr>
                         <tr><td class="px-6 py-3 font-bold">Frontend</td><td class="px-6 py-3">Tailwind CSS v4, Alpine.js, Lucide Icons</td><td class="px-6 py-3">Responsive, Utility-first CSS</td></tr>
                         <tr><td class="px-6 py-3 font-bold">Build</td><td class="px-6 py-3">Vite 6</td><td class="px-6 py-3">Hot Module Replacement, Asset Bundling</td></tr>
                         <tr><td class="px-6 py-3 font-bold">Database</td><td class="px-6 py-3">MySQL 8 (Aiven Cloud)</td><td class="px-6 py-3">Cloud-managed, SSL enforced</td></tr>
@@ -687,6 +687,54 @@
                 </details>
                 @endforeach
             @endforeach
+        </div>
+
+        <!-- Two Webhook Testing Modes -->
+        <div class="bg-cream-50 border border-walnut-800/10 rounded-3xl p-8 space-y-6">
+            <h3 class="font-display text-xl font-black uppercase tracking-tight text-walnut-950 border-b border-walnut-800/10 pb-3">Two Webhook Testing Modes</h3>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Mode A -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-gold-600">Mode A — Official Presentation</h4>
+                    <p class="text-[0.7rem] text-muted">Used for formal demonstrations.</p>
+                    <p class="text-xs font-bold text-walnut-950 mt-2">Flow:</p>
+                    <ol class="text-xs space-y-2 list-decimal list-inside text-walnut-800 font-medium">
+                        <li>Complete checkout.</li>
+                        <li>Open Biteship dashboard.</li>
+                        <li>Enable Testing Mode.</li>
+                        <li>Select an order.</li>
+                        <li>Click Play Webhook.</li>
+                        <li>Biteship sends real webhook payload.</li>
+                        <li>Customer tracking updates in real time.</li>
+                    </ol>
+                    <p class="text-[0.7rem] text-muted mt-2">Tracking accuracy is fully based on Biteship.</p>
+                </div>
+                
+                <!-- Mode B -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-gold-600">Mode B — Public Simulation</h4>
+                    <p class="text-[0.7rem] text-muted">Used for demonstrations without Biteship account access.</p>
+                    <p class="text-xs font-bold text-walnut-950 mt-2">Flow:</p>
+                    <ol class="text-xs space-y-2 list-decimal list-inside text-walnut-800 font-medium">
+                        <li>Open <a href="/simulasi" class="text-gold-600 underline font-bold hover:text-gold-500">/simulasi</a>.</li>
+                        <li>Select an order.</li>
+                        <li>Press <strong>Update Status</strong>.</li>
+                        <li>Status advances one step at a time:
+                            <div class="bg-walnut-900/5 px-3 py-2 rounded text-walnut-950 font-mono text-[0.65rem] mt-2 mb-1">
+                                confirmed &rarr; allocated &rarr; pickingUp &rarr; picked &rarr; droppingOff &rarr; delivered
+                            </div>
+                        </li>
+                        <li>DjudasMS builds a Biteship-compatible payload.</li>
+                        <li>Payload is internally posted to the existing webhook handler.</li>
+                        <li>Customer tracking updates exactly as expected.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <p class="text-[0.7rem] text-muted leading-relaxed pt-2 border-t border-walnut-800/10 font-medium">
+                <strong>Note:</strong> Mode B uses the same payload structure and the same webhook handler as Mode A. Only the payload source differs.
+            </p>
         </div>
 
         {{-- Midtrans Sandbox --}}

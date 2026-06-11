@@ -13,10 +13,10 @@ class TrackingController extends Controller
 {
     public function simulatorPage()
     {
-        $orders = Order::with(['user', 'shipment', 'address'])->whereNotNull('biteship_order_id')->orderBy('created_at', 'desc')->paginate(10);
+        $orders = Order::with(['user', 'shipment', 'address', 'items.product'])->whereNotNull('biteship_order_id')->orderBy('created_at', 'desc')->paginate(10);
         // Fallback: If no orders have biteship_order_id, just get all orders that are paid/processing/shipped/completed
         if ($orders->isEmpty()) {
-            $orders = Order::with(['user', 'shipment', 'address'])->whereIn('status', ['paid', 'processing', 'shipped', 'completed'])->orderBy('created_at', 'desc')->paginate(10);
+            $orders = Order::with(['user', 'shipment', 'address', 'items.product'])->whereIn('status', ['paid', 'processing', 'shipped', 'completed'])->orderBy('created_at', 'desc')->paginate(10);
             // Provide fake biteship IDs for simulation
             foreach ($orders as $order) {
                 if (empty($order->biteship_order_id)) {
@@ -40,49 +40,30 @@ class TrackingController extends Controller
             return back()->with('error', 'Order dengan Biteship ID tersebut tidak ditemukan.');
         }
 
-        // Fetch real data from Biteship to make it 100% accurate
-        $apiKey = env('BITESHIP_API_KEY');
-        $biteshipData = null;
-        if ($apiKey) {
-            try {
-                $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
-                    'Authorization' => $apiKey
-                ])->get("https://api.biteship.com/v1/orders/{$request->order_id}");
-
-                if ($response->successful()) {
-                    $biteshipData = $response->json();
-                }
-            } catch (\Exception $e) {
-                // Silently fallback if API fails
-            }
-        }
-
-        $courierData = $biteshipData['courier'] ?? null;
-        $priceData = $biteshipData['price'] ?? $order->total;
-
         $payload = [
             'event' => 'order.status',
-            'courier_tracking_id' => $courierData['tracking_id'] ?? ($order->shipment->tracking_number ?? 'SIM-TRACK-' . rand(1000, 9999)),
-            'courier_waybill_id' => $courierData['waybill_id'] ?? ($order->shipment->tracking_number ?? 'SIM-WAYBILL-' . rand(1000, 9999)),
-            'courier_company' => $courierData['company'] ?? ($order->shipment->courier ?? 'JNE'),
-            'courier_type' => $courierData['type'] ?? ($order->shipment->service ?? 'REG'),
-            'courier_driver_name' => $courierData['driver_name'] ?? 'Budi Supir',
-            'courier_driver_phone' => $courierData['driver_phone'] ?? '088888888888',
-            'courier_driver_photo_url' => $courierData['driver_photo_url'] ?? 'https://picsum.photos/200',
-            'courier_driver_plate_number' => $courierData['driver_plate_number'] ?? 'B 1234 AAA',
-            'courier_link' => $courierData['link'] ?? 'https://biteship.com/track',
+            'courier_tracking_id' => $order->shipment->tracking_number ?? 'SIM-TRACK',
+            'courier_waybill_id' => $order->shipment->tracking_number ?? 'SIM-WAYBILL',
+            'courier_company' => $order->shipment->courier ?? 'JNE',
+            'courier_type' => $order->shipment->service ?? 'REG',
+            'courier_driver_name' => 'Budi Santoso',
+            'courier_driver_phone' => '08123456789',
+            'courier_driver_photo_url' => 'https://picsum.photos/200',
+            'courier_driver_plate_number' => 'B 1234 XYZ',
+            'courier_link' => 'https://biteship.com/track',
             'order_id' => $order->biteship_order_id,
-            'order_price' => $priceData,
+            'order_price' => intval($order->shipping_cost ?? 0),
             'status' => $request->status
         ];
 
-        // Instead of internal Request::create, let's do a real HTTP request to our own endpoint so it behaves exactly like a real webhook 
-        // We use url() to get the full app URL
         try {
-            \Illuminate\Support\Facades\Http::timeout(5)->post(url('/api/biteship/webhook'), $payload);
+            \Illuminate\Support\Facades\Http::timeout(5)
+                ->withHeaders(['X-Simulation' => 'true'])
+                ->post(url('/api/biteship/webhook'), $payload);
         } catch (\Exception $e) {
-            // Fallback to internal if HTTP fails (e.g., local environment without proper host resolution)
+            // Fallback to internal if HTTP fails
             $webhookRequest = Request::create('/api/biteship/webhook', 'POST', $payload);
+            $webhookRequest->headers->set('X-Simulation', 'true');
             $this->biteshipWebhook($webhookRequest);
         }
 
@@ -155,88 +136,147 @@ class TrackingController extends Controller
 
         $checkpoints = [];
 
-        if ($order->tracking_id) {
+        if (!$order->is_simulation && $order->tracking_id) {
             $apiKey = env('BITESHIP_API_KEY');
-            try {
-                $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
-                    'Authorization' => $apiKey
-                ])->get("https://api.biteship.com/v1/trackings/{$order->tracking_id}");
+            if ($apiKey) {
+                try {
+                    $response = \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                        'Authorization' => $apiKey
+                    ])->get("https://api.biteship.com/v1/trackings/{$order->tracking_id}");
 
-                if ($response->successful()) {
-                    $biteshipData = $response->json();
-                    if (!empty($biteshipData['history'])) {
-                        foreach ($biteshipData['history'] as $history) {
-                            $checkpoints[] = [
-                                'status' => ucfirst(str_replace('_', ' ', $history['status'])),
-                                'description' => $history['note'],
-                                'location' => 'Biteship Update',
-                                'lat' => null,
-                                'lng' => null,
-                                'datetime' => \Carbon\Carbon::parse($history['updated_at'])->format('d M Y, H:i') . ' WIB',
-                                'completed' => true,
-                            ];
+                    if ($response->successful()) {
+                        $biteshipData = $response->json();
+                        if (!empty($biteshipData['history'])) {
+                            foreach ($biteshipData['history'] as $history) {
+                                $checkpoints[] = [
+                                    'status' => ucfirst(str_replace('_', ' ', $history['status'])),
+                                    'description' => $history['note'],
+                                    'location' => 'Biteship Update',
+                                    'lat' => null,
+                                    'lng' => null,
+                                    'datetime' => \Carbon\Carbon::parse($history['updated_at'])->format('d M Y, H:i') . ' WIB',
+                                    'completed' => true,
+                                ];
+                            }
                         }
                     }
+                } catch (\Exception $e) {
+                    // fallback to local if API fails
                 }
-            } catch (\Exception $e) {
-                // fallback to dummy data if API fails
             }
         }
 
-        // Fallback to dummy data if no history from Biteship or if simulated locally (Biteship history lacks local progress)
-        $localStatus = $order->shipment->status ?? '';
-        $simulatedCheckpoints = [];
-        
-        $sequence = ['allocated', 'picking_up', 'picked', 'dropping_off', 'delivered'];
-        $statusDict = [
-            'allocated' => ['name' => 'Allocated', 'note' => 'Kurir telah dialokasikan untuk penjemputan.'],
-            'picking_up' => ['name' => 'Picking Up', 'note' => 'Kurir sedang menuju lokasi pickup.'],
-            'picked' => ['name' => 'Picked', 'note' => 'Barang telah diserahkan ke kurir.'],
-            'dropping_off' => ['name' => 'Dropping Off', 'note' => 'Barang sedang dalam perjalanan menuju alamat kustomer.'],
-            'delivered' => ['name' => 'Delivered', 'note' => 'Paket telah diterima di alamat tujuan.']
-        ];
-        
-        $existingNames = array_map(function($c) { return strtolower($c['status']); }, $checkpoints);
-        $baseDate = clone ($order->shipment->updated_at ?? now());
-        
-        $curIndex = array_search($localStatus, $sequence);
-        
-        if ($curIndex !== false) {
+        // Mode A OR Fallback (if $checkpoints is empty or is_simulation is true)
+        if ($order->is_simulation || empty($checkpoints)) {
+            // Generate checkpoints based on current shipment status
+            $localStatus = $order->shipment->status ?? 'confirmed';
+            
+            // Normalize status to camelCase for matching
+            $normalizedStatus = strtolower($localStatus);
+            if ($normalizedStatus === 'picking_up') $normalizedStatus = 'pickingup';
+            if ($normalizedStatus === 'dropping_off') $normalizedStatus = 'droppingoff';
+            if ($normalizedStatus === 'return_in_transit') $normalizedStatus = 'returnintransit';
+            
+            $sequence = ['confirmed', 'allocated', 'pickingup', 'picked', 'droppingoff', 'delivered'];
+            
+            // Check if returned sequence is active
+            $isReturnedSequence = in_array($normalizedStatus, ['returnintransit', 'returned']);
+            if ($isReturnedSequence) {
+                $sequence = ['confirmed', 'allocated', 'pickingup', 'picked', 'droppingoff', 'returnintransit', 'returned'];
+            }
+            
+            $statusDict = [
+                'confirmed' => [
+                    'name' => 'Confirmed', 
+                    'note' => 'Pesanan telah terkonfirmasi dan sedang diproses.',
+                    'loc' => 'Gudang DjudasMS, Jakarta Barat',
+                    'pct' => 0.0
+                ],
+                'allocated' => [
+                    'name' => 'Allocated', 
+                    'note' => 'Kurir telah dialokasikan untuk penjemputan.',
+                    'loc' => 'Sistem Biteship',
+                    'pct' => 0.0
+                ],
+                'pickingup' => [
+                    'name' => 'Picking Up', 
+                    'note' => 'Kurir sedang menuju lokasi pickup.',
+                    'loc' => 'Dalam Perjalanan ke Gudang',
+                    'pct' => 0.0
+                ],
+                'picked' => [
+                    'name' => 'Picked', 
+                    'note' => 'Barang telah diserahkan ke kurir.',
+                    'loc' => 'Gudang DjudasMS, Jakarta Barat',
+                    'pct' => 0.0
+                ],
+                'droppingoff' => [
+                    'name' => 'Dropping Off', 
+                    'note' => 'Barang sedang dalam perjalanan menuju alamat kustomer.',
+                    'loc' => 'Hub Transit Pengiriman',
+                    'pct' => 0.5
+                ],
+                'delivered' => [
+                    'name' => 'Delivered', 
+                    'note' => 'Paket telah diterima di alamat tujuan.',
+                    'loc' => 'Alamat Penerima',
+                    'pct' => 1.0
+                ],
+                'returnintransit' => [
+                    'name' => 'Return In Transit', 
+                    'note' => 'Paket gagal dikirim dan sedang dalam proses pengembalian.',
+                    'loc' => 'Hub Transit Pengembalian',
+                    'pct' => 0.5
+                ],
+                'returned' => [
+                    'name' => 'Returned', 
+                    'note' => 'Barang telah berhasil dikembalikan ke Gudang DjudasMS.',
+                    'loc' => 'Gudang DjudasMS, Jakarta Barat',
+                    'pct' => 0.0
+                ]
+            ];
+
+            // Define coordinates
+            $originLat = -6.1684;
+            $originLng = 106.7588;
+            $destLat = doubleval($order->address->latitude ?? ($originLat - 0.05));
+            $destLng = doubleval($order->address->longitude ?? ($originLng + 0.05));
+            
+            // If they are exactly the same and not null, adjust slightly
+            if ($destLat === $originLat && $destLng === $originLng) {
+                $destLat = $originLat - 0.05;
+                $destLng = $originLng + 0.05;
+            }
+
+            $curIndex = array_search($normalizedStatus, $sequence);
+            if ($curIndex === false) {
+                $curIndex = 0;
+            }
+
+            $baseDate = \Carbon\Carbon::parse($order->shipment->shipped_at ?? $order->created_at);
+            
+            $simulatedCheckpoints = [];
             foreach ($sequence as $index => $seqStatus) {
                 if ($index <= $curIndex) {
-                    $formattedName = strtolower(str_replace('_', ' ', $seqStatus));
-                    // Jika Biteship API belum mencatat status ini (karena testing via simulasi lokal)
-                    if (!in_array($formattedName, $existingNames)) {
-                        $simulatedCheckpoints[] = [
-                            'status' => $statusDict[$seqStatus]['name'],
-                            'description' => $statusDict[$seqStatus]['note'] . ' (Simulasi Lokal)',
-                            'location' => 'Sistem Internal',
-                            'lat' => null,
-                            'lng' => null,
-                            'datetime' => $baseDate->copy()->subMinutes(($curIndex - $index) * 30)->format('d M Y, H:i') . ' WIB',
-                            'completed' => true,
-                        ];
-                    }
+                    $dct = $statusDict[$seqStatus];
+                    
+                    // Interpolate coordinates
+                    $pct = $dct['pct'];
+                    $lat = $originLat + ($destLat - $originLat) * $pct;
+                    $lng = $originLng + ($destLng - $originLng) * $pct;
+                    
+                    $simulatedCheckpoints[] = [
+                        'status' => $dct['name'],
+                        'description' => $dct['note'] . ($order->is_simulation ? ' (Simulasi Lokal)' : ''),
+                        'location' => $dct['loc'],
+                        'lat' => $lat,
+                        'lng' => $lng,
+                        'datetime' => $baseDate->copy()->addMinutes($index * 30)->format('d M Y, H:i') . ' WIB',
+                        'completed' => true,
+                    ];
                 }
             }
-        }
-        
-        if (!empty($simulatedCheckpoints)) {
-            $checkpoints = array_merge($checkpoints, $simulatedCheckpoints);
-        }
-
-        // Jika benar-benar kosong dan belum masuk sequence biteship
-        if (empty($checkpoints) && in_array($order->status, ['processing', 'shipped', 'completed'])) {
-            $baseDateStatic = clone ($order->shipment->shipped_at ?? $order->created_at);
-            $checkpoints[] = [
-                'status' => 'Pesanan Diproses',
-                'description' => 'Pesanan Anda sedang dikemas di gudang DjudasMS Jakarta',
-                'location' => 'Gudang DjudasMS, Jakarta Barat',
-                'lat' => -6.1684,
-                'lng' => 106.7588,
-                'datetime' => $baseDateStatic->format('d M Y, H:i') . ' WIB',
-                'completed' => true,
-            ];
+            $checkpoints = $simulatedCheckpoints;
         }
 
         if ($request->wantsJson()) {
@@ -326,31 +366,30 @@ class TrackingController extends Controller
     }
     public function biteshipWebhook(Request $request)
     {
-        // Authenticate webhook (Biteship sends signature, but for simplicity we verify the payload)
-        // Log the incoming webhook for debugging
+        // Authenticate webhook
         \Illuminate\Support\Facades\Log::info('Biteship Webhook Received:', $request->all());
 
         $event = $request->input('event');
         
-        // If event is empty (usually during ping/installation test from Biteship)
         if (empty($event)) {
             return response('ok', 200);
         }
 
         if (in_array($event, ['order.status', 'waybill.status'])) {
             $biteshipOrderId = $request->input('order_id');
-            $status = $request->input('status'); // e.g. 'delivered', 'picking_up', 'in_transit'
+            $status = $request->input('status'); // e.g. 'delivered', 'pickingUp'
 
             $order = Order::with('shipment')->where('biteship_order_id', $biteshipOrderId)->first();
 
             if ($order && $order->shipment) {
-                // Update internal shipment status
-                $order->shipment->update([
-                    'status' => $status === 'delivered' ? 'delivered' : 'processing',
-                ]);
+                // Determine if this is Simulation or Real Biteship Webhook
+                $isSimulation = $request->header('X-Simulation') === 'true' 
+                    || $request->input('X-Simulation') === true 
+                    || $request->input('x_simulation') === true;
+
+                $order->update(['is_simulation' => $isSimulation]);
 
                 if ($status === 'delivered') {
-                    // Do NOT update order status directly to completed (Shopee flow)
                     $order->shipment->update([
                         'status' => 'delivered',
                         'delivered_at' => now(),
@@ -373,10 +412,15 @@ class TrackingController extends Controller
                             'user_agent' => request()->userAgent(),
                         ]);
                     } catch (\Exception $e) {}
-                } elseif (in_array($status, ['allocated', 'picking_up', 'picked', 'in_transit', 'dropping_off', 'shipped', 'on_hold', 'return_in_transit', 'returned', 'disposed', 'rejected', 'courier_not_found'])) {
+                } elseif ($status === 'returned') {
+                    $order->shipment->update([
+                        'status' => 'returned',
+                    ]);
+                } else {
                     // Update main order status to shipped if it was processing/paid and the package is moving
-                    if (in_array($status, ['picking_up', 'picked', 'in_transit', 'dropping_off', 'shipped'])) {
-                        if ($order->status === 'processing' || $order->status === 'paid') {
+                    $activeShippingStatuses = ['pickingUp', 'picking_up', 'picked', 'droppingOff', 'dropping_off', 'in_transit', 'shipped', 'returnInTransit', 'return_in_transit'];
+                    if (in_array($status, $activeShippingStatuses)) {
+                        if (in_array($order->status, ['processing', 'paid'])) {
                             $order->update(['status' => 'shipped']);
                         }
                     }

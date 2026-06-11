@@ -52,9 +52,10 @@
                 },
                 
                 initMap() {
-                    if (this.checkpoints.length === 0) return;
+                    const validCp = this.checkpoints.find(cp => cp.lat !== null && cp.lng !== null && !isNaN(cp.lat) && !isNaN(cp.lng));
+                    if (!validCp) return;
                     
-                    this.map = L.map('tracking-map').setView([this.checkpoints[0].lat, this.checkpoints[0].lng], 6);
+                    this.map = L.map('tracking-map').setView([validCp.lat, validCp.lng], 6);
                     // Premium CartoDB Map
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                         attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
@@ -70,6 +71,8 @@
                     
                     const latLngs = [];
                     this.checkpoints.forEach((cp, idx) => {
+                        if (cp.lat === null || cp.lng === null || isNaN(cp.lat) || isNaN(cp.lng)) return;
+                        
                         const isLast = idx === this.checkpoints.length - 1;
                         const marker = L.circleMarker([cp.lat, cp.lng], {
                             radius: isLast ? 10 : 6,

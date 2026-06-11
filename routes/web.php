@@ -285,24 +285,28 @@ Route::get('/cekapi', function () {
         $results['Biteship Rates API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
     }
 
-    // 3. Check MailerSend API
+    // 3. Check MailerSend API (Opsional karena user pakai SMTP)
     $mailerKey = env('MAILERSEND_API_KEY');
-    try {
-        $mailStart = microtime(true);
-        $mailRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
-            'Authorization' => 'Bearer ' . $mailerKey,
-            'Content-Type' => 'application/json'
-        ])->get('https://api.mailersend.com/v1/identities'); // domain endpoint
-        $mailTime = round((microtime(true) - $mailStart) * 1000) . 'ms';
+    if (!$mailerKey) {
+        $results['MailerSend API'] = ['status' => 'SKIPPED', 'code' => '-', 'time' => '-', 'detail' => 'Menggunakan SMTP (MAIL_USERNAME), tidak menggunakan API Key'];
+    } else {
+        try {
+            $mailStart = microtime(true);
+            $mailRes = Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                'Authorization' => 'Bearer ' . $mailerKey,
+                'Content-Type' => 'application/json'
+            ])->get('https://api.mailersend.com/v1/identities'); // domain endpoint
+            $mailTime = round((microtime(true) - $mailStart) * 1000) . 'ms';
 
-        if ($mailRes->successful()) {
-            $results['MailerSend API'] = ['status' => 'OK (Belum Limit)', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => 'Token valid'];
-        } else {
-            $err = $mailRes->json();
-            $results['MailerSend API'] = ['status' => 'LIMIT / ERROR', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => $err['message'] ?? $mailRes->body()];
+            if ($mailRes->successful()) {
+                $results['MailerSend API'] = ['status' => 'OK (Belum Limit)', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => 'Token valid'];
+            } else {
+                $err = $mailRes->json();
+                $results['MailerSend API'] = ['status' => 'LIMIT / ERROR', 'code' => $mailRes->status(), 'time' => $mailTime, 'detail' => $err['message'] ?? $mailRes->body()];
+            }
+        } catch (\Exception $e) {
+             $results['MailerSend API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
         }
-    } catch (\Exception $e) {
-         $results['MailerSend API'] = ['status' => 'EXCEPTION', 'code' => 500, 'time' => '-', 'detail' => $e->getMessage()];
     }
 
     return response()->json([

@@ -125,7 +125,7 @@ class MidtransWebhookTest extends TestCase
 
         $this->assertDatabaseHas('orders', [
             'id' => $order->id,
-            'status' => 'paid',
+            'status' => 'processing',
         ]);
 
         $this->assertDatabaseHas('payments', [

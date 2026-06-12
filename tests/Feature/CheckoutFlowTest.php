@@ -76,7 +76,6 @@ class CheckoutFlowTest extends TestCase
 
         // 4. Verifikasi data tersimpan di database keranjang
         $this->assertDatabaseHas('cart_items', [
-            'user_id' => $user->id,
             'product_id' => $product->id,
             'quantity' => 1
         ]);

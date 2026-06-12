@@ -31,7 +31,7 @@
             <li>Klik tombol <span class="bg-gold-500 text-white px-2 py-0.5 text-xs rounded">Kirim Pesanan</span>. Sistem akan men-generate resi SIM-RESI-XXX dan memulai tracking history.</li>
             <li>Di tabel pesanan tersebut, akan muncul tombol-tombol webhook status (Allocated, Picking Up, Picked, Dropping Off, Delivered).</li>
             <li>Klik tombol-tombol tersebut secara berurutan.</li>
-            <li>Periksa halaman <a href="{{ route('profile.orders') }}" target="_blank">Pesanan Saya</a> sebagai Customer, lalu klik "Lacak".</li>
+            <li>Periksa halaman <a href="{{ route('orders.history') }}" target="_blank">Pesanan Saya</a> sebagai Customer, lalu klik "Lacak".</li>
             <li>Anda akan melihat map dan history tracking bertambah secara real-time untuk setiap tombol status yang Anda klik. Label <strong>[TEST MODE]</strong> akan muncul pada notifikasi dan history.</li>
         </ol>
 

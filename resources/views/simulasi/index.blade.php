@@ -17,6 +17,30 @@
         </form>
     </div>
 
+    <!-- Penjelasan untuk Assessor -->
+    <div class="mb-8 bg-walnut-900 border border-walnut-800 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+        <!-- Dekorasi Background -->
+        <i data-lucide="shield-question" class="absolute -right-4 -bottom-4 w-32 h-32 text-walnut-800/30 opacity-50 transform -rotate-12 pointer-events-none"></i>
+        
+        <div class="relative z-10 flex gap-4">
+            <div class="w-12 h-12 bg-gold-500/10 rounded-xl flex items-center justify-center shrink-0">
+                <i data-lucide="info" class="w-6 h-6 text-gold-500"></i>
+            </div>
+            <div class="space-y-3">
+                <h2 class="text-sm font-black uppercase tracking-widest text-gold-500">Kenapa Simulator Ini Dibuat?</h2>
+                <div class="text-[0.75rem] leading-relaxed text-cream-50/80 space-y-2">
+                    <p>Sistem <strong>DjudasMS sudah terintegrasi secara penuh (Real-Time) dengan Biteship</strong>. Dalam alur normal, kurir Biteship akan memperbarui status resi dan mengirimkan <em>webhook</em> ke sistem kita.</p>
+                    <p><strong>Lalu kenapa tidak menggunakan Biteship saja untuk pengujian (testing)?</strong></p>
+                    <ul class="list-disc list-inside space-y-1 pl-1">
+                        <li>Mengubah status pengiriman secara manual di mode Sandbox/Testing <strong>membutuhkan akses login ke Dashboard Developer Biteship</strong>.</li>
+                        <li>Sebagai langkah keamanan, kredensial dan akses dashboard Biteship tidak dapat diberikan kepada penguji eksternal (Assessor).</li>
+                    </ul>
+                    <p class="pt-2"><strong>Solusi:</strong> Halaman simulator ini dirancang <strong>khusus untuk Assessor UAS</strong>. Saat tombol ditekan, sistem DjudasMS akan merakit (build) payload JSON yang format dan strukturnya <strong class="text-gold-400">100% sama persis</strong> dengan data yang dikirimkan oleh server Biteship, lalu menembakkannya (POST) ke <em>webhook endpoint</em> lokal. Ini menjamin pengujian fitur asinkron berjalan valid tanpa membahayakan kunci akses utama.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if(session('success'))
         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-800/10 text-emerald-800 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3">
             <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>

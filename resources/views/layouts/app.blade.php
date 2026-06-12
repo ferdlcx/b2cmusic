@@ -161,19 +161,24 @@
                         </a>
 
                         <!-- Cart -->
-                        <a href="{{ route('cart.index') }}" class="relative text-walnut-800 hover:text-gold-600 transition" title="Keranjang Belanja">
-                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                            @php
-                                $cartCount = \App\Models\CartItem::whereHas('cart', function($q) {
-                                    $q->where('user_id', auth()->id());
-                                })->sum('quantity');
-                            @endphp
-                            @if($cartCount > 0)
-                                <span class="absolute -top-1.5 -right-1.5 bg-gold-500 text-white text-[0.55rem] font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center">
-                                    {{ $cartCount }}
-                                </span>
-                            @endif
-                        </a>
+                        <div x-data="{ 
+                            cartCount: {{ \App\Models\CartItem::whereHas('cart', function($q) { $q->where('user_id', auth()->id()); })->sum('quantity') ?: 0 }},
+                            animate: false,
+                            init() {
+                                document.addEventListener('cart-updated', (e) => {
+                                    this.cartCount = e.detail.count;
+                                    this.animate = true;
+                                    setTimeout(() => this.animate = false, 300);
+                                });
+                            }
+                        }">
+                            <a href="{{ route('cart.index') }}" class="relative text-walnut-800 hover:text-gold-600 transition block" title="Keranjang Belanja">
+                                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                                <template x-if="cartCount > 0">
+                                    <span :class="animate ? 'animate-pop' : ''" class="absolute -top-1.5 -right-1.5 bg-gold-500 text-white text-[0.55rem] font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center" x-text="cartCount"></span>
+                                </template>
+                            </a>
+                        </div>
 
                         <!-- Orders (Desktop Only) -->
                         <a href="{{ route('orders.history') }}" class="hidden md:inline-flex text-walnut-800 hover:text-gold-600 transition" title="Riwayat Pesanan">
@@ -292,55 +297,63 @@
             </div>
         </header>
 
-        <!-- Flash Messages -->
-        @if(session('success'))
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
-                <div class="bg-cream-50 border-l-4 border-gold-500 px-6 py-4 flex items-center justify-between shadow-xl">
+        <!-- Modern Toast Notifications -->
+        <div class="fixed bottom-6 right-6 z-[110] flex flex-col gap-3 pointer-events-none" id="toast-container">
+            @if(session('success'))
+                <div class="toast-message pointer-events-auto flex items-center justify-between gap-4 bg-walnut-950 text-cream-50 px-5 py-3.5 shadow-xl border border-walnut-800/10 min-w-[300px] animate-fade-in-up">
                     <div class="flex items-center gap-3">
-                        <i data-lucide="check-circle" class="w-5 h-5 text-gold-500"></i>
-                        <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">{{ session('success') }}</span>
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+                        <span class="text-[0.75rem] font-medium tracking-wide">{{ session('success') }}</span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-walnut-400 hover:text-gold-600 transition ml-4">
-                        <i data-lucide="x" class="w-4 h-4"></i>
+                    <button onclick="this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 300)" class="text-walnut-400 hover:text-white transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        @if(session('error'))
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
-                <div class="bg-cream-50 border-l-4 border-red-600 px-6 py-4 flex items-center justify-between shadow-xl">
+            @if(session('error'))
+                <div class="toast-message pointer-events-auto flex items-center justify-between gap-4 bg-walnut-950 text-cream-50 px-5 py-3.5 shadow-xl border border-walnut-800/10 min-w-[300px] animate-fade-in-up">
                     <div class="flex items-center gap-3">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
-                        <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">{{ session('error') }}</span>
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-rose-400"></i>
+                        <span class="text-[0.75rem] font-medium tracking-wide">{{ session('error') }}</span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-walnut-400 hover:text-red-600 transition ml-4">
-                        <i data-lucide="x" class="w-4 h-4"></i>
+                    <button onclick="this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 300)" class="text-walnut-400 hover:text-white transition">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        @if($errors->any())
-            <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mt-6 z-50 relative">
-                <div class="bg-cream-50 border-l-4 border-rose-600 px-6 py-4 flex flex-col justify-center shadow-xl">
-                    <div class="flex items-center justify-between">
+            @if($errors->any())
+                <div class="toast-message pointer-events-auto flex flex-col gap-2 bg-walnut-950 text-cream-50 px-5 py-4 shadow-xl border border-walnut-800/10 min-w-[300px] max-w-[400px] animate-fade-in-up">
+                    <div class="flex items-start justify-between gap-4">
                         <div class="flex items-center gap-3">
-                            <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
-                            <span class="text-[0.75rem] font-bold uppercase tracking-widest text-walnut-900">Validasi Gagal</span>
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
+                            <span class="text-[0.75rem] font-bold tracking-widest uppercase">Validasi Gagal</span>
                         </div>
-                        <button onclick="this.parentElement.parentElement.remove()" class="text-walnut-400 hover:text-rose-600 transition ml-4">
-                            <i data-lucide="x" class="w-4 h-4"></i>
+                        <button onclick="this.parentElement.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.parentElement.remove(), 300)" class="text-walnut-400 hover:text-white transition">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
-                    <ul class="mt-2 text-xs text-rose-600 font-medium list-disc list-inside">
+                    <ul class="ml-7 text-[0.7rem] text-walnut-300 font-medium list-disc">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
-            </div>
-        @endif
+            @endif
+        </div>
+        
+        <script>
+            // Auto-hide toasts after 5 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.toast-message').forEach(toast => {
+                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(10px)';
+                    setTimeout(() => toast.remove(), 300);
+                });
+            }, 5000);
+        </script>
 
         <!-- Content -->
         <main class="max-w-[1440px] mx-auto px-6 lg:px-10 py-8">

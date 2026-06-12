@@ -16,7 +16,7 @@
 @endphp
 
 <!-- Editorial Hero Section -->
-<section class="relative w-screen left-1/2 -ml-[50vw] -mt-[5.5rem] pt-[8.5rem] pb-16 overflow-hidden bg-cream-100" 
+<section class="relative w-screen left-1/2 -ml-[50vw] -mt-[5.5rem] pt-[8.5rem] pb-16 overflow-hidden bg-cream-50 subtle-grid" 
          x-data="{ scrollY: 0 }" 
          @scroll.window="scrollY = window.scrollY">
     
@@ -26,24 +26,21 @@
             
             <!-- Left Column: Typography -->
             <div class="lg:col-span-8 z-20 flex flex-col justify-center">
-                <div class="mb-6 animate-fade-in-up" style="animation-delay: 0.1s">
-                </div>
-                
                 <!-- Main Heading (Editorial Style) -->
-                <h1 class="font-display text-[4rem] sm:text-[6rem] md:text-[8rem] lg:text-[10rem] leading-[0.85] font-black uppercase tracking-tighter text-walnut-950 mix-blend-multiply">
-                    <span class="block animate-fade-in-up" style="animation-delay: 0.3s">Pure.</span>
-                    <span class="block animate-fade-in-up" style="animation-delay: 0.5s">Craft.</span>
-                    <span class="block text-gold-500 animate-fade-in-up" style="animation-delay: 0.7s">Iconic.</span>
+                <h1 class="font-display text-[4.5rem] sm:text-[6.5rem] md:text-[8.5rem] lg:text-[10rem] leading-[0.9] font-black uppercase tracking-tighter text-walnut-950 mix-blend-multiply">
+                    <span class="block animate-fade-in-up" style="animation-delay: 0.2s">Pure.</span>
+                    <span class="block animate-fade-in-up" style="animation-delay: 0.4s">Craft.</span>
+                    <span class="block text-gold-500 animate-fade-in-up" style="animation-delay: 0.6s">Iconic.</span>
                 </h1>
                 
                 <!-- Subtitle -->
-                <p class="mt-12 max-w-md text-sm md:text-base text-muted leading-relaxed font-medium animate-fade-in-up" style="animation-delay: 0.9s">
+                <p class="mt-8 max-w-md text-[0.85rem] md:text-sm text-muted leading-loose font-medium animate-fade-in-up" style="animation-delay: 0.8s">
                     Kurasi instrumen musik kelas dunia dan perlengkapan rekaman otentik. Temukan karya seni sejati untuk menyempurnakan harmoni Anda.
                 </p>
                 
                 <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-6 mt-12 animate-fade-in-up" style="animation-delay: 1.1s">
-                    <a href="{{ route('catalog') }}" class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-walnut-900 text-cream-50 text-[0.75rem] font-bold tracking-[0.2em] uppercase hover:bg-gold-600 transition-all duration-500">
+                <div class="flex flex-col sm:flex-row gap-6 mt-12 animate-fade-in-up" style="animation-delay: 1.0s">
+                    <a href="{{ route('catalog') }}" class="group inline-flex items-center justify-center gap-3 px-8 py-3.5 border border-walnut-900 bg-walnut-900 text-cream-50 text-[0.7rem] font-bold tracking-[0.2em] uppercase hover:bg-cream-50 hover:text-walnut-900 transition-all duration-300">
                         Jelajahi Toko
                         <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300"></i>
                     </a>
@@ -54,8 +51,8 @@
             <div class="absolute right-0 top-1/2 -translate-y-1/2 w-full lg:w-[55%] max-w-[800px] z-10 pointer-events-none hidden md:block">
                 <img src="{{ asset('images/hero_guitar.png') }}" 
                      alt="Premium Guitar" 
-                     class="w-full h-auto object-contain mix-blend-multiply opacity-90 drop-shadow-2xl"
-                     :style="'transform: translateY(' + (scrollY * -0.15) + 'px) scale(1.05)'" 
+                     class="w-full h-auto object-contain mix-blend-multiply opacity-95"
+                     :style="'transform: translateY(' + (scrollY * -0.1) + 'px) scale(1.02)'" 
                      onerror="this.src='https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80'" />
             </div>
 
@@ -63,15 +60,15 @@
             <div class="md:hidden w-full h-[300px] mt-8 relative">
                 <img src="{{ asset('images/hero_guitar.png') }}" 
                      alt="Premium Guitar" 
-                     class="w-full h-full object-contain mix-blend-multiply opacity-90 drop-shadow-xl" 
+                     class="w-full h-full object-contain mix-blend-multiply opacity-95" 
                      onerror="this.src='https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80'" />
             </div>
         </div>
         
         <!-- Rotating Badge -->
-        <div class="absolute bottom-12 right-12 hidden lg:flex items-center justify-center w-32 h-32 animate-fade-in-up z-30" style="animation-delay: 1.5s">
+        <div class="absolute bottom-12 right-12 hidden lg:flex items-center justify-center w-32 h-32 animate-fade-in-up z-30 opacity-70" style="animation-delay: 1.2s">
             <div class="relative w-full h-full flex items-center justify-center">
-                <i data-lucide="award" class="w-8 h-8 text-gold-600 absolute"></i>
+                <i data-lucide="award" class="w-8 h-8 text-gold-500 absolute"></i>
                 <svg viewBox="0 0 100 100" class="w-full h-full animate-spin-slow">
                     <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
                     <text>
@@ -84,7 +81,7 @@
         </div>
         
         <!-- Scroll Down Indicator -->
-        <div class="absolute bottom-8 left-6 lg:left-12 flex items-center gap-4 animate-fade-in-up" style="animation-delay: 1.5s">
+        <div class="absolute bottom-8 left-6 lg:left-12 flex items-center gap-4 animate-fade-in-up opacity-60" style="animation-delay: 1.2s">
             <div class="w-[1px] h-12 bg-walnut-800/20 overflow-hidden relative">
                 <div class="absolute top-0 left-0 w-full h-1/2 bg-walnut-800 animate-bounce-slow"></div>
             </div>
@@ -116,14 +113,14 @@
                     elseif (str_contains($slug, 'audio') || str_contains($slug, 'recording')) $icon = 'mic';
                 @endphp
                 <a href="{{ route('catalog', ['category' => $cat->slug]) }}" class="group block space-y-6">
-                    <div class="h-[2px] w-12 bg-gold-500 group-hover:w-full transition-all duration-500"></div>
+                    <div class="h-[1px] w-12 bg-gold-500 group-hover:w-full transition-all duration-700 ease-out"></div>
                     <div class="flex items-start justify-between">
-                        <i data-lucide="{{ $icon }}" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition duration-300"></i>
-                        <span class="text-[0.65rem] text-muted font-bold tracking-widest">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                        <i data-lucide="{{ $icon }}" class="w-5 h-5 text-walnut-800 group-hover:text-gold-600 transition duration-300"></i>
+                        <span class="text-[0.6rem] text-muted font-bold tracking-widest">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
                     <div class="space-y-3">
-                        <h3 class="font-display text-xl font-black uppercase tracking-tight text-walnut-950 group-hover:text-gold-600 transition">{{ $cat->name }}</h3>
-                        <p class="text-[0.8rem] text-muted leading-relaxed line-clamp-2">{{ $cat->description }}</p>
+                        <h3 class="font-display text-lg font-black uppercase tracking-tight text-walnut-950 group-hover:text-gold-600 transition">{{ $cat->name }}</h3>
+                        <p class="text-[0.75rem] text-muted leading-relaxed line-clamp-2 font-medium">{{ $cat->description }}</p>
                     </div>
                 </a>
             @endforeach
@@ -132,64 +129,57 @@
 </section>
 
 <!-- Flow Section (How it works) -->
-<section class="py-16 bg-walnut-950 text-cream-50 -mx-6 lg:-mx-12 px-6 lg:px-12 my-12">
-    <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-16">
+<section class="py-24 bg-cream-50 border-y border-walnut-800/5 -mx-6 lg:-mx-12 px-6 lg:px-12 my-12">
+    <div class="max-w-[1440px] mx-auto">
+        <div class="text-center mb-20">
             <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-500 font-bold block mb-4">Cara Kerja</span>
-            <h2 class="font-display text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">4 Langkah Mudah.</h2>
+            <h2 class="font-display text-3xl md:text-4xl font-black uppercase tracking-tighter text-walnut-950">4 Langkah Mudah.</h2>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            <div class="hidden md:block absolute top-12 left-1/8 right-1/8 h-0.5 bg-walnut-800 z-0"></div>
+            <div class="hidden md:block absolute top-10 left-1/8 right-1/8 h-[1px] bg-walnut-800/10 z-0"></div>
             
             <!-- Step 1 -->
             <div class="relative z-10 flex flex-col items-center text-center group">
-                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
-                    <i data-lucide="search" class="w-8 h-8 text-gold-500"></i>
+                <div class="w-20 h-20 bg-cream-100 border border-walnut-800/10 flex items-center justify-center mb-6 group-hover:border-gold-500 transition-colors duration-500">
+                    <i data-lucide="search" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition-colors duration-500"></i>
                 </div>
-                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">1. Pilih Produk</h3>
-                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Jelajahi kurasi instrumen dan gear audio premium kami.</p>
+                <h3 class="font-display text-base font-bold uppercase tracking-widest text-walnut-950 mb-2">1. Pilih Produk</h3>
+                <p class="text-xs text-muted font-medium leading-relaxed max-w-[200px]">Jelajahi kurasi instrumen dan gear audio premium kami.</p>
             </div>
 
             <!-- Step 2 -->
             <div class="relative z-10 flex flex-col items-center text-center group">
-                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
-                    <i data-lucide="shopping-bag" class="w-8 h-8 text-gold-500"></i>
+                <div class="w-20 h-20 bg-cream-100 border border-walnut-800/10 flex items-center justify-center mb-6 group-hover:border-gold-500 transition-colors duration-500">
+                    <i data-lucide="shopping-bag" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition-colors duration-500"></i>
                 </div>
-                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">2. Checkout</h3>
-                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Pilih kurir dengan harga terbaik yang otomatis disesuaikan.</p>
+                <h3 class="font-display text-base font-bold uppercase tracking-widest text-walnut-950 mb-2">2. Checkout</h3>
+                <p class="text-xs text-muted font-medium leading-relaxed max-w-[200px]">Pilih kurir dengan harga terbaik yang otomatis disesuaikan.</p>
             </div>
 
             <!-- Step 3 -->
             <div class="relative z-10 flex flex-col items-center text-center group">
-                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
-                    <i data-lucide="credit-card" class="w-8 h-8 text-gold-500"></i>
+                <div class="w-20 h-20 bg-cream-100 border border-walnut-800/10 flex items-center justify-center mb-6 group-hover:border-gold-500 transition-colors duration-500">
+                    <i data-lucide="credit-card" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition-colors duration-500"></i>
                 </div>
-                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">3. Bayar Aman</h3>
-                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Transaksi aman dan instan dengan berbagai metode pembayaran.</p>
+                <h3 class="font-display text-base font-bold uppercase tracking-widest text-walnut-950 mb-2">3. Bayar Aman</h3>
+                <p class="text-xs text-muted font-medium leading-relaxed max-w-[200px]">Transaksi aman dan instan dengan berbagai metode pembayaran.</p>
             </div>
 
             <!-- Step 4 -->
             <div class="relative z-10 flex flex-col items-center text-center group">
-                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
-                    <i data-lucide="truck" class="w-8 h-8 text-gold-500"></i>
+                <div class="w-20 h-20 bg-cream-100 border border-walnut-800/10 flex items-center justify-center mb-6 group-hover:border-gold-500 transition-colors duration-500">
+                    <i data-lucide="truck" class="w-6 h-6 text-walnut-800 group-hover:text-gold-600 transition-colors duration-500"></i>
                 </div>
-                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">4. Lacak Pesanan</h3>
-                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Pantau pengiriman Anda secara real-time hingga sampai tujuan.</p>
+                <h3 class="font-display text-base font-bold uppercase tracking-widest text-walnut-950 mb-2">4. Lacak Pesanan</h3>
+                <p class="text-xs text-muted font-medium leading-relaxed max-w-[200px]">Pantau pengiriman Anda secara real-time hingga sampai tujuan.</p>
             </div>
-        </div>
-        
-        <div class="mt-16 text-center">
-            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gold-600 text-walnut-950 text-[0.75rem] font-bold tracking-[0.2em] uppercase hover:bg-gold-500 transition-all duration-300 shadow-[0_0_20px_rgba(212,160,23,0.3)]">
-                Mulai Belanja
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </a>
         </div>
     </div>
 </section>
 
 <!-- Featured Products Section -->
-<section id="products" class="py-24 bg-cream-200 -mx-6 lg:-mx-10 px-6 lg:px-10 my-16 border-y border-walnut-800/5">
+<section id="products" class="py-24 bg-cream-50 -mx-6 lg:-mx-10 px-6 lg:px-10 my-16">
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16">
         <div>
             <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-600 font-bold block mb-4">Featured Selection</span>
@@ -201,28 +191,31 @@
         </a>
     </div>
     
-    <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         @forelse($products as $product)
-            <article class="group flex flex-col h-full">
-                <a href="{{ route('products.show', $product->slug) }}" class="block mb-6 relative overflow-hidden bg-cream-50 border border-walnut-800/5 h-[320px]">
+            <article class="group flex flex-col h-full bg-white border border-walnut-800/5 hover:border-walnut-800/20 transition-colors duration-500">
+                <a href="{{ route('products.show', $product->slug) }}" class="block relative overflow-hidden bg-cream-50 h-[320px] aspect-[4/3] w-full" x-data="{ loaded: false }">
+                    <div x-show="!loaded" class="absolute inset-0 skeleton"></div>
                     <img src="{{ $product->primaryImage ? $product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80' }}" 
                          alt="{{ $product->name }}" 
-                         class="h-full w-full object-cover mix-blend-multiply opacity-90 transition duration-700 group-hover:scale-105 group-hover:opacity-100" />
+                         @load="loaded = true"
+                         :class="loaded ? 'opacity-90 group-hover:scale-105 group-hover:opacity-100' : 'opacity-0'"
+                         class="h-full w-full object-cover mix-blend-multiply transition-all duration-700 ease-out" />
                     
-                    <div class="absolute top-4 left-4">
-                        <span class="text-[0.6rem] uppercase tracking-[0.2em] font-bold bg-walnut-900 text-cream-50 px-3 py-1.5">
+                    <div class="absolute top-4 left-4 z-10">
+                        <span class="text-[0.6rem] uppercase tracking-[0.2em] font-bold bg-white/90 backdrop-blur text-walnut-950 border border-walnut-800/10 px-3 py-1.5">
                             {{ $product->brand }}
                         </span>
                     </div>
                 </a>
                 
-                <div class="space-y-3 flex-1 flex flex-col justify-between">
+                <div class="p-6 flex-1 flex flex-col justify-between">
                     <div>
                         <span class="text-[0.6rem] uppercase tracking-[0.2em] text-gold-600 font-bold">{{ $product->category->name }}</span>
-                        <h3 class="font-display text-lg font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-1 group-hover:text-gold-600 transition">{{ $product->name }}</h3>
+                        <h3 class="font-display text-lg font-bold uppercase tracking-tight text-walnut-950 leading-snug mt-2 group-hover:text-gold-600 transition-colors">{{ $product->name }}</h3>
                     </div>
                     
-                    <div class="flex items-center justify-between pt-4 border-t border-walnut-800/10 mt-auto">
+                    <div class="flex items-center justify-between pt-6 mt-6 border-t border-walnut-800/5">
                         <p class="text-sm font-bold tracking-widest text-walnut-900">IDR {{ number_format($product->price, 0, ',', '.') }}</p>
                         
                         <div class="flex items-center gap-4">
@@ -235,7 +228,7 @@
                                 <form action="{{ route('wishlist.destroy', $wishlistItemId) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-gold-600 hover:text-red-600 transition" title="Hapus dari Wishlist">
+                                    <button type="submit" class="text-gold-600 hover:opacity-70 transition-opacity" title="Hapus dari Wishlist">
                                         <i data-lucide="heart" class="w-4 h-4 fill-gold-600"></i>
                                     </button>
                                 </form>
@@ -243,18 +236,76 @@
                                 <form action="{{ route('wishlist.add') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <button type="submit" class="text-walnut-400 hover:text-gold-600 transition" title="Tambah ke Wishlist">
+                                    <button type="submit" class="text-walnut-400 hover:text-gold-600 transition-colors" title="Tambah ke Wishlist">
                                         <i data-lucide="heart" class="w-4 h-4"></i>
                                     </button>
                                 </form>
                             @endif
 
-                            <form action="{{ route('cart.add') }}" method="POST">
+                            <form action="{{ route('cart.add') }}" method="POST"
+                                  x-data="{ 
+                                      loading: false,
+                                      submitForm(e) {
+                                          e.preventDefault();
+                                          this.loading = true;
+                                          
+                                          const formData = new FormData(e.target);
+                                          
+                                          fetch('{{ route('cart.add') }}', {
+                                              method: 'POST',
+                                              body: formData,
+                                              headers: {
+                                                  'X-Requested-With': 'XMLHttpRequest'
+                                              }
+                                          })
+                                          .then(response => {
+                                              if (response.ok || response.redirected) {
+                                                  const cartElem = document.querySelector('[x-data*=cartCount]');
+                                                  if (cartElem && cartElem.__x) {
+                                                      const currentCount = cartElem.__x.$data.cartCount;
+                                                      document.dispatchEvent(new CustomEvent('cart-updated', { 
+                                                          detail: { count: currentCount + 1 } 
+                                                      }));
+                                                      
+                                                      // Show toast manually
+                                                      const container = document.getElementById('toast-container');
+                                                      if (container) {
+                                                          const toast = document.createElement('div');
+                                                          toast.className = 'toast-message pointer-events-auto flex items-center justify-between gap-4 bg-walnut-950 text-cream-50 px-5 py-3.5 shadow-xl border border-walnut-800/10 min-w-[300px] animate-fade-in-up';
+                                                          toast.innerHTML = `
+                                                              <div class=\"flex items-center gap-3\">
+                                                                  <i data-lucide=\"check-circle-2\" class=\"w-4 h-4 text-emerald-400\"></i>
+                                                                  <span class=\"text-[0.75rem] font-medium tracking-wide\">Produk ditambahkan ke keranjang!</span>
+                                                              </div>
+                                                              <button onclick=\"this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 300)\" class=\"text-walnut-400 hover:text-white transition\">
+                                                                  <i data-lucide=\"x\" class=\"w-3.5 h-3.5\"></i>
+                                                              </button>
+                                                          `;
+                                                          container.prepend(toast);
+                                                          if (typeof lucide !== 'undefined') lucide.createIcons();
+                                                          setTimeout(() => {
+                                                              toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                                              toast.style.opacity = '0';
+                                                              toast.style.transform = 'translateY(10px)';
+                                                              setTimeout(() => toast.remove(), 300);
+                                                          }, 5000);
+                                                      }
+                                                  }
+                                              }
+                                          })
+                                          .catch(err => console.error(err))
+                                          .finally(() => {
+                                              this.loading = false;
+                                          });
+                                      }
+                                  }"
+                                  @submit="submitForm($event)">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                                 <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="text-walnut-800 hover:text-gold-600 transition" title="Tambah ke Keranjang">
-                                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                <button type="submit" :class="loading ? 'opacity-50 cursor-not-allowed' : 'hover:text-gold-600'" class="text-walnut-800 transition-colors" title="Tambah ke Keranjang">
+                                    <i data-lucide="shopping-bag" class="w-4 h-4" x-show="!loading"></i>
+                                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin" x-show="loading" style="display: none;"></i>
                                 </button>
                             </form>
                         </div>
@@ -262,7 +313,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-3 text-center py-20 text-muted text-sm uppercase tracking-widest">Koleksi belum tersedia.</div>
+            <div class="col-span-3 text-center py-20 text-muted text-sm uppercase tracking-widest border border-walnut-800/10 border-dashed">Koleksi belum tersedia.</div>
         @endforelse
     </div>
 </section>

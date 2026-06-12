@@ -21,7 +21,7 @@
 
         <h3 class="text-2xl font-black text-walnut-950 border-b pb-2">1. Tech Stack</h3>
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
-            <li class="bg-cream-50 p-4 rounded-xl border border-walnut-800/10"><strong class="block text-walnut-950">Framework:</strong> Laravel 11.x</li>
+            <li class="bg-cream-50 p-4 rounded-xl border border-walnut-800/10"><strong class="block text-walnut-950">Framework:</strong> Laravel 13.x</li>
             <li class="bg-cream-50 p-4 rounded-xl border border-walnut-800/10"><strong class="block text-walnut-950">Frontend:</strong> Blade + TailwindCSS + Alpine.js</li>
             <li class="bg-cream-50 p-4 rounded-xl border border-walnut-800/10"><strong class="block text-walnut-950">Payment:</strong> Midtrans (Snap API & Webhooks)</li>
             <li class="bg-cream-50 p-4 rounded-xl border border-walnut-800/10"><strong class="block text-walnut-950">Logistik:</strong> Biteship (Order Creation & Webhooks)</li>

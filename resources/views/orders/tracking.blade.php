@@ -148,33 +148,42 @@
         <!-- Timeline from Checkpoints -->
         <div class="p-10 max-w-2xl mx-auto">
             <div class="relative">
-                <div class="absolute top-0 bottom-0 left-[15px] w-0.5 bg-walnut-800/10"></div>
+                <div class="absolute top-0 bottom-0 left-[21px] w-[1px] bg-walnut-800/10"></div>
 
                 <template x-for="(cp, index) in checkpoints" :key="index">
-                    <div class="relative flex items-start gap-6" :class="index !== checkpoints.length - 1 ? 'mb-10' : ''">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm"
-                             :class="cp.completed ? (index === checkpoints.length - 1 ? 'bg-emerald-50 border border-emerald-500' : 'bg-gold-50 border border-gold-500') : 'bg-cream-50 border border-walnut-800/20'">
-                            
-                            <template x-if="cp.completed && index === checkpoints.length - 1">
-                                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                            </template>
-                            <template x-if="cp.completed && index !== checkpoints.length - 1">
-                                <svg class="w-4 h-4 text-gold-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            </template>
-                            <template x-if="!cp.completed">
-                                <svg class="w-4 h-4 text-walnut-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
-                            </template>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-walnut-950 text-[0.8rem] uppercase tracking-widest flex items-center gap-2">
-                                <span x-text="cp.status"></span>
-                                <template x-if="cp.source === 'simulation'">
-                                    <span class="bg-red-100 text-red-700 text-[0.55rem] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-red-200">[TEST MODE]</span>
+                    <div class="relative flex gap-8" :class="index !== checkpoints.length - 1 ? 'mb-12' : ''">
+                        <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 z-10 bg-cream-50"
+                             :class="cp.completed ? (index === checkpoints.length - 1 ? 'border-emerald-500' : 'border-gold-500') : 'border-walnut-800/20'">
+                             <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                                  :class="cp.completed ? (index === checkpoints.length - 1 ? 'bg-emerald-50' : 'bg-gold-50') : 'bg-cream-100'">
+                                <template x-if="cp.completed && index === checkpoints.length - 1">
+                                    <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                 </template>
-                            </h4>
-                            <p class="text-[0.7rem] font-medium text-muted mt-1" x-text="cp.description.replace(' [TEST MODE]', '')"></p>
-                            <p class="text-[0.65rem] text-walnut-500 mt-0.5">📍 <span x-text="cp.location"></span></p>
-                            <p class="text-[0.65rem] text-walnut-400 mt-0.5">🕐 <span x-text="cp.datetime"></span></p>
+                                <template x-if="cp.completed && index !== checkpoints.length - 1">
+                                    <svg class="w-4 h-4 text-gold-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </template>
+                                <template x-if="!cp.completed">
+                                    <svg class="w-4 h-4 text-walnut-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle></svg>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="flex-1 pt-1">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-1.5">
+                                <h4 class="font-bold text-walnut-950 text-sm tracking-wide flex items-center gap-3">
+                                    <span x-text="cp.status"></span>
+                                    <template x-if="cp.source === 'simulation'">
+                                        <span class="bg-transparent text-walnut-500 font-mono text-[0.55rem] px-2 py-0.5 rounded-full tracking-widest border border-walnut-800/10 uppercase">[SIMULATION]</span>
+                                    </template>
+                                    <template x-if="cp.source === 'biteship'">
+                                        <span class="bg-walnut-900 text-gold-500 font-mono text-[0.55rem] px-2 py-0.5 rounded-full tracking-widest uppercase border border-walnut-900">[PRODUCTION]</span>
+                                    </template>
+                                </h4>
+                                <span class="text-[0.65rem] font-bold text-walnut-400 uppercase tracking-widest flex items-center gap-1.5 shrink-0">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> <span x-text="cp.datetime"></span>
+                                </span>
+                            </div>
+                            <p class="text-[0.8rem] font-medium text-muted leading-relaxed" x-text="cp.description.replace(' [TEST MODE]', '')"></p>
+                            <p class="text-[0.7rem] text-walnut-500 mt-2 flex items-center gap-1.5 font-medium"><i data-lucide="map-pin" class="w-3 h-3"></i> <span x-text="cp.location"></span></p>
                         </div>
                     </div>
                 </template>

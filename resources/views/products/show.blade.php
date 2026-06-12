@@ -36,8 +36,14 @@
         <!-- Left: Images Gallery & Video -->
         <div class="lg:col-span-7 space-y-6">
             <!-- Main Image Frame with zoom-on-hover -->
-            <div class="bg-cream-50 flex items-center justify-center aspect-square w-full border border-walnut-800/5 overflow-hidden">
-                <img :src="activeImage" alt="{{ $product->name }}" class="w-full h-full object-contain p-8 mix-blend-multiply transition-transform duration-700 hover:scale-105" />
+            <div class="bg-cream-50 flex items-center justify-center aspect-square w-full border border-walnut-800/5 overflow-hidden relative" x-data="{ loaded: false }">
+                <div x-show="!loaded" class="absolute inset-0 skeleton"></div>
+                <img :src="activeImage" 
+                     alt="{{ $product->name }}" 
+                     @load="loaded = true"
+                     @click.away="loaded = false" 
+                     :class="loaded ? 'opacity-90' : 'opacity-0'"
+                     class="w-full h-full object-contain p-8 mix-blend-multiply transition-all duration-500 ease-out hover:scale-105 hover:opacity-100" />
             </div>
 
             <!-- Gallery Images (Alpine switcher) -->
@@ -47,16 +53,20 @@
                     @if($product->primaryImage)
                         <div @click="activeImage = '{{ $product->primaryImage->image }}'" 
                              :class="activeImage === '{{ $product->primaryImage->image }}' ? 'border-gold-500 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'"
-                             class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-cream-50 border-b-2 cursor-pointer transition duration-300">
-                            <img src="{{ $product->primaryImage->image }}" alt="Thumbnail" class="w-full h-full object-cover mix-blend-multiply" />
+                             class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-cream-50 border-b-2 cursor-pointer transition duration-300 relative"
+                             x-data="{ tloaded: false }">
+                            <div x-show="!tloaded" class="absolute inset-0 skeleton"></div>
+                            <img src="{{ $product->primaryImage->image }}" alt="Thumbnail" @load="tloaded = true" :class="tloaded ? 'opacity-100' : 'opacity-0'" class="w-full h-full object-cover mix-blend-multiply transition-opacity duration-300" />
                         </div>
                     @endif
                     <!-- Secondary Images -->
                     @foreach($product->images->where('is_primary', false) as $img)
                         <div @click="activeImage = '{{ $img->image }}'" 
                              :class="activeImage === '{{ $img->image }}' ? 'border-gold-500 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'"
-                             class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-cream-50 border-b-2 cursor-pointer transition duration-300">
-                            <img src="{{ $img->image }}" alt="Thumbnail" class="w-full h-full object-cover mix-blend-multiply" />
+                             class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-cream-50 border-b-2 cursor-pointer transition duration-300 relative"
+                             x-data="{ tloaded: false }">
+                            <div x-show="!tloaded" class="absolute inset-0 skeleton"></div>
+                            <img src="{{ $img->image }}" alt="Thumbnail" @load="tloaded = true" :class="tloaded ? 'opacity-100' : 'opacity-0'" class="w-full h-full object-cover mix-blend-multiply transition-opacity duration-300" />
                         </div>
                     @endforeach
                 </div>
@@ -109,7 +119,74 @@
 
                 <!-- Add to Cart Form -->
                 @if($product->stock > 0)
-                    <form action="{{ route('cart.add') }}" method="POST" class="space-y-4 pt-4">
+                    <form action="{{ route('cart.add') }}" method="POST" class="space-y-4 pt-4"
+                          x-data="{ 
+                              loading: false,
+                              submitForm(e, actionType) {
+                                  if (actionType === 'buy_now') return; // let it submit normally to redirect to cart
+                                  
+                                  e.preventDefault();
+                                  this.loading = true;
+                                  
+                                  const formData = new FormData(e.target);
+                                  formData.append('action', 'add_to_cart');
+                                  
+                                  fetch('{{ route('cart.add') }}', {
+                                      method: 'POST',
+                                      body: formData,
+                                      headers: {
+                                          'X-Requested-With': 'XMLHttpRequest'
+                                      }
+                                  })
+                                  .then(response => {
+                                      if (response.ok || response.redirected) {
+                                          // Simulate fetching the new cart count if the backend doesn't return JSON
+                                          // For now, just increment the local cart counter slightly
+                                          const cartElem = document.querySelector('[x-data*=cartCount]');
+                                          if (cartElem && cartElem.__x) {
+                                              const currentCount = cartElem.__x.$data.cartCount;
+                                              const addedQty = parseInt(formData.get('quantity')) || 1;
+                                              
+                                              // Dispatch custom event to app.blade.php
+                                              document.dispatchEvent(new CustomEvent('cart-updated', { 
+                                                  detail: { count: currentCount + addedQty } 
+                                              }));
+                                              
+                                              // Show toast manually
+                                              this.showToast('Produk ditambahkan ke keranjang!');
+                                          }
+                                      }
+                                  })
+                                  .catch(err => console.error(err))
+                                  .finally(() => {
+                                      this.loading = false;
+                                  });
+                              },
+                              showToast(msg) {
+                                  const container = document.getElementById('toast-container');
+                                  if (!container) return;
+                                  const toast = document.createElement('div');
+                                  toast.className = 'toast-message pointer-events-auto flex items-center justify-between gap-4 bg-walnut-950 text-cream-50 px-5 py-3.5 shadow-xl border border-walnut-800/10 min-w-[300px] animate-fade-in-up';
+                                  toast.innerHTML = `
+                                      <div class=\"flex items-center gap-3\">
+                                          <i data-lucide=\"check-circle-2\" class=\"w-4 h-4 text-emerald-400\"></i>
+                                          <span class=\"text-[0.75rem] font-medium tracking-wide\">${msg}</span>
+                                      </div>
+                                      <button onclick=\"this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 300)\" class=\"text-walnut-400 hover:text-white transition\">
+                                          <i data-lucide=\"x\" class=\"w-3.5 h-3.5\"></i>
+                                      </button>
+                                  `;
+                                  container.prepend(toast);
+                                  if (typeof lucide !== 'undefined') lucide.createIcons();
+                                  setTimeout(() => {
+                                      toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                      toast.style.opacity = '0';
+                                      toast.style.transform = 'translateY(10px)';
+                                      setTimeout(() => toast.remove(), 300);
+                                  }, 5000);
+                              }
+                          }"
+                          @submit="submitForm($event, $event.submitter.value)">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         
@@ -122,8 +199,10 @@
                             
                             <div class="grid grid-cols-5 gap-3">
                                 <button type="submit" name="action" value="add_to_cart" title="Tambah ke Keranjang"
-                                    class="col-span-1 py-4 bg-transparent border border-walnut-900 text-walnut-900 font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-walnut-900 hover:text-gold-500 transition duration-500 flex items-center justify-center">
-                                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                                    :class="loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-walnut-900 hover:text-gold-500'"
+                                    class="col-span-1 py-4 bg-transparent border border-walnut-900 text-walnut-900 font-bold uppercase text-[0.7rem] tracking-[0.2em] transition duration-500 flex items-center justify-center relative">
+                                    <i data-lucide="shopping-bag" class="w-5 h-5" x-show="!loading"></i>
+                                    <i data-lucide="loader-2" class="w-5 h-5 animate-spin" x-show="loading" style="display: none;"></i>
                                 </button>
                                 <button type="submit" name="action" value="buy_now"
                                     class="col-span-4 py-4 bg-walnut-900 text-gold-500 font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-gold-600 hover:text-white transition duration-500 flex items-center justify-center gap-3">

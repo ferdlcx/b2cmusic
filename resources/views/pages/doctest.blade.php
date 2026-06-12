@@ -26,7 +26,7 @@
         <h3 class="text-2xl font-black text-walnut-950 border-b pb-2 mt-12">2. Simulasi Pengiriman Lokal (Sandbox Tracker)</h3>
         <p>Jika pesanan menggunakan simulasi (atau Anda tidak menggunakan resi asli Biteship), Anda dapat menjalankan simulasi status tracker secara manual melalui Sandbox.</p>
         <ol class="space-y-2">
-            <li>Buka halaman <a href="{{ route('simulasi') }}" target="_blank" class="font-bold">/simulasi</a> di browser Anda.</li>
+            <li>Buka halaman <a href="{{ route('simulasi.index') }}" target="_blank" class="font-bold">/simulasi</a> di browser Anda.</li>
             <li>Cari pesanan Anda yang berstatus <strong>Processing</strong>.</li>
             <li>Klik tombol <span class="bg-gold-500 text-white px-2 py-0.5 text-xs rounded">Kirim Pesanan</span>. Sistem akan men-generate resi SIM-RESI-XXX dan memulai tracking history.</li>
             <li>Di tabel pesanan tersebut, akan muncul tombol-tombol webhook status (Allocated, Picking Up, Picked, Dropping Off, Delivered).</li>

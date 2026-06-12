@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="simulator()">
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 min-h-[80vh]" x-data="simulator()">
     <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
             <h1 class="text-2xl font-black uppercase tracking-tight text-walnut-950 flex items-center gap-2">
@@ -30,21 +30,17 @@
         </div>
     @endif
 
-    <div class="bg-white border border-walnut-800/10 shadow-sm overflow-hidden rounded-xl">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-white border-b border-walnut-800/10 text-walnut-600 text-[0.7rem] font-bold uppercase tracking-wider">
+    <div class="bg-white border border-walnut-800/10 shadow-sm overflow-hidden rounded-xl min-h-[500px] flex flex-col">
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left text-sm whitespace-nowrap min-w-[1000px]">
+                <thead class="bg-walnut-900/5 border-b border-walnut-800/10 text-walnut-800 text-[0.65rem] font-bold uppercase tracking-widest">
                     <tr>
-                        <th class="px-4 py-4">Order ID<br><span class="text-walnut-400 font-normal">Reference ID</span></th>
-                        <th class="px-4 py-4">Nomor Resi<br><span class="text-walnut-400 font-normal">Kurir - Layanan</span></th>
-                        <th class="px-4 py-4">Tanggal Dibuat<br><span class="text-walnut-400 font-normal">Jam Dibuat</span></th>
-                        <th class="px-4 py-4">Kec. Tujuan<br><span class="text-walnut-400 font-normal">Kode Pos</span></th>
-                        <th class="px-4 py-4">Nama Penerima<br><span class="text-walnut-400 font-normal">No. Telepon</span></th>
-                        <th class="px-4 py-4">Total Item<br><span class="text-walnut-400 font-normal">Total Bobot</span></th>
-                        <th class="px-4 py-4">Total Ongkir<br><span class="text-walnut-400 font-normal">Nilai COD</span></th>
-                        <th class="px-4 py-4">Status<br><span class="text-walnut-400 font-normal">Tanggal Terakhir Update</span></th>
-                        <th class="px-4 py-4">Sumber Order</th>
-                        <th class="px-4 py-4 text-center">Aksi Webhook</th>
+                        <th class="px-6 py-4">ID & Resi</th>
+                        <th class="px-6 py-4">Waktu</th>
+                        <th class="px-6 py-4">Penerima</th>
+                        <th class="px-6 py-4">Kurir & Ongkir</th>
+                        <th class="px-6 py-4">Status & Sumber</th>
+                        <th class="px-6 py-4 text-center">Aksi Simulasi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-walnut-800/5 text-walnut-950 font-medium text-[0.75rem]">
@@ -58,15 +54,15 @@
                             $currentStatus = $order->shipment->status ?? 'pending';
                             
                             $statusPill = match(strtolower($currentStatus)) {
-                                'delivered' => 'bg-emerald-50 text-emerald-600 border border-emerald-200',
-                                'returnintransit', 'return_in_transit' => 'bg-purple-50 text-purple-600 border border-purple-200',
-                                'returned' => 'bg-rose-50 text-rose-600 border border-rose-200',
-                                'dropping_off', 'droppingoff' => 'bg-blue-50 text-blue-600 border border-blue-200',
-                                'picked' => 'bg-teal-50 text-teal-600 border border-teal-200',
-                                'picking_up', 'pickingup' => 'bg-amber-50 text-amber-600 border border-amber-200',
-                                'allocated' => 'bg-orange-50 text-orange-600 border border-orange-200',
-                                'confirmed' => 'bg-gray-100 text-gray-700 border border-gray-200',
-                                default => 'bg-gray-50 text-gray-600 border border-gray-200'
+                                'delivered' => 'bg-emerald-50 text-emerald-600 border-emerald-200',
+                                'returnintransit', 'return_in_transit' => 'bg-purple-50 text-purple-600 border-purple-200',
+                                'returned' => 'bg-rose-50 text-rose-600 border-rose-200',
+                                'dropping_off', 'droppingoff' => 'bg-blue-50 text-blue-600 border-blue-200',
+                                'picked' => 'bg-teal-50 text-teal-600 border-teal-200',
+                                'picking_up', 'pickingup' => 'bg-amber-50 text-amber-600 border-amber-200',
+                                'allocated' => 'bg-orange-50 text-orange-600 border-orange-200',
+                                'confirmed' => 'bg-gray-100 text-gray-700 border-gray-200',
+                                default => 'bg-gray-50 text-gray-600 border-gray-200'
                             };
 
                             $statusLabel = match(strtolower($currentStatus)) {
@@ -110,52 +106,67 @@
                                 $nextActions = ['returned' => 'Mark Returned'];
                             }
                         @endphp
-                        <tr class="hover:bg-walnut-50/30 transition-colors group">
-                            <td class="px-4 py-3 font-bold">
-                                <span class="text-purple-700 underline decoration-dashed underline-offset-2">{{ $biteshipId }}</span><br>
-                                <span class="text-walnut-500 text-[0.65rem]">{{ $order->order_code }}</span>
+                        <tr class="hover:bg-walnut-50/50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-walnut-950">{{ $biteshipId }}</span><br>
+                                <span class="text-[0.65rem] text-walnut-500 font-mono">{{ $order->order_code }}</span>
+                                <div class="mt-1.5 flex items-center gap-1.5">
+                                    <i data-lucide="barcode" class="w-3.5 h-3.5 text-gold-500"></i>
+                                    <span class="text-[0.65rem] font-bold text-walnut-800">{{ $order->waybill_id ?? $order->shipment->tracking_number ?? 'Menunggu Resi' }}</span>
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
-                                <span class="font-bold border-b border-walnut-900 border-dashed pb-0.5">{{ $order->waybill_id ?? $order->shipment->tracking_number ?? 'Menunggu Resi' }}</span><br>
-                                <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white uppercase">{{ $order->shipment->courier ?? 'JNE' }} - {{ $order->shipment->service ?? 'REG' }}</span>
+                            <td class="px-6 py-4">
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-1.5 text-[0.65rem]">
+                                        <i data-lucide="clock" class="w-3 h-3 text-walnut-400"></i>
+                                        <span class="text-walnut-600">Dibuat: <strong class="text-walnut-900">{{ $order->created_at->format('d M Y, H:i') }}</strong></span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-[0.65rem]">
+                                        <i data-lucide="refresh-cw" class="w-3 h-3 text-walnut-400"></i>
+                                        <span class="text-walnut-600">Update: <strong class="text-walnut-900">{{ ($order->shipment->updated_at ?? $order->updated_at)->format('d M Y, H:i') }}</strong></span>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
-                                <span class="font-bold">{{ $order->created_at->format('d M Y') }}</span><br>
-                                <span class="text-walnut-500 text-[0.65rem]">{{ $order->created_at->format('H:i') }} WIB</span>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-walnut-950">{{ $address->recipient_name ?? $order->user->name }}</span><br>
+                                <span class="text-[0.65rem] text-walnut-500">{{ $address->phone ?? $order->user->phone }}</span>
+                                <div class="mt-1 text-[0.65rem] text-walnut-600">
+                                    {{ $address->district ?? $address->city ?? 'Jakarta' }} ({{ $address->postal_code ?? '12345' }})
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
-                                <span class="font-bold">{{ $address->district ?? $address->city ?? 'Jakarta' }}</span><br>
-                                <span class="text-walnut-500 text-[0.65rem]">{{ $address->postal_code ?? '12345' }}</span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="font-bold">{{ $address->recipient_name ?? $order->user->name }}</span><br>
-                                <span class="text-walnut-500 text-[0.65rem]">{{ $address->phone ?? $order->user->phone }}</span>
-                            </td>
-                            <td class="px-4 py-3 font-bold text-walnut-900">
-                                <span>{{ $qty }} Item</span><br>
-                                <span class="text-walnut-500 font-normal text-[0.65rem]">{{ number_format($bobot, 2) }} kg</span>
-                            </td>
-                            <td class="px-4 py-3 font-bold text-walnut-900">
-                                <span>Rp{{ number_format($order->shipping_cost, 0, ',', '.') }}</span><br>
-                                <span class="inline-block mt-1 px-2 py-0.5 border border-walnut-800/20 text-walnut-500 rounded text-[0.6rem]">Non COD</span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <span class="inline-flex px-2 py-1 rounded-full text-[0.65rem] font-bold {{ $statusPill }}">{{ $statusLabel }}</span><br>
-                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 border border-walnut-800/10 text-walnut-500 rounded-full text-[0.6rem] bg-white">
-                                    {{ ($order->shipment->updated_at ?? $order->updated_at)->format('d M Y, H:i') }} WIB
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-0.5 border border-walnut-800/10 rounded-full text-[0.6rem] uppercase font-bold text-walnut-700 bg-white shadow-sm mb-1">
+                                    {{ $order->shipment->courier ?? 'JNE' }} - {{ $order->shipment->service ?? 'REG' }}
                                 </span>
+                                <div class="text-[0.65rem] text-walnut-600">
+                                    Total: <strong class="text-walnut-900">Rp{{ number_format($order->shipping_cost, 0, ',', '.') }}</strong>
+                                </div>
+                                <div class="text-[0.65rem] text-walnut-500">
+                                    {{ $qty }} item ({{ number_format($bobot, 2) }} kg)
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
-                                @if($order->is_simulation)
-                                    <span class="inline-flex px-2.5 py-1 rounded-full text-[0.6rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">Simulasi</span>
-                                @else
-                                    <span class="inline-flex px-2.5 py-1 rounded-full text-[0.6rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">API</span>
-                                @endif
+                            <td class="px-6 py-4 space-y-2">
+                                <div>
+                                    <span class="inline-flex px-2 py-1 rounded text-[0.65rem] font-bold border uppercase tracking-wide {{ $statusPill }}">
+                                        {{ $statusLabel }}
+                                    </span>
+                                </div>
+                                <div>
+                                    @if($order->is_simulation)
+                                        <span class="inline-flex px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                                            Simulasi Lokal
+                                        </span>
+                                    @else
+                                        <span class="inline-flex px-2 py-0.5 rounded text-[0.6rem] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                            API Biteship
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
-                            <td class="px-4 py-3 text-center">
-                                <div class="flex flex-col items-center gap-1.5">
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col items-center justify-center gap-2">
                                     @if(count($nextActions) > 0)
-                                        <div class="flex flex-col gap-1 w-full max-w-[130px]">
+                                        <div class="flex flex-col gap-1.5 w-full max-w-[140px]">
                                             @php
                                                 $firstTarget = array_key_first($nextActions);
                                             @endphp
@@ -163,40 +174,47 @@
                                                 @csrf
                                                 <input type="hidden" name="order_id" value="{{ $biteshipId }}">
                                                 <input type="hidden" name="status" value="{{ $firstTarget }}">
-                                                <button type="submit" class="w-full py-1 px-2 bg-purple-600 hover:bg-purple-700 text-white rounded text-[0.6rem] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1 shadow-sm">
-                                                    <i data-lucide="play" class="w-3 h-3"></i> Update Status
+                                                <button type="submit" class="w-full py-1.5 px-3 bg-walnut-900 hover:bg-gold-600 text-white rounded-lg text-[0.65rem] font-bold uppercase tracking-widest transition flex items-center justify-center gap-1.5 shadow-sm group">
+                                                    <i data-lucide="play" class="w-3.5 h-3.5 text-gold-500 group-hover:text-white transition"></i> Update Status
                                                 </button>
                                             </form>
                                             
                                             @if(isset($nextActions['returnInTransit']))
-                                            <form action="{{ route('simulasi.webhook.status') }}" method="POST" class="w-full mt-1">
+                                            <form action="{{ route('simulasi.webhook.status') }}" method="POST" class="w-full">
                                                 @csrf
                                                 <input type="hidden" name="order_id" value="{{ $biteshipId }}">
                                                 <input type="hidden" name="status" value="returnInTransit">
-                                                <button type="submit" class="w-full py-1 px-2 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 rounded text-[0.6rem] font-bold uppercase tracking-wider transition flex items-center justify-center gap-1">
-                                                    <i data-lucide="corner-down-right" class="w-3 h-3"></i> Return Status
+                                                <button type="submit" class="w-full py-1.5 px-3 border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg text-[0.65rem] font-bold uppercase tracking-widest transition flex items-center justify-center gap-1.5">
+                                                    <i data-lucide="corner-down-right" class="w-3.5 h-3.5"></i> Return Status
                                                 </button>
                                             </form>
                                             @endif
                                         </div>
                                     @else
-                                        <span class="text-[0.6rem] text-walnut-400 italic font-medium">Completed</span>
+                                        <div class="px-3 py-1.5 bg-walnut-50 border border-walnut-800/10 text-walnut-400 rounded-lg text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Selesai
+                                        </div>
                                     @endif
                                     
-                                    <button @click="openPriceModal('{{ $biteshipId }}', {{ $order->shipping_cost }})" class="w-full max-w-[130px] py-1 px-2 border border-gold-500 text-gold-600 bg-gold-50/30 hover:bg-gold-50 rounded text-[0.6rem] font-bold transition flex items-center justify-center gap-1 uppercase tracking-wider">
-                                        <i data-lucide="dollar-sign" class="w-3 h-3"></i> Update Price
-                                    </button>
-
-                                    <button type="button" onclick="alert('Tags successfully simulated!')" class="w-full max-w-[130px] py-1 px-2 border border-purple-400 text-purple-600 bg-purple-50/30 hover:bg-purple-50 rounded text-[0.6rem] font-bold transition flex items-center justify-center gap-1 uppercase tracking-wider">
-                                        <i data-lucide="tag" class="w-3 h-3"></i> Tambah Tags
-                                    </button>
+                                    <div class="flex items-center gap-1.5 w-full max-w-[140px] pt-1">
+                                        <button @click="openPriceModal('{{ $biteshipId }}', {{ $order->shipping_cost }})" class="flex-1 py-1.5 border border-gold-500 text-gold-600 hover:bg-gold-50 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider transition flex items-center justify-center" title="Update Harga Ongkir">
+                                            <i data-lucide="dollar-sign" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                        <button type="button" onclick="alert('Tags successfully simulated!')" class="flex-1 py-1.5 border border-walnut-800/20 text-walnut-600 hover:bg-walnut-50 rounded-lg text-[0.6rem] font-bold uppercase tracking-wider transition flex items-center justify-center" title="Tambah Tags Webhook">
+                                            <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="px-6 py-12 text-center text-walnut-500 font-medium text-sm">
-                                Tidak ada pesanan untuk disimulasikan.
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="flex flex-col items-center justify-center text-walnut-400">
+                                    <i data-lucide="package-x" class="w-10 h-10 mb-3 opacity-50"></i>
+                                    <p class="text-sm font-bold uppercase tracking-widest">Tidak ada pesanan</p>
+                                    <p class="text-xs mt-1 text-muted">Belum ada pesanan untuk disimulasikan.</p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse

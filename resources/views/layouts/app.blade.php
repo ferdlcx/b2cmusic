@@ -144,12 +144,28 @@
                     <a href="{{ route('catalog') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('catalog') ? 'text-gold-600' : '' }}">
                         Shop Catalog
                     </a>
-                    <a href="{{ route('docs') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('docs') ? 'text-gold-600' : '' }}">
-                        Docs
-                    </a>
-                    <a href="{{ route('doctest') }}" class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('doctest') ? 'text-gold-600' : '' }}">
-                        DocTest
-                    </a>
+                    <!-- Dev Dropdown -->
+                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true" @mouseleave="open = false">
+                        <button class="hover:text-gold-600 transition flex items-center gap-1.5 {{ request()->routeIs('docs') || request()->routeIs('doctest') ? 'text-gold-600' : '' }}">
+                            Dev <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-2"
+                             class="absolute top-full mt-2 w-48 bg-white border border-walnut-800/10 shadow-xl py-2 z-50 rounded-xl"
+                             style="display: none;">
+                            <a href="{{ route('docs') }}" class="flex items-center gap-3 px-5 py-2.5 text-xs font-semibold text-walnut-800 hover:bg-cream-100 hover:text-gold-600 transition">
+                                <i data-lucide="book-open" class="w-4 h-4"></i> Docs
+                            </a>
+                            <a href="{{ route('doctest') }}" class="flex items-center gap-3 px-5 py-2.5 text-xs font-semibold text-walnut-800 hover:bg-cream-100 hover:text-gold-600 transition">
+                                <i data-lucide="flask-conical" class="w-4 h-4"></i> DocTest
+                            </a>
+                        </div>
+                    </div>
                 </nav>
 
                 <!-- Auth & Cart Actions -->
@@ -257,12 +273,15 @@
                 <a href="{{ route('catalog') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
                     <i data-lucide="shopping-bag" class="w-4 h-4"></i> Shop Catalog
                 </a>
-                <a href="{{ route('docs') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
-                    <i data-lucide="file-text" class="w-4 h-4"></i> Docs
-                </a>
-                <a href="{{ route('doctest') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
-                    <i data-lucide="flask-conical" class="w-4 h-4"></i> DocTest
-                </a>
+                <div class="pt-2">
+                    <p class="text-[0.6rem] font-bold text-walnut-400 uppercase tracking-widest px-2 mb-2">Developer</p>
+                    <a href="{{ route('docs') }}" class="flex items-center gap-3 py-2 px-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="book-open" class="w-4 h-4"></i> Docs
+                    </a>
+                    <a href="{{ route('doctest') }}" class="flex items-center gap-3 py-2 px-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">
+                        <i data-lucide="flask-conical" class="w-4 h-4"></i> DocTest
+                    </a>
+                </div>
                 @auth
                     <hr class="border-walnut-800/10 my-2" />
                     <a href="{{ route('orders.history') }}" class="flex items-center gap-3 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-bold text-walnut-800 hover:text-gold-600 transition">

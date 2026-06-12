@@ -66,12 +66,17 @@ class OrderController extends Controller
 
                 if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $fraudStatus == 'accept')) {
                     DB::beginTransaction();
-                    $order->update(['status' => 'paid']);
+                    $order->update(['status' => 'processing']);
                     $order->payment->update([
                         'status' => 'paid',
                         'paid_at' => now(),
                         'transaction_id' => $statusData['transaction_id'] ?? $order->payment->transaction_id,
                     ]);
+                    
+                    // Auto-init tracking history
+                    if ($order->shipment) {
+                        $order->shipment->appendStatus('confirmed', 'Pesanan telah terkonfirmasi dan sedang diproses.', 'Gudang DjudasMS, Jakarta Barat');
+                    }
                     $user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
                     DB::commit();
                     
@@ -154,13 +159,13 @@ class OrderController extends Controller
                     $orderStatus = 'pending';
                     $paymentStatus = 'pending';
                 } else {
-                    $orderStatus = 'paid';
+                    $orderStatus = 'processing';
                     $paymentStatus = 'paid';
                     $paidAt = now();
                 }
             }
         } elseif ($transactionStatus == 'settlement') {
-            $orderStatus = 'paid';
+            $orderStatus = 'processing';
             $paymentStatus = 'paid';
             $paidAt = now();
         } elseif ($transactionStatus == 'pending') {
@@ -188,8 +193,13 @@ class OrderController extends Controller
             // Update Order
             $order->update(['status' => $orderStatus]);
 
-            if ($orderStatus === 'paid') {
+            if ($paymentStatus === 'paid') {
                 $order->user->notify((new PaymentSuccess($order))->delay(now()->addMinutes(5)));
+                
+                // Auto-init tracking history
+                if ($order->shipment && empty($order->shipment->status_history)) {
+                    $order->shipment->appendStatus('confirmed', 'Pesanan telah terkonfirmasi dan sedang diproses.', 'Gudang DjudasMS, Jakarta Barat');
+                }
                 
                 try {
                     \Illuminate\Support\Facades\Mail::to($order->user->email)->send(new \App\Mail\InvoiceMail($order));
@@ -210,7 +220,7 @@ class OrderController extends Controller
             DB::commit();
             Log::info("Order {$order->order_code} updated successfully via Webhook to: {$orderStatus}");
             
-            if ($orderStatus === 'paid') {
+            if ($paymentStatus === 'paid') {
                 $this->processBiteshipOrder($order);
             }
             

@@ -42,6 +42,7 @@ class PaymentSuccess extends Notification implements ShouldQueue
             'body' => 'Pembayaran untuk pesanan #' . $this->order->order_code . ' sebesar Rp ' . number_format($this->order->total, 0, ',', '.') . ' telah kami terima. Pesanan Anda sedang diproses.',
             'order_code' => $this->order->order_code,
             'order_id' => $this->order->id,
+            'source' => $this->order->is_simulation ? 'simulation' : 'system'
         ];
     }
 }

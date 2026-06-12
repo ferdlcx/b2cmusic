@@ -137,7 +137,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // RajaOngkir API (V2 Komerce)
     Route::get('/api/rajaongkir/search-area', [App\Http\Controllers\RajaOngkirController::class, 'searchArea'])->name('api.rajaongkir.search');
-    Route::post('/api/rajaongkir/rates', [App\Http\Controllers\RajaOngkirController::class, 'getRates'])->name('api.rajaongkir.rates');
+    Route::post('/api/rajaongkir/rates', [App\Http\Controllers\CheckoutController::class, 'calculateShipping'])->name('api.rajaongkir.rates');
+    Route::post('/api/rajaongkir/calculate', [App\Http\Controllers\CheckoutController::class, 'calculateShipping'])->name('api.rajaongkir.calculate');
 
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

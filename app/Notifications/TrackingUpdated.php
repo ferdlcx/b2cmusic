@@ -6,15 +6,19 @@ use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class OrderShipped extends Notification
+class TrackingUpdated extends Notification
 {
     use Queueable;
 
     protected $order;
+    protected $statusLabel;
+    protected $source;
 
-    public function __construct(Order $order)
+    public function __construct(Order $order, $statusLabel, $source = 'system')
     {
         $this->order = $order;
+        $this->statusLabel = $statusLabel;
+        $this->source = $source;
     }
 
     public function via($notifiable): array
@@ -25,17 +29,18 @@ class OrderShipped extends Notification
     public function toArray($notifiable): array
     {
         $trackingNumber = $this->order->shipment ? $this->order->shipment->tracking_number : null;
-        $body = 'Pesanan #' . $this->order->order_code . ' telah diserahkan ke kurir dan sedang dikirim.';
+        $body = 'Status pengiriman pesanan #' . $this->order->order_code . ' telah diupdate menjadi: ' . $this->statusLabel . '.';
+        
         if ($trackingNumber) {
-            $body .= ' Nomor resi: ' . $trackingNumber;
+            $body .= ' (Resi: ' . $trackingNumber . ')';
         }
 
         return [
-            'title' => 'Pesanan Sedang Dikirim',
+            'title' => 'Update Pengiriman Pesanan',
             'body' => $body,
             'order_code' => $this->order->order_code,
             'order_id' => $this->order->id,
-            'source' => $this->order->is_simulation ? 'simulation' : 'system'
+            'source' => $this->source
         ];
     }
 }

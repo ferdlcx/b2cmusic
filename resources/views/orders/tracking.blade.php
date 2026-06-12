@@ -52,10 +52,24 @@
                 },
                 
                 initMap() {
-                    const validCp = this.checkpoints.find(cp => cp.lat !== null && cp.lng !== null && !isNaN(cp.lat) && !isNaN(cp.lng));
-                    if (!validCp) return;
+                    let validCp = null;
+                    if (this.checkpoints && this.checkpoints.length > 0) {
+                        // Find the most recent valid checkpoint
+                        for (let i = this.checkpoints.length - 1; i >= 0; i--) {
+                            const cp = this.checkpoints[i];
+                            if (cp.lat !== null && cp.lng !== null && !isNaN(cp.lat) && !isNaN(cp.lng)) {
+                                validCp = cp;
+                                break;
+                            }
+                        }
+                    }
                     
-                    this.map = L.map('tracking-map').setView([validCp.lat, validCp.lng], 6);
+                    // Fallback to center of Indonesia if absolutely no coordinates found
+                    const startLat = validCp ? validCp.lat : -2.5;
+                    const startLng = validCp ? validCp.lng : 118.0;
+                    const startZoom = validCp ? 6 : 5;
+                    
+                    this.map = L.map('tracking-map').setView([startLat, startLng], startZoom);
                     // Premium CartoDB Map
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                         attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
@@ -152,8 +166,13 @@
                             </template>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-walnut-950 text-[0.8rem] uppercase tracking-widest" x-text="cp.status"></h4>
-                            <p class="text-[0.7rem] font-medium text-muted mt-1" x-text="cp.description"></p>
+                            <h4 class="font-bold text-walnut-950 text-[0.8rem] uppercase tracking-widest flex items-center gap-2">
+                                <span x-text="cp.status"></span>
+                                <template x-if="cp.source === 'simulation'">
+                                    <span class="bg-red-100 text-red-700 text-[0.55rem] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-red-200">[TEST MODE]</span>
+                                </template>
+                            </h4>
+                            <p class="text-[0.7rem] font-medium text-muted mt-1" x-text="cp.description.replace(' [TEST MODE]', '')"></p>
                             <p class="text-[0.65rem] text-walnut-500 mt-0.5">📍 <span x-text="cp.location"></span></p>
                             <p class="text-[0.65rem] text-walnut-400 mt-0.5">🕐 <span x-text="cp.datetime"></span></p>
                         </div>

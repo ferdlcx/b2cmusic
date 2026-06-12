@@ -45,8 +45,11 @@
                     <!-- Message Content -->
                     <div class="flex-1 space-y-1.5 min-w-0">
                         <div class="flex items-center justify-between gap-3">
-                            <h4 class="text-xs font-bold text-slate-850 uppercase tracking-wide truncate">
+                            <h4 class="text-xs font-bold text-slate-850 uppercase tracking-wide truncate flex items-center gap-2">
                                 {{ $notification->data['title'] ?? 'Notifikasi Toko' }}
+                                @if(isset($notification->data['source']) && $notification->data['source'] === 'simulation')
+                                    <span class="bg-red-100 text-red-700 text-[0.5rem] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-red-200">[TEST MODE]</span>
+                                @endif
                             </h4>
                             <span class="text-[0.65rem] text-walnut-400 font-semibold shrink-0">{{ $notification->created_at->diffForHumans() }}</span>
                         </div>

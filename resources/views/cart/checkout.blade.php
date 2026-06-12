@@ -159,7 +159,13 @@
                       });
                       if (res.ok) {
                           let data = await res.json();
-                          if (data.costs) {
+                          if (data.options) {
+                              this.courierOptions = data.options;
+                              if (this.courierOptions.length > 0) {
+                                  // Auto-select the cheapest one (since they are sorted)
+                                  this.selectCourier(this.courierOptions[0]);
+                              }
+                          } else if (data.costs) { // Fallback for old structure if somehow still used
                               data.costs.forEach(c => {
                                   this.courierOptions.push({
                                       courier: c.service.split(' - ')[0] || 'COURIER',
@@ -171,6 +177,11 @@
                                       distance: data.distance || null
                                   });
                               });
+                              if (this.courierOptions.length > 0) {
+                                  // Sort by cost
+                                  this.courierOptions.sort((a,b) => a.cost - b.cost);
+                                  this.selectCourier(this.courierOptions[0]);
+                              }
                           }
                       }
                   } catch(e) { console.error(e); }

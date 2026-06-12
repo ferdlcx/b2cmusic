@@ -55,14 +55,16 @@
                 <img src="{{ asset('images/hero_guitar.png') }}" 
                      alt="Premium Guitar" 
                      class="w-full h-auto object-contain mix-blend-multiply opacity-90 drop-shadow-2xl"
-                     :style="'transform: translateY(' + (scrollY * -0.15) + 'px) scale(1.05)'" />
+                     :style="'transform: translateY(' + (scrollY * -0.15) + 'px) scale(1.05)'" 
+                     onerror="this.src='https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80'" />
             </div>
 
             <!-- Mobile Image Fallback -->
             <div class="md:hidden w-full h-[300px] mt-8 relative">
                 <img src="{{ asset('images/hero_guitar.png') }}" 
                      alt="Premium Guitar" 
-                     class="w-full h-full object-contain mix-blend-multiply opacity-90 drop-shadow-xl" />
+                     class="w-full h-full object-contain mix-blend-multiply opacity-90 drop-shadow-xl" 
+                     onerror="this.src='https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80'" />
             </div>
         </div>
         
@@ -125,6 +127,63 @@
                     </div>
                 </a>
             @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Flow Section (How it works) -->
+<section class="py-16 bg-walnut-950 text-cream-50 -mx-6 lg:-mx-12 px-6 lg:px-12 my-12">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <span class="text-[0.65rem] uppercase tracking-[0.45em] text-gold-500 font-bold block mb-4">Cara Kerja</span>
+            <h2 class="font-display text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">4 Langkah Mudah.</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+            <div class="hidden md:block absolute top-12 left-1/8 right-1/8 h-0.5 bg-walnut-800 z-0"></div>
+            
+            <!-- Step 1 -->
+            <div class="relative z-10 flex flex-col items-center text-center group">
+                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
+                    <i data-lucide="search" class="w-8 h-8 text-gold-500"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">1. Pilih Produk</h3>
+                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Jelajahi kurasi instrumen dan gear audio premium kami.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative z-10 flex flex-col items-center text-center group">
+                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
+                    <i data-lucide="shopping-bag" class="w-8 h-8 text-gold-500"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">2. Checkout</h3>
+                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Pilih kurir dengan harga terbaik yang otomatis disesuaikan.</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative z-10 flex flex-col items-center text-center group">
+                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
+                    <i data-lucide="credit-card" class="w-8 h-8 text-gold-500"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">3. Bayar Aman</h3>
+                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Transaksi aman dan instan dengan berbagai metode pembayaran.</p>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="relative z-10 flex flex-col items-center text-center group">
+                <div class="w-24 h-24 rounded-full bg-walnut-900 border-2 border-walnut-800 flex items-center justify-center mb-6 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
+                    <i data-lucide="truck" class="w-8 h-8 text-gold-500"></i>
+                </div>
+                <h3 class="font-display text-lg font-bold uppercase tracking-widest text-white mb-2">4. Lacak Pesanan</h3>
+                <p class="text-xs text-walnut-400 font-medium leading-relaxed max-w-[200px]">Pantau pengiriman Anda secara real-time hingga sampai tujuan.</p>
+            </div>
+        </div>
+        
+        <div class="mt-16 text-center">
+            <a href="{{ route('catalog') }}" class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gold-600 text-walnut-950 text-[0.75rem] font-bold tracking-[0.2em] uppercase hover:bg-gold-500 transition-all duration-300 shadow-[0_0_20px_rgba(212,160,23,0.3)]">
+                Mulai Belanja
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
         </div>
     </div>
 </section>

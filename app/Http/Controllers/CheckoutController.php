@@ -259,7 +259,7 @@ class CheckoutController extends Controller
                 'service' => $serviceName,
                 'tracking_number' => null, // Generated when shipped by admin
                 'shipping_cost' => $shippingCost,
-                'status' => 'shipped', // Default status in ERD
+                'status' => 'pending', // Default status is pending until paid
                 'shipped_at' => null,
                 'delivered_at' => null,
             ]);
@@ -422,5 +422,131 @@ class CheckoutController extends Controller
         }
     }
 
+    public function calculateShipping(Request $request)
+    {
+        $request->validate([
+            'address_id' => 'nullable|exists:addresses,id',
+            'area_id' => 'required_without:address_id',
+            'weight' => 'nullable|numeric' // Weight in grams
+        ]);
 
+        $areaId = $request->area_id;
+        if ($request->address_id) {
+            $address = Address::find($request->address_id);
+            $areaId = $address->area_id ?? null;
+            // Fallback for old addresses without area_id
+            if (!$areaId && $address->city) {
+                // If we don't have area_id, we'll use a default mock calculation below
+            }
+        }
+
+        $weight = $request->weight ?? 1000;
+        
+        $roKey = env('RAJAONGKIR_API_KEY', config('services.rajaongkir.api_key'));
+        
+        if ($roKey && $areaId) {
+            try {
+                $response = Http::timeout(5)->withHeaders([
+                    'key' => $roKey
+                ])->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+                    'origin' => 152, // Jakarta Barat (or your origin id)
+                    'destination' => $areaId,
+                    'weight' => $weight,
+                    'couriers' => 'jne,sicepat,jnt' // Fetch a few standard couriers
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (!empty($data['data'])) {
+                        $options = [];
+                        foreach ($data['data'] as $courierResult) {
+                            $courierCode = $courierResult['code'];
+                            foreach ($courierResult['costs'] as $cost) {
+                                $options[] = [
+                                    'courier' => strtoupper($courierCode),
+                                    'service' => $cost['service'],
+                                    'description' => $cost['description'] ?? '',
+                                    'cost' => $cost['cost'][0]['value'],
+                                    'etd' => $cost['cost'][0]['etd'] ?? '2-3',
+                                    'id' => strtoupper($courierCode) . '_' . $cost['service']
+                                ];
+                            }
+                        }
+
+                        // Sort by lowest cost first
+                        usort($options, function($a, $b) {
+                            return $a['cost'] <=> $b['cost'];
+                        });
+
+                        return response()->json([
+                            'success' => true,
+                            'options' => $options
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('RajaOngkir error: ' . $e->getMessage());
+            }
+        }
+
+        // MOCK FALLBACK if API fails or no area_id
+        $provinceStr = strtolower($request->province ?? 'jawa');
+        if ($request->address_id && isset($address)) {
+            $provinceStr = strtolower($address->province ?? 'jawa');
+        }
+
+        $weightInKg = ceil($weight / 1000);
+        if ($weightInKg < 1) $weightInKg = 1;
+
+        if (str_contains($provinceStr, 'jawa') || str_contains($provinceStr, 'dki') || str_contains($provinceStr, 'banten') || str_contains($provinceStr, 'yogyakarta') || str_contains($provinceStr, 'jogja')) {
+            $baseCost = 15000;
+        } else if (str_contains($provinceStr, 'sumatra') || str_contains($provinceStr, 'sumatera') || str_contains($provinceStr, 'bali') || str_contains($provinceStr, 'nusa tenggara')) {
+            $baseCost = 35000;
+        } else if (str_contains($provinceStr, 'kalimantan') || str_contains($provinceStr, 'sulawesi')) {
+            $baseCost = 45000;
+        } else if (str_contains($provinceStr, 'papua') || str_contains($provinceStr, 'maluku')) {
+            $baseCost = 80000;
+        } else {
+            $baseCost = 25000;
+        }
+
+        $finalCost = $baseCost + (($weightInKg - 1) * ($baseCost * 0.5));
+
+        $mockOptions = [
+            [
+                'courier' => 'JNE',
+                'service' => 'REG',
+                'description' => 'Layanan Reguler',
+                'cost' => $finalCost,
+                'etd' => '2-3',
+                'id' => 'JNE_REG'
+            ],
+            [
+                'courier' => 'SICEPAT',
+                'service' => 'REG',
+                'description' => 'SiCepat Reguler',
+                'cost' => $finalCost - 1000,
+                'etd' => '2-3',
+                'id' => 'SICEPAT_REG'
+            ],
+            [
+                'courier' => 'JNE',
+                'service' => 'YES',
+                'description' => 'Yakin Esok Sampai',
+                'cost' => $finalCost + 15000,
+                'etd' => '1-1',
+                'id' => 'JNE_YES'
+            ]
+        ];
+
+        // Sort by lowest cost
+        usort($mockOptions, function($a, $b) {
+            return $a['cost'] <=> $b['cost'];
+        });
+
+        return response()->json([
+            'success' => true,
+            'options' => $mockOptions
+        ]);
+    }
 }

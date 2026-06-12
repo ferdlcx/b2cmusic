@@ -243,62 +243,7 @@
                             @endif
 
                             <form action="{{ route('cart.add') }}" method="POST"
-                                  x-data="{ 
-                                      loading: false,
-                                      submitForm(e) {
-                                          e.preventDefault();
-                                          this.loading = true;
-                                          
-                                          const formData = new FormData(e.target);
-                                          
-                                          fetch('{{ route('cart.add') }}', {
-                                              method: 'POST',
-                                              body: formData,
-                                              headers: {
-                                                  'X-Requested-With': 'XMLHttpRequest'
-                                              }
-                                          })
-                                          .then(response => {
-                                              if (response.ok || response.redirected) {
-                                                  const cartElem = document.querySelector('[x-data*=cartCount]');
-                                                  if (cartElem && cartElem.__x) {
-                                                      const currentCount = cartElem.__x.$data.cartCount;
-                                                      document.dispatchEvent(new CustomEvent('cart-updated', { 
-                                                          detail: { count: currentCount + 1 } 
-                                                      }));
-                                                      
-                                                      // Show toast manually
-                                                      const container = document.getElementById('toast-container');
-                                                      if (container) {
-                                                          const toast = document.createElement('div');
-                                                          toast.className = 'toast-message pointer-events-auto flex items-center justify-between gap-4 bg-walnut-950 text-cream-50 px-5 py-3.5 shadow-xl border border-walnut-800/10 min-w-[300px] animate-fade-in-up';
-                                                          toast.innerHTML = `
-                                                              <div class=\"flex items-center gap-3\">
-                                                                  <i data-lucide=\"check-circle-2\" class=\"w-4 h-4 text-emerald-400\"></i>
-                                                                  <span class=\"text-[0.75rem] font-medium tracking-wide\">Produk ditambahkan ke keranjang!</span>
-                                                              </div>
-                                                              <button onclick=\"this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(), 300)\" class=\"text-walnut-400 hover:text-white transition\">
-                                                                  <i data-lucide=\"x\" class=\"w-3.5 h-3.5\"></i>
-                                                              </button>
-                                                          `;
-                                                          container.prepend(toast);
-                                                          if (typeof lucide !== 'undefined') lucide.createIcons();
-                                                          setTimeout(() => {
-                                                              toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                                                              toast.style.opacity = '0';
-                                                              toast.style.transform = 'translateY(10px)';
-                                                              setTimeout(() => toast.remove(), 300);
-                                                          }, 5000);
-                                                      }
-                                                  }
-                                              }
-                                          })
-                                          .catch(err => console.error(err))
-                                          .finally(() => {
-                                              this.loading = false;
-                                          });
-                                      }
-                                  }"
+                                  x-data="cartForm"
                                   @submit="submitForm($event)">
                                 @csrf
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">

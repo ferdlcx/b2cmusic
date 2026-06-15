@@ -24,7 +24,7 @@
             </div>
         </div>
     @else
-        <div class="grid gap-16 lg:grid-cols-[1fr_380px]">
+        <div x-data="cartCheckout()" class="grid gap-16 lg:grid-cols-[1fr_380px]">
             <!-- Items List -->
             <div class="space-y-8">
                 <!-- Desktop Item List -->
@@ -32,6 +32,9 @@
                     <table class="w-full text-left">
                         <thead class="text-[0.65rem] uppercase tracking-widest text-muted border-b border-walnut-800/20">
                             <tr>
+                                <th class="pb-4 w-12 text-center">
+                                    <input type="checkbox" @change="toggleAll" :checked="selected.length === items.length && items.length > 0" class="w-4 h-4 rounded border-walnut-800/20 text-gold-500 focus:ring-gold-500 cursor-pointer">
+                                </th>
                                 <th class="pb-4 font-bold">Karya</th>
                                 <th class="pb-4 text-center font-bold">Kuantitas</th>
                                 <th class="pb-4 text-right font-bold">Subtotal</th>
@@ -41,6 +44,11 @@
                         <tbody>
                             @foreach($cartItems as $item)
                                 <tr class="border-b border-walnut-800/10 last:border-0 hover:bg-cream-50 transition">
+                                    <!-- Checkbox -->
+                                    <td class="py-6 text-center">
+                                        <input type="checkbox" value="{{ $item->id }}" x-model="selected" class="w-4 h-4 rounded border-walnut-800/20 text-gold-500 focus:ring-gold-500 cursor-pointer">
+                                    </td>
+                                    
                                     <!-- Product Info -->
                                     <td class="py-6 flex items-center gap-6">
                                         <div class="w-20 h-20 bg-cream-100 flex-shrink-0 flex items-center justify-center border border-walnut-800/5">
@@ -88,6 +96,9 @@
                     @foreach($cartItems as $item)
                         <div class="border-b border-walnut-800/10 pb-6 space-y-4">
                             <div class="flex items-start gap-4">
+                                <div class="pt-1">
+                                    <input type="checkbox" value="{{ $item->id }}" x-model="selected" class="w-4 h-4 rounded border-walnut-800/20 text-gold-500 focus:ring-gold-500 cursor-pointer">
+                                </div>
                                 <div class="w-20 h-20 bg-cream-50 flex-shrink-0 flex items-center justify-center border border-walnut-800/5">
                                     <img src="{{ $item->product->primaryImage ? $item->product->primaryImage->image : 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=80&q=80' }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover mix-blend-multiply" />
                                 </div>
@@ -143,7 +154,7 @@
                     <div class="space-y-4">
                         <div class="flex justify-between text-[0.7rem] uppercase tracking-widest text-muted font-bold">
                             <span>Subtotal</span>
-                            <span class="text-walnut-950">IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
+                            <span class="text-walnut-950" x-text="formattedSubtotal">IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between text-[0.7rem] uppercase tracking-widest text-muted font-bold">
                             <span>Pengiriman</span>
@@ -152,17 +163,76 @@
                         
                         <div class="pt-6 border-t border-walnut-800/10 flex justify-between items-end">
                             <span class="text-[0.65rem] uppercase tracking-widest text-walnut-950 font-bold">Total</span>
-                            <span class="text-2xl font-display font-black text-walnut-950 tracking-tight">IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
+                            <span class="text-2xl font-display font-black text-walnut-950 tracking-tight" x-text="formattedSubtotal">IDR {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
-                    <a href="{{ route('checkout.index') }}" 
-                        class="w-full block py-4 bg-walnut-900 text-gold-500 text-center font-bold uppercase text-[0.7rem] tracking-[0.2em] hover:bg-gold-600 hover:text-white transition duration-500">
-                        Proses Checkout
-                    </a>
+                    <button type="button" @click="submitCheckout" :disabled="selected.length === 0" :class="selected.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gold-600 hover:text-white'" class="w-full block py-4 bg-walnut-900 text-gold-500 text-center font-bold uppercase text-[0.7rem] tracking-[0.2em] transition duration-500">
+                        Proses Checkout (<span x-text="selected.length"></span>)
+                    </button>
                 </div>
             </div>
         </div>
     @endif
 </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('cartCheckout', () => ({
+        selected: [],
+        items: [
+            @foreach($cartItems as $item)
+            { id: '{{ $item->id }}', price: {{ $item->price }}, quantity: {{ $item->quantity }} },
+            @endforeach
+        ],
+        init() {
+            // Select all by default when page loads
+            this.selected = this.items.map(i => i.id);
+        },
+        get subtotal() {
+            return this.items
+                .filter(i => this.selected.includes(i.id))
+                .reduce((sum, i) => sum + (i.price * i.quantity), 0);
+        },
+        get formattedSubtotal() {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(this.subtotal).replace('Rp', 'IDR').replace(/,00$/, '');
+        },
+        toggleAll() {
+            if (this.selected.length === this.items.length) {
+                this.selected = [];
+            } else {
+                this.selected = this.items.map(i => i.id);
+            }
+        },
+        submitCheckout() {
+            if (this.selected.length === 0) {
+                alert('Pilih minimal satu produk untuk di-checkout.');
+                return;
+            }
+            
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("checkout.prepare") }}';
+            
+            let csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            form.appendChild(csrf);
+            
+            this.selected.forEach(id => {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'selected_items[]';
+                input.value = id;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }))
+})
+</script>
 @endsection

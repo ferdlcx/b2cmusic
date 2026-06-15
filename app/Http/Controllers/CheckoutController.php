@@ -21,6 +21,21 @@ use App\Notifications\OrderCreated;
 
 class CheckoutController extends Controller
 {
+    public function prepare(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|array|min:1',
+            'selected_items.*' => 'exists:cart_items,id'
+        ], [
+            'selected_items.required' => 'Pilih minimal satu produk untuk di-checkout.'
+        ]);
+
+        session(['selected_cart_items' => $request->selected_items]);
+        session()->forget('buy_now');
+
+        return redirect()->route('checkout.index');
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -50,9 +65,15 @@ class CheckoutController extends Controller
                 return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
             }
 
-            $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
+            $query = CartItem::with('product')->where('cart_id', $cart->id);
+            
+            if (session()->has('selected_cart_items')) {
+                $query->whereIn('id', session('selected_cart_items'));
+            }
+
+            $cartItems = $query->get();
             if ($cartItems->isEmpty()) {
-                return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+                return redirect()->route('catalog')->with('error', 'Tidak ada produk yang dipilih untuk checkout.');
             }
         }
 
@@ -72,7 +93,8 @@ class CheckoutController extends Controller
     public function cancelBuyNow()
     {
         session()->forget('buy_now');
-        return redirect()->route('cart.index')->with('success', 'Pembelian langsung dibatalkan. Menampilkan keranjang Anda.');
+        session()->forget('selected_cart_items');
+        return redirect()->route('cart.index')->with('success', 'Pembelian dibatalkan. Menampilkan keranjang Anda.');
     }
 
     public function process(Request $request)
@@ -100,10 +122,16 @@ class CheckoutController extends Controller
             $cart = null; // No real cart
         } else {
             $cart = Cart::where('user_id', $user->id)->firstOrFail();
-            $cartItems = CartItem::with('product')->where('cart_id', $cart->id)->get();
+            $query = CartItem::with('product')->where('cart_id', $cart->id);
+            
+            if (session()->has('selected_cart_items')) {
+                $query->whereIn('id', session('selected_cart_items'));
+            }
+            
+            $cartItems = $query->get();
 
             if ($cartItems->isEmpty()) {
-                return redirect()->route('catalog')->with('error', 'Keranjang Anda kosong.');
+                return redirect()->route('catalog')->with('error', 'Tidak ada produk yang dipilih untuk checkout.');
             }
         }
 
@@ -386,7 +414,12 @@ class CheckoutController extends Controller
 
             // 7. Clear user cart if not buy now
             if (!$isBuyNow && $cart) {
-                CartItem::where('cart_id', $cart->id)->delete();
+                if (session()->has('selected_cart_items')) {
+                    CartItem::where('cart_id', $cart->id)->whereIn('id', session('selected_cart_items'))->delete();
+                    session()->forget('selected_cart_items');
+                } else {
+                    CartItem::where('cart_id', $cart->id)->delete();
+                }
             }
             
             if ($isBuyNow) {

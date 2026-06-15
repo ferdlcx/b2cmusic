@@ -99,6 +99,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/wishlist/{id}/to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.toCart');
 
     // Checkout Routes
+    Route::post('/checkout/prepare', [CheckoutController::class, 'prepare'])->name('checkout.prepare');
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::get('/checkout/cancel-buy-now', [CheckoutController::class, 'cancelBuyNow'])->name('checkout.cancelBuyNow');
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');

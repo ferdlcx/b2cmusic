@@ -406,14 +406,17 @@
                         .then(response => {
                             if (response.ok || response.redirected) {
                                 const cartElem = document.querySelector('[x-data*=cartCount]');
-                                if (cartElem && cartElem.__x) {
-                                    const currentCount = cartElem.__x.$data.cartCount;
+                                if (cartElem) {
+                                    const currentCount = Alpine.$data(cartElem).cartCount || 0;
                                     const addedQty = parseInt(formData.get('quantity')) || 1;
                                     
                                     document.dispatchEvent(new CustomEvent('cart-updated', { 
                                         detail: { count: currentCount + addedQty } 
                                     }));
                                     
+                                    this.showToast('Produk ditambahkan ke keranjang!');
+                                } else {
+                                    // Fallback if cart elem not found
                                     this.showToast('Produk ditambahkan ke keranjang!');
                                 }
                             }

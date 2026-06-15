@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-
-#[Fillable(['order_id', 'coupon_id', 'discount'])]
 class OrderCoupon extends Model
 {
     protected $table = 'order_coupons';
+    protected $fillable = ['order_id', 'coupon_id', 'discount'];
 
     protected $casts = [
         'discount' => 'decimal:2',

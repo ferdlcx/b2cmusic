@@ -40,6 +40,11 @@ class TrackingController extends Controller
             return back()->with('error', 'Order dengan Biteship ID tersebut tidak ditemukan.');
         }
 
+        if ($request->status === 'completed') {
+            $order->update(['status' => 'completed']);
+            return back()->with('success', 'Pesanan berhasil disimulasikan sebagai Selesai (Completed)!');
+        }
+
         if ($order->shipment) {
             $originLat = -6.1684;
             $originLng = 106.7588;

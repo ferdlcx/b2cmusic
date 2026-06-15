@@ -148,7 +148,7 @@
                               'X-CSRF-TOKEN': '{{ csrf_token() }}'
                           },
                           body: JSON.stringify({
-                              destination_area_id: this.selectedCityId,
+                              area_id: this.selectedCityId,
                               postal_code: this.postalCode,
                               weight: this.totalWeight,
                               city: this.city,

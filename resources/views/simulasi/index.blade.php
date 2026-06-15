@@ -104,6 +104,9 @@
                                 ];
                             } elseif ($cs === 'returnintransit') {
                                 $nextActions = ['returned' => 'Mark Returned'];
+                            } elseif ($cs === 'delivered' && $order->status !== 'completed') {
+                                // Provide an internal action to simulate user clicking "Pesanan Diterima"
+                                $nextActions = ['completed' => 'Complete Order'];
                             }
                         @endphp
                         <tr class="hover:bg-walnut-50/50 transition-colors group">
